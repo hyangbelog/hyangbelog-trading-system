@@ -1,1 +1,455 @@
+<!-- BAGIAN 1: STRUKTUR ANTARMUKA HTML UTAMA -->
+
+<!-- KALKULATOR SCALPING MINI -->
+<div class="scalp-calc-mini">
+    <div class="scalp-mini-head">
+        <span>📊</span>
+        <h3>Kalkulator Scalping</h3>
+    </div>
+    
+    <div class="scalp-grid-inputs">
+        <div class="scalp-mini-group">
+            <label>Modal (IDR)</label>
+            <input type="text" id="m_capital" value="600.000" oninput="formatRupiahInput(this)" />
+        </div>
+        <div class="scalp-mini-group">
+            <label>Harga Beli (IDR)</label>
+            <input type="text" id="m_buyPrice" value="1.469.000.000" oninput="formatRupiahInput(this)" />
+        </div>
+        
+        <div class="scalp-mini-group">
+            <label>Target Profit</label>
+            <select id="m_targetPercent">
+                <option value="0.5" />0.5% (Kilat)
+                <option value="0.7" />0.7% (Aman)
+                <option value="1.0" selected />1.0% (Ideal)
+                <option value="1.5" />1.5% (Medium)
+                <option value="1.73" />1.73% (Antrean)
+            </select>
+        </div>
+        <div class="scalp-mini-group">
+            <label>Fee Bursa (%)</label>
+            <input type="number" id="m_feePercent" step="0.01" value="0.11" />
+        </div>
+    </div>
+    
+    <div class="scalp-action-row">
+        <button class="scalp-btn-mini" onclick="hitungMini()">Hitung Target Jual</button>
+        <button class="scalp-btn-reset" onclick="resetMini()">Reset</button>
+    </div>
+    
+    <div class="scalp-res-mini" id="m_resultBox">
+        <div class="scalp-res-row">
+            <span>Koin Dapat: <b id="m_resCrypto" style="color:#fff;">0</b></span>
+            <span>Fee Beli: <b class="t-red" id="m_resFeeBeli">0</b></span>
+        </div>
+        <div class="scalp-res-row scalp-bold-res">
+            <span>Harga Jual: <span class="t-green" id="m_resHargaJual">0</span></span>
+        </div>
+        <div class="scalp-res-row">
+            <span>Fee Jual: <b class="t-red" id="m_resFeeJual">0</b></span>
+            <span class="scalp-bold-res">Net Profit: <span class="t-green" id="m_resProfitBersih">0</span></span>
+        </div>
+    </div>
+</div>
+
+<div style="margin-bottom: 15px;"></div>
+
+<!-- CRYPTO JARING JOURNAL -->
+<div id="crypto-journal-wrapper">
+    <div class="title">📝 Crypto Jaring Journal</div>
+    
+    <div class="section-title">Antrean Aktif Pasar</div>
+    <div id="journal-container"></div>
+    
+    <div class="form-add">
+        <div class="section-title" style="margin-top:0!important;">Tambah Catatan Jaring</div>
+        <div class="journal-input-grid">
+            <select id="j-koin">
+                <option value="BTC" />BTC/IDR
+                <option value="SOL" />SOL/IDR
+                <option value="ETH" />ETH/IDR
+            </select>
+            <select id="j-tipe">
+                <option value="Beli" />BELI (Jaring Bawah)
+                <option value="Jual" />JUAL (Take Profit)
+            </select>
+            <input type="text" id="j-harga" placeholder="Harga Target (IDR)" oninput="formatRupiahInput(this)" />
+            <input type="text" id="j-jumlah" placeholder="Volume / Jumlah Koin" />
+        </div>
+        <button class="btn-submit" onclick="tambahItem()">Simpan ke Jurnal</button>
+    </div>
+</div>
+
+
+<!-- BAGIAN 2: GAYA DESAIN CSS UNTUK HP -->
+<style>
+    .scalp-calc-mini {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        max-width: 100% !important;
+        background: #111622 !important;
+        color: #ffffff !important;
+        padding: 12px !important;
+        border-radius: 8px !important;
+        box-sizing: border-box !important;
+    }
+    .scalp-mini-head {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        margin-bottom: 10px !important;
+        border-bottom: 1px solid #1f293d !important;
+        padding-bottom: 6px !important;
+    }
+    .scalp-mini-head h3 {
+        margin: 0 !important;
+        font-size: 14px !important;
+        color: #4eedb0 !important;
+    }
+    .scalp-grid-inputs {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+        margin-bottom: 8px !important;
+    }
+    .scalp-mini-group {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    .scalp-mini-group label {
+        font-size: 11px !important;
+        color: #94a3b8 !important;
+        margin-bottom: 3px !important;
+    }
+    .scalp-mini-group input, .scalp-mini-group select {
+        width: 100% !important;
+        padding: 6px 8px !important;
+        border-radius: 4px !important;
+        border: 1px solid #1f293d !important;
+        background: #182030 !important;
+        color: #ffffff !important;
+        font-size: 13px !important;
+        height: 32px !important;
+        box-sizing: border-box !important;
+    }
+    .scalp-action-row {
+        display: flex !important;
+        gap: 6px !important;
+        margin-bottom: 8px !important;
+    }
+    .scalp-btn-mini {
+        flex: 7 !important;
+        padding: 8px !important;
+        background: #4eedb0 !important;
+        color: #111622 !important;
+        border: none !important;
+        border-radius: 4px !important;
+        font-size: 13px !important;
+        font-weight: bold !important;
+        cursor: pointer !important;
+        height: 34px !important;
+    }
+    .scalp-btn-reset {
+        flex: 3 !important;
+        padding: 8px !important;
+        background: #24324a !important;
+        color: #94a3b8 !important;
+        border: none !important;
+        border-radius: 4px !important;
+        font-size: 13px !important;
+        cursor: pointer !important;
+        height: 34px !important;
+    }
+    .scalp-res-mini {
+        background: #182030 !important;
+        padding: 10px !important;
+        border-radius: 4px !important;
+        border-left: 3px solid #4eedb0 !important;
+        display: none;
+        font-size: 12px !important;
+    }
+    .scalp-res-row {
+        display: flex !important;
+        justify-content: space-between !important;
+        margin-bottom: 4px !important;
+        padding-bottom: 4px !important;
+        border-bottom: 1px dashed #24324a !important;
+    }
+    .scalp-res-row:last-child {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+        border-bottom: none !important;
+    }
+    .scalp-bold-res { font-weight: bold !important; font-size: 13px !important; }
+    .t-green { color: #4eedb0 !important; }
+    .t-red { color: #ff6b6b !important; }
+
+    #crypto-journal-wrapper {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
+        background: #12161a !important;
+        border: 1px solid #2d3748 !important;
+        border-radius: 12px !important;
+        padding: 12px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        color: #e2e8f0 !important;
+    }
+    #crypto-journal-wrapper .title {
+        font-size: 14px !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        margin: 0 0 10px 0 !important;
+        padding-bottom: 6px !important;
+        border-bottom: 2px solid #2d3748 !important;
+        color: #f6ad55 !important;
+    }
+    #crypto-journal-wrapper .section-title {
+        font-size: 11px !important;
+        font-weight: bold !important;
+        text-transform: uppercase !important;
+        color: #a0aec0 !important;
+        margin: 10px 0 6px 0 !important;
+        letter-spacing: 0.5px !important;
+    }
+    #crypto-journal-wrapper .item-card {
+        background: #1a202c !important;
+        border: 1px solid #2d3748 !important;
+        border-radius: 6px !important;
+        padding: 8px 10px !important;
+        margin-bottom: 6px !important;
+        font-size: 12px !important;
+    }
+    #crypto-journal-wrapper .item-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        font-weight: bold !important;
+        margin-bottom: 4px !important;
+        color: #ffffff !important;
+        font-size: 13px !important;
+    }
+    #crypto-journal-wrapper .badge {
+        padding: 2px 6px !important;
+        border-radius: 4px !important;
+        font-size: 10px !important;
+        color: white !important;
+        font-weight: bold !important;
+    }
+    #crypto-journal-wrapper .badge.beli { background-color: #38a169 !important; }
+    #crypto-journal-wrapper .badge.jual { background-color: #e53e3e !important; }
+    #crypto-journal-wrapper .item-detail {
+        display: flex !important;
+        justify-content: space-between !important;
+        color: #cbd5e0 !important;
+        margin-top: 2px !important;
+    }
+    #crypto-journal-wrapper .val { font-weight: 600 !important; color: #ffffff !important; }
+    #crypto-journal-wrapper .btn-delete {
+        background: none !important;
+        border: none !important;
+        color: #718096 !important;
+        cursor: pointer !important;
+        font-size: 11px !important;
+        padding: 0 !important;
+        text-decoration: underline !important;
+    }
+    #crypto-journal-wrapper .btn-delete:hover { color: #fc8181 !important; }
+    .journal-input-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 6px !important;
+        margin-bottom: 6px !important;
+    }
+    #crypto-journal-wrapper input, #crypto-journal-wrapper select {
+        width: 100% !important;
+        padding: 6px 8px !important;
+        margin-bottom: 0 !important;
+        font-size: 12px !important;
+        border: 1px solid #4a5568 !important;
+        border-radius: 4px !important;
+        background: #1a202c !important;
+        color: #ffffff !important;
+        box-sizing: border-box !important;
+        height: 32px !important;
+    }
+    #crypto-journal-wrapper button.btn-submit {
+        width: 100% !important;
+        background-color: #3182ce !important;
+        color: white !important;
+        border: none !important;
+        padding: 8px !important;
+        font-size: 13px !important;
+        font-weight: bold !important;
+        border-radius: 4px !important;
+        cursor: pointer !important;
+        height: 34px !important;
+    }
+</style>
+
+
+<!-- BAGIAN 3: SISTEM LOGIKA JAVASCRIPT AKURASI TINGGI -->
+<script>
+    // FUNGSI UTAMA: Otomatis mengubah angka ketikan menjadi format titik pemisah ribuan
+    function formatRupiahInput(element) {
+        let value = element.value.replace(/[^0-9]/g, ""); // Bersihkan karakter non-angka
+        if (value === "") {
+            element.value = "";
+            return;
+        }
+        element.value = parseInt(value, 10).toLocaleString("id-ID");
+    }
+
+    // FUNGSI PEMBANTU: Membersihkan titik format agar bisa dihitung matematika secara akurat
+    function cleanFormattedNumber(valString) {
+        if (!valString) return 0;
+        let clean = valString.replace(/\./g, ""); // Hilangkan semua titik
+        return parseFloat(clean) || 0;
+    }
+
+    // LOGIC KALKULATOR SCALPING (VERSI FIX PRESETS - ANTI SELISIH)
+    function hitungMini() {
+        const modal = cleanFormattedNumber(document.getElementById('m_capital').value);
+        const hargaBeli = cleanFormattedNumber(document.getElementById('m_buyPrice').value);
+        const targetPersen = parseFloat(document.getElementById('m_targetPercent').value);
+        const feePersen = parseFloat(document.getElementById('m_feePercent').value) / 100;
+
+        if (isNaN(modal) || isNaN(hargaBeli) || modal <= 0 || hargaBeli <= 0) {
+            alert("Input tidak valid.");
+            return;
+        }
+
+        // 1. Hitung Pengeluaran Fee Beli & Akumulasi Koin Neto Presisi Tinggi (8 Desimal Satoshi)
+        const feeBeliNominal = modal * feePersen;
+        const modalBersih = modal - feeBeliNominal;
+        const jumlahKoin = parseFloat((modalBersih / hargaBeli).toFixed(8));
+
+        // 2. RUMUS SCALPING REAL BURSA: Menghitung target harga jual agar untung bersih tepat sasaran
+        const targetMultiplier = 1 + (targetPersen / 100);
+        const hargaJualTarget = (hargaBeli * targetMultiplier) / ((1 - feePersen) * (1 - feePersen));
+
+        // 3. Cari Nilai Omzet Jual, Fee Jual, dan Profit Akhir Bersih Kantong
+        const totalOmzetJual = jumlahKoin * hargaJualTarget;
+        const feeJualNominal = totalOmzetJual * feePersen;
+        const profitBersih = totalOmzetJual - feeJualNominal - modal;
+
+        // FORMAT PRINT OUT KE LAYAR LAYOUT
+        const fmt = (num) => "Rp " + Math.round(num).toLocaleString('id-ID');
+
+        document.getElementById('m_resCrypto').innerText = jumlahKoin.toFixed(8);
+        document.getElementById('m_resFeeBeli').innerText = fmt(feeBeliNominal);
+        document.getElementById('m_resHargaJual').innerText = fmt(hargaJualTarget);
+        document.getElementById('m_resFeeJual').innerText = fmt(feeJualNominal);
+        
+        const profEl = document.getElementById('m_resProfitBersih');
+        profEl.innerText = fmt(profitBersih);
+        profEl.className = profitBersih > 0 ? "t-green" : "t-red";
+
+        document.getElementById('m_resultBox').style.display = 'block';
+    }
+
+    function resetMini() {
+        document.getElementById('m_capital').value = '';
+        document.getElementById('m_buyPrice').value = '';
+        document.getElementById('m_targetPercent').selectedIndex = 2;
+        document.getElementById('m_feePercent').value = '0.11';
+        document.getElementById('m_resultBox').style.display = 'none';
+    }
+
+    // LOGIC JURNAL ANTREAN JARING PASAR
+    const defaultData = [
+        { id: 1, koin: 'BTC', tipe: 'Jual', harga: '1498000000', jumlah: '0.00027361' },
+        { id: 2, koin: 'BTC', tipe: 'Jual', harga: '1494500000', jumlah: '0.00040760' },
+        { id: 3, koin: 'BTC', tipe: 'Beli', harga: '1415000000', jumlah: 'Jaring Utama' },
+        { id: 4, koin: 'SOL', tipe: 'Beli', harga: '1825000', jumlah: 'Rp1.000.000' },
+        { id: 5, koin: 'ETH', tipe: 'Beli', harga: '43250000', jumlah: 'Rp1.000.000' }
+    ];
+
+    function loadJournal() {
+        let data = localStorage.getItem('crypto_jaring_portfolio');
+        if (!data) {
+            localStorage.setItem('crypto_jaring_portfolio', JSON.stringify(defaultData));
+            data = JSON.stringify(defaultData);
+        }
+        
+        const items = JSON.stringify(data).includes('[]') ? [] : JSON.parse(data);
+        const container = document.getElementById('journal-container');
+        container.innerHTML = '';
+        
+        if (items.length === 0) {
+            container.innerHTML = '<div style="text-align:center;color:#718096;font-size:12px;padding:10px;">Belum ada antrean tercatat.</div>';
+            return;
+        }
+        
+        items.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'item-card';
+            
+            let hargaClean = typeof item.harga === 'string' ? item.harga.replace(/\./g, '') : item.harga;
+            let hargaTampil = parseInt(hargaClean);
+            if(isNaN(hargaTampil)) hargaTampil = 0;
+
+            card.innerHTML = `
+                <div class="item-header">
+                    <span>${item.koin}/IDR</span>
+                    <span class="badge ${item.tipe.toLowerCase()}">${item.tipe.toUpperCase()}</span>
+                </div>
+                <div class="item-detail">
+                    <span>Target:</span>
+                    <span class="val">Rp ${hargaTampil.toLocaleString('id-ID')}</span>
+                </div>
+                <div class="item-detail">
+                    <span>Ukuran/Vol:</span>
+                    <span class="val">${item.jumlah}</span>
+                </div>
+                <div style="text-align:right; margin-top:2px;">
+                    <button class="btn-delete" onclick="hapusItem(${item.id})">Hapus</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function tambahItem() {
+        const koin = document.getElementById('j-koin').value;
+        const tipe = document.getElementById('j-tipe').value;
+        const hargaInputRaw = document.getElementById('j-harga').value;
+        const hargaInputClean = cleanFormattedNumber(hargaInputRaw);
+        const jumlah = document.getElementById('j-jumlah').value || '-';
+        
+        if (!hargaInputRaw || hargaInputClean <= 0) {
+            alert('Mohon masukkan harga target yang valid.');
+            return;
+        }
+        
+        let data = JSON.parse(localStorage.getItem('crypto_jaring_portfolio') || '[]');
+        const newItem = {
+            id: Date.now(),
+            koin: koin,
+            tipe: tipe,
+            harga: hargaInputClean.toString(),
+            jumlah: jumlah
+        };
+        
+        data.push(newItem);
+        localStorage.setItem('crypto_jaring_portfolio', JSON.stringify(data));
+        loadJournal();
+        
+        document.getElementById('j-harga').value = '';
+        document.getElementById('j-jumlah').value = '';
+    }
+
+    function hapusItem(id) {
+        if(confirm('Hapus catatan antrean ini dari jurnal?')) {
+            let data = JSON.parse(localStorage.getItem('crypto_jaring_portfolio') || '[]');
+            data = data.filter(item => item.id !== id);
+            localStorage.setItem('crypto_jaring_portfolio', JSON.stringify(data));
+            loadJournal();
+        }
+    }
+
+    // Inisialisasi awal eksekusi table portfolio jurnal
+    loadJournal();
+</script>
+
 
