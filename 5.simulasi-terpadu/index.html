@@ -1,1 +1,180 @@
+<div style="width:100%;max-width:480px;margin:0 auto;box-sizing:border-box;text-align:left;">
+    <style>
+        .tc-box { background:#181a20!important;color:#eaecef!important;padding:8px!important;border-radius:8px!important;border:1px solid #2b3139!important;font-family:Arial,sans-serif!important;font-size:11px!important;box-sizing:border-box!important;line-height:1.2!important; }
+        .tc-title { text-align:center!important;color:#f0b90b!important;margin:0 0 2px 0!important;font-size:13px!important;font-weight:bold!important; }
+        .tc-desc { text-align:center!important;color:#848e9c!important;font-size:10px!important;margin-bottom:6px!important; }
+        .tc-grid { display:grid!important;grid-template-columns:1fr 1fr!important;gap:4px 6px!important;margin-bottom:4px!important; }
+        .tc-group { margin-bottom:2px!important; }
+        .tc-label { display:block!important;margin-bottom:1px!important;font-weight:bold!important;color:#eaecef!important;font-size:10.5px!important; }
+        .tc-input, .tc-select { width:100%!important;padding:4px 6px!important;background:#0b0e11!important;border:1px solid #2b3139!important;border-radius:4px!important;color:#eaecef!important;font-size:11px!important;box-sizing:border-box!important; }
+        .tc-btn-reset { width:100%!important;grid-column: span 2!important;padding:5px!important;background:#2b3139!important;border:none!important;border-radius:4px!important;color:#eaecef!important;font-size:10.5px!important;font-weight:bold!important;cursor:pointer!important;margin-top:2px!important;text-align:center!important; }
+        .tc-btn-reset:hover { background:#353c46!important; }
+        .tc-div { margin-top:6px!important;border-top:1px dashed #2b3139!important;padding-top:4px!important; }
+        .tc-subtitle { color:#f0b90b!important;font-size:11px!important;margin:2px 0 4px 0!important;font-weight:bold!important; }
+        .tc-table { width:100%!important;border-collapse:collapse!important;margin-bottom:6px!important;font-size:10.5px!important; }
+        .tc-table th, .tc-table td { padding:3px 2px!important;text-align:left!important;border-bottom:1px solid #2b3139!important;color:#eaecef!important;white-space:nowrap!important; }
+        .tc-table th { color:#848e9c!important;font-weight:normal!important; }
+        .tc-card { background:rgba(240,185,11,0.05)!important;border-left:3px solid #f0b90b!important;padding:6px!important;border-radius:3px!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:3px 10px!important; }
+        .tc-row { display:flex!important;justify-content:space-between!important;font-size:10.5px!important; }
+        .tc-danger { color:#f6465d!important;font-weight:bold!important; }
+        .tc-success { color:#0ecb81!important;font-weight:bold!important; }
+    </style>
+
+    <div class="tc-box">
+        <div class="tc-title">Simulasi Trading Terpadu</div>
+        <div class="tc-desc">Kalkulator otomatis DCA, Stop Loss, Proyeksi Profit & Multi-Koin.</div>
+
+        <div class="tc-grid">
+            <div class="tc-group">
+                <label class="tc-label">Pilih Aset Kripto</label>
+                <select class="tc-select" id="v_coin" onchange="runCalc()">
+    <option value="USDT" />USDT / IDR
+    <option value="BTC" selected />BTC / IDR
+    <option value="ETH" />ETH / IDR
+    <option value="SOL" />SOL / IDR
+    <option value="XRP" />XRP / IDR
+</select>
+
+            </div>
+            <div class="tc-group">
+                <label class="tc-label">Total Modal (IDR)</label>
+                <input class="tc-input" type="number" id="v_modal" value="900000" oninput="runCalc()" />
+            </div>
+        </div>
+        <div class="tc-grid">
+            <div class="tc-group">
+                <label class="tc-label">Target Jual / TP (IDR)</label>
+                <input class="tc-input" type="number" id="v_tp" value="1550000000" oninput="runCalc()" />
+            </div>
+            <div class="tc-group">
+                <label class="tc-label">Batas Rugi / SL (IDR)</label>
+                <input class="tc-input" type="number" id="v_sl" value="1400000000" oninput="runCalc()" />
+            </div>
+        </div>
+        <div class="tc-grid">
+            <div class="tc-group">
+                <label class="tc-label">Harga Beli 1 (Agresif)</label>
+                <input class="tc-input" type="number" id="v_h1" value="1492000000" oninput="runCalc()" />
+            </div>
+            <div class="tc-group">
+                <label class="tc-label">Harga Beli 2 (Aman)</label>
+                <input class="tc-input" type="number" id="v_h2" value="1479000000" oninput="runCalc()" />
+            </div>
+        </div>
+        <div class="tc-grid">
+            <div class="tc-group">
+                <label class="tc-label">Harga Beli 3 (Diskon)</label>
+                <input class="tc-input" type="number" id="v_h3" value="1430000000" oninput="runCalc()" />
+            </div>
+            <button type="button" class="tc-btn-reset" onclick="paksaKosongkanBlogger()">🔄 MULAISIMULASI BARU (RESET)</button>
+        </div>
+
+        <div class="tc-div">
+            <div class="tc-subtitle">🎯 Eksekusi Strategi DCA (Bagi 3 Porsi)</div>
+            <table class="tc-table">
+                <thead>
+                    <tr>
+                        <th>Tahap</th>
+                        <th>Harga Target</th>
+                        <th>Alokasi Modal</th>
+                        <th>Hasil Aset</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>Beli 1</b></td>
+                        <td id="lbl_h1">0</td>
+                        <td id="lbl_m1">0</td>
+                        <td id="lbl_u1">0</td>
+                    </tr>
+                    <tr>
+                        <td><b>Beli 2</b></td>
+                        <td id="lbl_h2">0</td>
+                        <td id="lbl_m2">0</td>
+                        <td id="lbl_u2">0</td>
+                    </tr>
+                    <tr>
+                        <td><b>Beli 3</b></td>
+                        <td id="lbl_h3">0</td>
+                        <td id="lbl_m3">0</td>
+                        <td id="lbl_u3">0</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="tc-subtitle">📊 Kalkulasi Risiko & Keuntungan</div>
+            <div class="tc-card">
+                <div class="tc-row"><span>Total Aset:</span><span id="r_tUsdt" style="font-weight:bold;">0</span></div>
+                <div class="tc-row"><span>Estimasi Cuan:</span><span id="r_cuan" class="tc-success">0</span></div>
+                <div class="tc-row"><span>Rata Beli:</span><span id="r_avg" class="tc-success">0</span></div>
+                <div class="tc-row"><span>Persentase TP:</span><span id="r_pCuan" class="tc-success">0</span></div>
+                <div class="tc-row"><span>Resiko SL:</span><span id="r_rugi" class="tc-danger">0</span></div>
+                <div class="tc-row"><span>Persentase SL:</span><span id="r_pRugi" class="tc-danger">0</span></div>
+            </div>
+        </div>
+    </div>
+
+      <script>
+        function runCalc() {
+            const coin = document.getElementById('v_coin').value;
+            const modal = parseFloat(document.getElementById('v_modal').value) || 0;
+            const tp = parseFloat(document.getElementById('v_tp').value) || 0;
+            const sl = parseFloat(document.getElementById('v_sl').value) || 0;
+            const h1 = parseFloat(document.getElementById('v_h1').value) || 0;
+            const h2 = parseFloat(document.getElementById('v_h2').value) || 0;
+            const h3 = parseFloat(document.getElementById('v_h3').value) || 0;
+
+            // STRATEGI PIRAMIDA: Membagi modal menjadi 20%, 30%, dan 50%
+            const m1 = modal * 0.20;
+            const m2 = modal * 0.30;
+            const m3 = modal * 0.50;
+
+            const u1 = h1 > 0 ? m1 / h1 : 0;
+            const u2 = h2 > 0 ? m2 / h2 : 0;
+            const u3 = h3 > 0 ? m3 / h3 : 0;
+
+            const dec = (coin === "USDT") ? 2 : 5;
+
+            document.getElementById('lbl_h1').innerText = h1.toLocaleString('id-ID');
+            document.getElementById('lbl_h2').innerText = h2.toLocaleString('id-ID');
+            document.getElementById('lbl_h3').innerText = h3.toLocaleString('id-ID');
+            
+            // Menampilkan porsi modal kustom piramida ke tabel
+            document.getElementById('lbl_m1').innerText = fmtRp(m1);
+            document.getElementById('lbl_m2').innerText = fmtRp(m2);
+            document.getElementById('lbl_m3').innerText = fmtRp(m3);
+            
+            document.getElementById('lbl_u1').innerText = u1.toFixed(dec) + ' ' + coin;
+            document.getElementById('lbl_u2').innerText = u2.toFixed(dec) + ' ' + coin;
+            document.getElementById('lbl_u3').innerText = u3.toFixed(dec) + ' ' + coin;
+
+            const totalUsdt = u1 + u2 + u3;
+            const avg = totalUsdt > 0 ? modal / totalUsdt : 0;
+
+            let cuan = (totalUsdt * tp) - modal; if(cuan < 0) cuan = 0;
+            let rugi = modal - (totalUsdt * sl); if(rugi < 0) rugi = 0;
+            const pCuan = avg > 0 && tp > avg ? ((tp - avg) / avg) * 100 : 0;
+            const pRugi = avg > 0 && avg > sl ? ((avg - sl) / avg) * 100 : 0;
+
+            document.getElementById('r_tUsdt').innerText = totalUsdt.toFixed(dec) + ' ' + coin;
+            document.getElementById('r_avg').innerText = fmtRp(avg);
+            document.getElementById('r_cuan').innerText = '+' + fmtRp(cuan);
+            document.getElementById('r_rugi').innerText = '-' + fmtRp(rugi);
+            document.getElementById('r_pCuan').innerText = '+' + pCuan.toFixed(1) + '%';
+            document.getElementById('r_pRugi').innerText = '-' + pRugi.toFixed(1) + '%';
+        }
+        function fmtRp(v) { return 'Rp' + Math.round(v).toLocaleString('id-ID'); }
+        
+        function paksaKosongkanBlogger() {
+            document.getElementById('v_modal').value = '';
+            document.getElementById('v_tp').value = '';
+            document.getElementById('v_sl').value = '';
+            document.getElementById('v_h1').value = '';
+            document.getElementById('v_h2').value = '';
+            document.getElementById('v_h3').value = '';
+            runCalc();
+        }
+        runCalc();
+    </script>
+</div>
 
