@@ -101,12 +101,20 @@ async function prosesDataLive() {
     const koin = document.getElementById('pilihanKoin').value;
     
     try {
-        const respon = await fetch(`https://indodax.com{koin}idr`);
+        const respon = await fetch(`https://indodax.com/api/ticker/${koin}_idr`);
+        if (!respon.ok) {
+            throw new Error(`HTTP ${respon.status}`);
+        }
+
         const data = await respon.json();
-        
-        const hargaTerakhir = parseFloat(data.ticker.last);
-        const hargaTertinggi = parseFloat(data.ticker.high);
-        const hargaTerendah = parseFloat(data.ticker.low);
+        const ticker = data.ticker || data;
+        const hargaTerakhir = parseFloat(ticker.last);
+        const hargaTertinggi = parseFloat(ticker.high);
+        const hargaTerendah = parseFloat(ticker.low);
+
+        if (!Number.isFinite(hargaTerakhir) || !Number.isFinite(hargaTertinggi) || !Number.isFinite(hargaTerendah)) {
+            throw new Error('Data harga tidak valid');
+        }
         
         // Tampilkan Harga Live
         document.getElementById('hargaLive').innerText = `Rp ${hargaTerakhir.toLocaleString('id-ID')}`;
@@ -139,5 +147,3 @@ async function prosesDataLive() {
 
 </body>
 </html>
-
-
