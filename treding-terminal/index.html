@@ -1,20 +1,337 @@
-<!-- TradingView Widget BEGIN -->
-<div class="tradingview-widget-container">
-  <div class="tradingview-widget-container__widget"></div>
-  <script type="text/javascript" src="https://tradingview.com" async="async">
-  {
-  "symbols": [
-    {"proName": "FOREXCOM:SPXUSD", "title": "S&P 500"},
-    {"proName": "FX_IDC:USDIRR", "title": "USD/IDR"},
-    {"cryptoName": "BITSTAMP:BTCUSD", "title": "Bitcoin"},
-    {"cryptoName": "BITSTAMP:ETHUSD", "title": "Ethereum"}
-  ],
-  "showSymbolLogo": true,
-  "colorTheme": "light",
-  "isTransparent": false,
-  "displayMode": "adaptive",
-  "locale": "id"
-}
-  </script>
-</div>
-<!-- TradingView Widget END -->
+<!doctype html> 
+    
+    Crypto Trading Pro Terminal
+    <style>
+        :root {
+            --bg-main: #0b0f19;
+            --bg-card: #121824;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --bullish: #22c55e;
+            --bearish: #ef4444;
+            --brand: #3b82f6;
+            --border: #1e293b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 10px;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 1px;
+            line-height: 1.2;
+            letter-spacing: -0.1px;
+        }
+
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            box-sizing: border-box;
+            gap: 2px;
+        }
+
+        .chart-container {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0;
+            height: 440px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-control {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 4px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4px;
+            gap: 2px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .tab-link {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 5px;
+            cursor: pointer;
+        }
+
+        .tab-link.active {
+            color: var(--brand);
+            border-bottom: 1.5px solid var(--brand);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        h4 { margin: 0 0 2px 0; font-size: 10px; color: var(--brand); text-transform: uppercase; }
+        p { margin: 0 0 2px 0; color: var(--text-secondary); }
+        
+        ul { margin: 0 0 3px 0; padding-left: 10px; color: var(--text-secondary); }
+        li { margin-bottom: 1px; }
+
+        .alert-box {
+            background: rgba(59, 130, 246, 0.08);
+            border-left: 2px solid var(--brand);
+            padding: 3px;
+            margin-top: 2px;
+            font-size: 9px;
+        }
+
+        .option-item {
+            background: #1e293b;
+            padding: 4px;
+            border-radius: 2px;
+            margin-bottom: 2px;
+            cursor: pointer;
+        }
+
+        /* Gaya Khusus Komponen Kalkulator & Proyeksi Visual */
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3px;
+            margin-bottom: 4px;
+        }
+        .calc-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .calc-group label {
+            color: var(--text-secondary);
+            font-size: 8px;
+            margin-bottom: 1px;
+            text-transform: uppercase;
+        }
+        .calc-group input {
+            background: #1e293b;
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            color: #fff;
+            padding: 2px;
+            font-size: 10px;
+            outline: none;
+        }
+        
+        /* Bar Proyeksi Visual Long Position */
+        .visual-bar-container {
+            margin-top: 4px;
+            border-radius: 3px;
+            overflow: hidden;
+            display: flex;
+            height: 16px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 16px;
+            font-size: 9px;
+            color: #fff;
+        }
+        #bar-tp { background-color: var(--bullish); transition: width 0.3s; }
+        #bar-sl { background-color: var(--bearish); transition: width 0.3s; }
+
+        .calc-result {
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px dashed var(--bullish);
+            padding: 4px;
+            border-radius: 2px;
+            margin-top: 3px;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1px;
+        }
+    </style>
+
+
+
+    <div class="dashboard">
+        <div class="chart-container">
+            <div id="tv_chart_terminal" style="width: 100%; height: 100%;"></div>
+        </div>
+
+        <div class="panel-control">
+            <div class="nav-tabs">
+                <button class="tab-link active" onclick="openModule(event, 'm-struktur')">1. STRUKTUR</button>
+                <button class="tab-link" onclick="openModule(event, 'm-candle')">2. CANDLE</button>
+                <button class="tab-link" onclick="openModule(event, 'm-kuis')">3. KUIS</button>
+                <button class="tab-link" onclick="openModule(event, 'm-kalkulator')" style="color: #f59e0b;">🧮 RISK CALC</button>
+            </div>
+
+            <div id="m-struktur" class="tab-content active">
+                <h4>Structure</h4>
+                <p>Membaca tren murni:</p>
+                <ul>
+                    <li><span style="color:var(--bullish)">Uptrend</span>: Tangga naik (HH & HL).</li>
+                    <li><span style="color:var(--bearish)">Downtrend</span>: Tangga turun (LH & LL).</li>
+                </ul>
+                <div class="alert-box">
+                    💡 <b>Tip:</b> Beli di area HL (Higher Low) saat tren naik terkonfirmasi.
+                </div>
+            </div>
+
+            <div id="m-candle" class="tab-content">
+                <h4>Reversal</h4>
+                <p>Sinyal pembalikan arah harga:</p>
+                <p><b>Pin Bar/Hammer:</b> Ekor bawah panjang = Penolakan turun.</p>
+                <p><b>Engulfing:</b> Badan candle baru memakan candle lama.</p>
+            </div>
+
+            <div id="m-kuis" class="tab-content">
+                <h4>Quiz</h4>
+                <p>Pasar membentuk LH dan LL beruntun. Tindakan Anda?</p>
+                <div class="option-item" onclick="document.getElementById('fb').innerText='Benar! Tren turun, jangan paksakan beli.'">A. Wait & See / Siapkan Posisi Jual.</div>
+                <div class="option-item" onclick="document.getElementById('fb').innerText='Salah. Sangat berisiko melawan tren turun.'">B. Agresif Beli karena murah.</div>
+                <div id="fb" style="margin-top:2px; font-weight:bold; color:var(--brand); font-size:9px;"></div>
+            </div>
+
+            <div id="m-kalkulator" class="tab-content">
+                <h4>Risk & Long Position Projections</h4>
+                <div class="calc-grid">
+                    <div class="calc-group">
+                        <label>Total Modal ($)</label>
+                        <input type="number" id="totalCapital" value="1000" oninput="calculateRisk()" />
+                    </div>
+                    <div class="calc-group">
+                        <label>Risiko per Trade (%)</label>
+                        <input type="number" id="riskPercent" value="1" oninput="calculateRisk()" />
+                    </div>
+                    <div class="calc-group">
+                        <label>Harga Entry ($)</label>
+                        <input type="number" id="entryPrice" value="83500" oninput="calculateRisk()" />
+                    </div>
+                    <div class="calc-group">
+                        <label>Harga Stop Loss ($)</label>
+                        <input type="number" id="stopLoss" value="82500" oninput="calculateRisk()" />
+                    </div>
+                    <div class="calc-group" style="grid-column: span 2;">
+                        <label>Target Take Profit ($)</label>
+                        <input type="number" id="takeProfit" value="86500" oninput="calculateRisk()" />
+                    </div>
+                </div>
+
+                <!-- SIMULATOR VISUAL LONG POSITION OTOMATIS -->
+                <div class="visual-bar-container">
+                    <div id="bar-tp">PROFIT</div>
+                    <div id="bar-sl">RISK</div>
+                </div>
+
+                <div class="calc-result">
+                    <div class="result-row">
+                        <span>Uang Siap Rugi / Potensi Untung:</span>
+                        <span><span id="resCashRisk" style="color: var(--bearish); font-weight:bold;">$10</span> / <span id="resCashProfit" style="color: var(--bullish); font-weight:bold;">$20</span></span>
+                    </div>
+                    <div class="result-row">
+                        <span>Rasio Risiko/Imbalan (RRR):</span>
+                        <span id="resRRR" style="color: #f59e0b; font-weight: bold;">1:2.00</span>
+                    </div>
+                    <div class="result-row">
+                        <span>Jarak SL / Ukuran Beli:</span>
+                        <span><span id="resSlPercent">1.20%</span> / <span id="resPositionSize" style="color: var(--bullish); font-weight: bold;">$835.00</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <!-- SCRIPT UTAMA & LOGIKA REKAYASA MANAJEMEN RISIKO VISUAL -->
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script type="text/javascript">
+        // Inisialisasi Grafik Real-Time Bitcoin resmi TradingView
+        new TradingView.widget({
+            "autosize": true,
+            "symbol": "BINANCE:BTCUSDT",
+            "interval": "240",
+            "timezone": "Asia/Jakarta",
+            "theme": "dark",
+            "style": "1",
+            "locale": "id",
+            "enable_publishing": false,
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "container_id": "tv_chart_terminal"
+        });
+
+        // Pengatur perpindahan tab menu dasar
+        function openModule(evt, modId) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) { tabcontent[i].style.display = "none"; }
+            tablinks = document.getElementsByClassName("tab-link");
+            for (i = 0; i < tablinks.length; i++) { tablinks[i].classList.remove("active"); }
+            document.getElementById(modId).style.display = "block";
+            evt.currentTarget.classList.add("active");
+            
+            if(modId === 'm-kalkulator') { calculateRisk(); }
+        }
+
+        // Fungsi Inti Matematika Kalkulator Risiko & Simulasi Bar Visual Long Position
+        function calculateRisk() {
+            const capital = parseFloat(document.getElementById('totalCapital').value) || 0;
+            const riskPercent = parseFloat(document.getElementById('riskPercent').value) || 0;
+            const entry = parseFloat(document.getElementById('entryPrice').value) || 0;
+            const sl = parseFloat(document.getElementById('stopLoss').value) || 0;
+            const tp = parseFloat(document.getElementById('takeProfit').value) || 0;
+
+            // 1. Hitung jumlah uang riil yang siap dipertaruhkan (Cash Risk)
+            const cashRisk = capital * (riskPercent / 100);
+            document.getElementById('resCashRisk').innerText = "$" + cashRisk.toFixed(2);
+
+            if (entry > 0 && sl > 0 && entry !== sl) {
+                // 2. Jarak Stop Loss (%)
+                const slDistancePercent = Math.abs((entry - sl) / entry) * 100;
+                document.getElementById('resSlPercent').innerText = slDistancePercent.toFixed(2) + "%";
+
+                // 3. Batas Ukuran Alokasi Dana Pembelian (Position Size)
+                const positionSize = cashRisk / (slDistancePercent / 100);
+                if (positionSize > 0 && isFinite(positionSize)) {
+                    document.getElementById('resPositionSize').innerText = "$" + positionSize.toFixed(2);
+                } else {
+                    document.getElementById('resPositionSize').innerText = "$0.00";
+                }
+
+                // 4. Perhitungan Target Profit & Rasio Risiko (Risk to Reward Ratio)
+                if (tp > 0 && tp !== entry) {
+                    const tpDistance = Math.abs(tp - entry);
+                    const slDistance = Math.abs(entry - sl);
+                    
+                    // Rasio perbandingan RRR murni
+                    const rrr = tpDistance / slDistance;
+                    document.getElementById('resRRR').innerText = "1 : " + rrr.toFixed(2);
+
+                    // Potensi akumulasi uang keuntungan riil (Cash Profit)
+                    const cashProfit = cashRisk * rrr;
+                    document.getElementById('resCashProfit').innerText = "$" + cashProfit.toFixed(2);
+
+                    // 5. Animasi Dinamis Pembagian Bar Proyeksi Visual (Simulasi Hijau / Merah)
+                    const totalDistance = tpDistance + slDistance;
+                    const tpWeight = (tpDistance / totalDistance) * 100;
+                    const slWeight = (slDistance / totalDistance) * 100;
+
+                    document.getElementById('bar-tp').style.width = tpWeight + "%";
+                    document.getElementById('bar-sl').style.width = slWeight + "%";
+                    document.getElementById('bar-tp').innerText = "PROFIT (" + tpWeight.toFixed(0) + "%)";
+                    document.getElementById('bar-sl').innerText = "RISK (" + slWeight.toFixed(0) + "%)";
+                }
+            } else {
+                document.getElementById('resSlPercent').innerText = "0.00%";
+                document.getElementById('resPositionSize').innerText = "$0.00";
+                document.getElementById('resRRR').innerText = "1 : 0.00";
+                document.getElementById('resCashProfit').innerText = "$0.00";
+            }
+        }
+    </script>
+
+</!doctype>
