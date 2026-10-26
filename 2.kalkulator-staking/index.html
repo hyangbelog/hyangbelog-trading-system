@@ -1,1 +1,174 @@
+<div class="multi-staking-widget" style="box-sizing: border-box; width: 100%; max-width: 100%; padding: 0; margin: 5px auto 1px auto; background-color: #0b141e; border-radius: 8px; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+    <div style="box-sizing: border-box; background-color: #141f2d; width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #1e2d3d;">
+        
+        <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px; text-align: center; color: #4a90e2; border-bottom: 1px solid #1e2d3d; padding-bottom: 5px;">
+            Kalkulator Staking Multi-Koin
+        </div>
+        
+        <!-- INPUT UTAMA FORM -->
+        <div style="box-sizing: border-box; display: flex; gap: 4px; align-items: flex-end; margin-bottom: 8px;">
+            
+            <div style="flex: 1.2; min-width: 0;">
+                <label style="display: block; font-size: 9px; color: #8492a6; margin-bottom: 2px; text-transform: uppercase;">Koin</label>
+                <select id="multiCoinSelect" onchange="updateMultiApyPreset()" style="box-sizing: border-box; width: 100%; padding: 6px 4px; background-color: #0b141e; border: 1px solid #2a3b50; border-radius: 4px; color: #ffffff; font-size: 11px; outline: none; appearance: none; -webkit-appearance: none;">
+                    <option value="ETH" data-apy="2.08" />ETH
+                    <option value="SOL" data-apy="3.98" />SOL
+                    <option value="TRX" data-apy="2.81" />TRX
+                    <option value="POL" data-apy="2.30" />POL
+                    <option value="DOT" data-apy="2.29" />DOT
+                    <option value="ADA" data-apy="1.31" />ADA
+                    <option value="BNB" data-apy="0.34" />BNB
+                    <option value="CUSTOM" />Manual
+                </select>
+            </div>
 
+            <div style="flex: 1.8; min-width: 0;">
+                <label style="display: block; font-size: 9px; color: #8492a6; margin-bottom: 2px; text-transform: uppercase;">Jumlah</label>
+                <input type="number" id="multiCoinAmount" step="any" placeholder="0.00" min="0" style="box-sizing: border-box; width: 100%; padding: 6px; background-color: #0b141e; border: 1px solid #2a3b50; border-radius: 4px; color: #ffffff; font-size: 11px; outline: none;" />
+            </div>
+
+            <div style="flex: 1; min-width: 0;">
+                <label style="display: block; font-size: 9px; color: #8492a6; margin-bottom: 2px; text-transform: uppercase;">APY%</label>
+                <input type="number" id="multiApyPercentage" step="0.01" placeholder="0.00" style="box-sizing: border-box; width: 100%; padding: 6px; background-color: #0b141e; border: 1px solid #2a3b50; border-radius: 4px; color: #ffffff; font-size: 11px; outline: none;" />
+            </div>
+
+            <button onclick="addCoinToStaking()" style="box-sizing: border-box; padding: 6px 6px; font-size: 11px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; background-color: #4a90e2; color: #ffffff; height: 29px; white-space: nowrap;">+ Tambah</button>
+            
+            <button onclick="resetInputRowOnly()" style="box-sizing: border-box; padding: 6px 8px; font-size: 11px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; background-color: #ea2027; color: #ffffff; height: 29px;" title="Reset baris ini">×</button>
+            
+            <button onclick="resetMultiStaking()" style="box-sizing: border-box; padding: 6px 8px; font-size: 11px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; background-color: #2a3b50; color: #a0aec0; height: 29px;">Reset</button>
+            
+        </div>
+
+        <!-- TABEL HASIL MINIMALIS DENGAN RESET POSITION TO CENTER -->
+        <div style="box-sizing: border-box; width: 100%; overflow-x: hidden; border: 1px solid #2a3b50; border-radius: 6px; background-color: #0b141e; margin-top: 5px;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10px; color: #ffffff; table-layout: fixed; white-space: nowrap;">
+                <colgroup>
+                    <col style="width: 10%;" />
+                    <col style="width: 20%;" />
+                    <col style="width: 10%;" />
+                    <col style="width: 20%;" />
+                    <col style="width: 20%;" />
+                    <col style="width: 20%;" />
+                </colgroup>
+                <thead>
+                    <tr style="background-color: #000000 !important; background: #000000 !important; border-bottom: 1px solid #2a3b50; color: #ffffff !important; font-weight: bold;">
+                        <th style="padding: 6px 2px; background-color: #000000 !important; color: #ffffff !important;">Koin</th>
+                        <th style="padding: 6px 2px; background-color: #000000 !important; color: #ffffff !important;">Pricpl</th>
+                        <th style="padding: 6px 2px; background-color: #000000 !important; color: #ffffff !important;">APY</th>
+                        <!-- REVISI: DISETEL ALIGN CENTER AGAR SEJAJAR DI TENGAH -->
+                        <th style="padding: 6px 2px; background-color: #000000 !important; color: #ffd32a !important; text-align: center;">Hari</th>
+                        <th style="padding: 6px 2px; background-color: #000000 !important; color: #ffd32a !important; text-align: center;">Bulan</th>
+                        <th style="padding: 6px 2px; background-color: #000000 !important; color: #ffd32a !important; text-align: center;">Tahun</th>
+                    </tr>
+                </thead>
+                <tbody id="stakingTableBody">
+                    <tr>
+                        <td colspan="6" style="padding: 12px; text-align: center; color: #576574; font-size: 11px;">Belum ada koin yang ditambahkan.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    let stakingList = [];
+
+    function updateMultiApyPreset() {
+        const select = document.getElementById('multiCoinSelect');
+        const apyInput = document.getElementById('multiApyPercentage');
+        apyInput.placeholder = "0.00";
+        apyInput.value = ''; 
+    }
+
+    function addCoinToStaking() {
+        const amount = parseFloat(document.getElementById('multiCoinAmount').value);
+        const select = document.getElementById('multiCoinSelect');
+        const selectedOption = select.options[select.selectedIndex];
+        
+        let apyRaw = document.getElementById('multiApyPercentage').value;
+        if (apyRaw === '') {
+            apyRaw = selectedOption.getAttribute('data-apy');
+        }
+        const apy = parseFloat(apyRaw);
+        let coinLabel = select.value;
+
+        if (coinLabel === 'CUSTOM') {
+            coinLabel = prompt("Masukkan Nama Koin/Token Anda (Contoh: BTC, NEAR):");
+            if (!coinLabel) coinLabel = "Koin";
+            coinLabel = coinLabel.toUpperCase().substring(0, 4);
+        }
+
+        if (isNaN(amount) || amount <= 0 || isNaN(apy) || apy <= 0) {
+            alert('Masukkan jumlah koin dan persentase APY dengan benar.');
+            return;
+        }
+
+        const apyDecimal = apy / 100;
+        const yearly = amount * apyDecimal;
+        const monthly = yearly / 12;
+        const daily = yearly / 365;
+
+        stakingList.push({
+            coin: coinLabel,
+            amount: amount,
+            apy: apy,
+            daily: daily,
+            monthly: monthly,
+            yearly: yearly
+        });
+
+        resetInputRowOnly();
+        renderStakingTable();
+    }
+
+    function resetInputRowOnly() {
+        document.getElementById('multiCoinAmount').value = '';
+        document.getElementById('multiCoinSelect').selectedIndex = 0;
+        updateMultiApyPreset();
+    }
+
+    function deleteStakingItem(index) {
+        stakingList.splice(index, 1);
+        renderStakingTable();
+    }
+
+    function renderStakingTable() {
+        const tbody = document.getElementById('stakingTableBody');
+        tbody.innerHTML = '';
+
+        if (stakingList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="padding: 12px; text-align: center; color: #576574; font-size: 11px;">Belum ada koin yang ditambahkan.</td></tr>`;
+            return;
+        }
+
+        stakingList.forEach((item, index) => {
+            const tr = document.createElement('tr');
+            tr.style.borderBottom = "1px solid #1e2d3d";
+            tr.setAttribute('title', 'Klik untuk menghapus koin ini');
+            tr.setAttribute('onclick', `if(confirm('Hapus ${item.coin}?')){ deleteStakingItem(${index}); }`);
+            tr.style.cursor = "pointer";
+            
+            tr.innerHTML = `
+                <td style="padding: 6px 2px; font-weight: bold; color: #4a90e2; overflow: hidden; text-overflow: ellipsis;">${item.coin}</td>
+                <td style="padding: 6px 2px; overflow: hidden; text-overflow: ellipsis;">${item.amount.toString()}</td>
+                <td style="padding: 6px 2px;">${item.apy}%</td>
+                <!-- REVISI FINAL: ANGKA DATA DISIMETRISKAN RATA TENGAH (TEXT-ALIGN: CENTER) -->
+                <td style="padding: 6px 2px; color: #00e676; font-weight: 500; text-align: center;">${item.daily.toFixed(8)}</td>
+                <td style="padding: 6px 2px; color: #00e676; font-weight: 500; text-align: center;">${item.monthly.toFixed(8)}</td>
+                <td style="padding: 6px 2px; color: #00e676; font-weight: 500; text-align: center;">${item.yearly.toFixed(8)}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function resetMultiStaking() {
+        stakingList = [];
+        resetInputRowOnly();
+        renderStakingTable();
+    }
+
+    setTimeout(updateMultiApyPreset, 100);
+</script>
