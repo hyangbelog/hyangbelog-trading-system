@@ -1,1 +1,449 @@
+<!-- BUNDEL REVISI DESAIN FINAL: TAHAP 1 (HTML & CSS) -->
+<div class="dca-container-dark">
+  <h3>📊 Kalkulator DCA & Penjualan Crypto</h3>
+  
+  <div class="pilih-koin-box">
+    <label for="selectKoin">Pilih Mata Koin / Token:</label>
+    <div class="koin-input-group">
+      <select id="selectKoin" onchange="gantiMataKoin()">
+        <option value="BTC" selected />Bitcoin (BTC)
+        <option value="ETH" />Ethereum (ETH)
+        <option value="SOL" />Solana (SOL)
+        <option value="BNB" />BNB (BNB)
+        <option value="XRP" />Ripple (XRP)
+        <option value="KUSTOM" />-- Koin Lainnya (Kustom) --
+      </select>
+      <input type="text" id="koinKustomNama" value="" placeholder="Masukkan nama koin..." oninput="gantiMataKoinKustom()" style="display: none;" />
+    </div>
+    <button class="btn-clear-empty" onclick="bersihkanKoinSaldoNol()">🧹 Bersihkan Memori Koin yang Habis Terjual (Saldo 0)</button>
+  </div>
+
+  <div class="table-responsive">
+    <table id="dcaTable">
+      <thead>
+        <tr>
+          <th style="width: 15%;">Tipe</th>
+          <th style="width: 32%;">Rupiah (IDR)</th>
+          <th style="width: 32%;">Koin (<span class="label-koin">BTC</span>)</th>
+          <th style="width: 15%;">Memo</th>
+          <th style="width: 6%;">×</th>
+        </tr>
+      </thead>
+      <tbody id="dcaTableBody">
+        <tr>
+          <td>
+            <select class="type-in" onchange="gantiTipeBaris(this)">
+              <option value="BELI" selected />BELI
+              <option value="JUAL" />JUAL
+            </select>
+          </td>
+          <td><input type="text" class="modal-in input-beli" value="0" oninput="formatDanHitung(this)" /></td>
+          <td><input type="text" class="btc-in input-beli" value="0" oninput="formatBTC(this)" /></td>
+          <td><input type="text" class="note-in" value="" placeholder="misal: TP1" oninput="simpanDataPerKoinOtomatis()" /></td>
+          <td><button class="btn-hapus-baris" onclick="hapusBaris(this)">×</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="action-buttons">
+    <!-- REVISI VISUAL: Tombol tambah diubah ke warna biru royal agar serasi secara ekosistem -->
+    <button class="btn-tambah" onclick="tambahBaris()">+ Tambah</button>
+    <button class="btn-simpan" onclick="simpanDataManual()">💾 Simpan</button>
+    <button class="btn-reset" onclick="resetKalkulatorKoinAktif()">Reset</button>
+  </div>
+
+  <div class="ringkasan-box">
+    <div class="ringkasan-item"><span>Total Modal Beli:</span> <span id="resTotalModal">Rp 0</span></div>
+    <div class="ringkasan-item"><span>Sisa Aset Koin (<span class="label-koin">BTC</span>):</span> <span id="resTotalBTC">0 BTC</span></div>
+    <div class="ringkasan-item rata-rata"><span>Harga Rata-Rata Beli:</span> <span id="resRataRata">Rp 0</span></div>
+      </div>
+
+
+<button class="btn-transfer-scalping" onclick="transferKeKalkulatorScalping()">Kirim Data ke Kalkulator Scalping ➡️</button>
+
+
+
+  <div class="simulasi-jual">
+    <label>Estimasi Harga Jual <span class="label-koin">BTC</span> Saat Ini (IDR):</label>
+    <input type="text" id="hargaJualSekarang" value="0" oninput="formatDanHitung(this)" />
+    
+    <div class="hasil-jual">
+      <div class="ringkasan-item"><span>Nilai Sisa Aset Sekarang:</span> <span id="resNilaiSekarang">Rp 0</span></div>
+      <div class="ringkasan-item"><span>Persentase Net Selisih:</span> <span id="resPersentase" class="persen-netral">0%</span></div>
+      <div class="ringkasan-item profit-loss-row"><span>Estimasi Untung/Rugi Riil:</span> <span id="resNominalProfitLoss" class="persen-netral">Rp 0</span></div>
+    </div>
+  </div>
+
+  <button class="btn-salin-share" onclick="salinRingkasan()">📋 Salin & Bagikan Hasil Hitung</button>
+</div>
+
+<style>
+.dca-container-dark {
+  max-width: 480px;
+  margin: 10px auto;
+  padding: 12px;
+  background: #0f172a !important;
+  border: 1px solid #1e2d3d;
+  border-radius: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 11px;
+  color: #94a3b8;
+  box-sizing: border-box;
+}
+.dca-container-dark h3 {
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  text-align: left;
+  color: #38bdf8;
+  border-bottom: 1px solid #1e2d3d;
+  padding-bottom: 8px;
+}
+.pilih-koin-box { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 8px 10px; margin-bottom: 10px; }
+.pilih-koin-box label { display: block; font-weight: bold; margin-bottom: 5px; color: #cbd5e1; }
+.koin-input-group { display: flex; flex-direction: column; gap: 5px; }
+#selectKoin, #koinKustomNama { width: 100%; border: 1px solid #334155; border-radius: 4px; padding: 6px; font-size: 11px; background: #0f172a; color: #f8fafc; box-sizing: border-box; }
+.btn-clear-empty { width: 100%; padding: 5px; background: #1e293b; color: #94a3b8; border: 1px dashed #334155; border-radius: 4px; cursor: pointer; font-size: 9px; font-weight: bold; margin-top: 6px; text-align: center; }
+.btn-clear-empty:hover { background: #334155; color: #f87171; border-style: solid; }
+.table-responsive { width: 100%; overflow-x: auto; }
+#dcaTable { width: 100%; border-collapse: collapse; margin-bottom: 8px; table-layout: fixed; }
+#dcaTable th, #dcaTable td { border: 1px solid #1e2d3d; padding: 6px 1px; text-align: center; color: #f8fafc; white-space: nowrap !important; overflow: hidden; }
+#dcaTable th { background-color: #1e293b; font-weight: 600; color: #94a3b8; font-size: 11px !important; }
+
+#dcaTable input, #hargaJualSekarang, .type-in { width: 98%; border: 1px solid #334155; border-radius: 4px; padding: 5px 1px; font-size: 11px; text-align: center; box-sizing: border-box; }
+.input-beli { background: #064e3b !important; color: #4ade80 !important; border: 1px solid #047857 !important; }
+
+/* REVISI VISUAL: Teks angka kolom JUAL diubah jadi putih bersih (#ffffff) agar kontras tajam & sangat jelas */
+.input-jual { background: #7f1d1d !important; color: #ffffff !important; border: 1px solid #b91c1c !important; font-weight: 500; }
+
+.note-in { font-style: italic; color: #cbd5e1 !important; background: #1e293b; font-size: 10px !important; }
+.note-in::placeholder { color: #475569; }
+.type-in { width: 100%; font-weight: bold; color: #4ade80; background: #0f172a; font-size: 10px !important; padding: 5px 0 !important; }
+#hargaJualSekarang { width: 100%; text-align: left; margin-top: 4px; margin-bottom: 8px; padding: 5px; background: #1e293b; color: #f8fafc; }
+.btn-hapus-baris { background: #ef4444; color: white; border: none; border-radius: 4px; padding: 4px 5px; cursor: pointer; font-weight: bold; font-size: 11px; }
+.action-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 12px; }
+.btn-tambah, .btn-simpan, .btn-reset, .btn-salin-share { padding: 8px 4px; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; text-align: center; }
+
+/* REVISI VISUAL: Mengubah tombol tambah menjadi Biru Royal Cerah (#3182ce) */
+.btn-tambah { background: #3182ce; color: white; }
+.btn-tambah:hover { background: #2b6cb0; }
+
+.btn-simpan { background: #f59e0b; color: white; }
+.btn-reset { background: #24324a; color: #94a3b8; border: 1px solid #1f293d; }
+.btn-salin-share { width: 100%; background: #10b981; color: white; margin-top: 10px; }
+.ringkasan-box { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px; }
+.ringkasan-item { display: flex; justify-content: space-between; margin-bottom: 4px; color: #cbd5e1; }
+.rata-rata { border-top: 1px dashed #334155; padding-top: 5px; margin-top: 5px; font-size: 12px; font-weight: bold; color: #f8fafc; }
+.btn-transfer-scalping { width: 100%; padding: 8px !important; background: #3182ce !important; color: #ffffff !important; border: none !important; border-radius: 4px !important; cursor: pointer !important; font-size: 11px !important; font-weight: bold !important; margin-top: 8px; text-align: center; height: 34px !important; }
+.btn-transfer-scalping:hover { background: #2b6cb0 !important; }
+.simulasi-jual { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 10px; }
+.simulasi-jual label { font-weight: 500; color: #94a3b8; }
+.hasil-jual { border-top: 1px solid #334155; padding-top: 6px; }
+.profit-loss-row { border-top: 1px dashed #334155; padding-top: 4px; margin-top: 4px; }
+.persen-untung { color: #4ade80; font-weight: bold; }
+.persen-rugi { color: #f87171; font-weight: bold; }
+.persen-netral { color: #94a3b8; font-weight: bold; }
+</style>
+
+
+<script>
+let globalSisaModalMurni = 0;
+let globalRataRataBeliMurni = 0;
+
+function parseAngka(str) {
+  if (!str) return 0;
+  let bersih = str.replace(/\./g, '').replace(/,/g, '.');
+  return parseFloat(bersih) || 0;
+}
+
+function formatRupiahString(angkaStr) {
+  let nomor = angkaStr.replace(/[^0-9]/g, '');
+  if(!nomor) return "0";
+  return new Intl.NumberFormat('id-ID').format(parseInt(nomor));
+}
+
+function formatDanHitung(input) {
+  let posisiKursor = input.selectionStart;
+  let panjangAwal = input.value.length;
+  input.value = formatRupiahString(input.value);
+  let panjangAkhir = input.value.length;
+  input.setSelectionRange(posisiKursor + (panjangAkhir - panjangAwal), posisiKursor + (panjangAkhir - panjangAwal));
+  hitungDCA();
+  simpanDataPerKoinOtomatis();
+}
+
+function formatBTC(input) {
+  input.value = input.value.replace(/[^0-9,.]/g, '');
+  hitungDCA();
+  simpanDataPerKoinOtomatis();
+}
+
+function gantiTipeBaris(select) {
+  let row = select.parentNode.parentNode;
+  let textInputs = row.querySelectorAll("input.modal-in, input.btc-in");
+  
+  if (select.value === "JUAL") {
+    select.style.color = "#f87171";
+    textInputs.forEach(inp => {
+      // REVISI VISUAL: Teks masukan JUAL otomatis berganti menjadi putih bersih kontras
+      inp.className = "modal-in input-jual";
+      if(inp.classList.contains("btc-in") || inp.className.includes("btc")) {
+        inp.className = "btc-in input-jual";
+      }
+    });
+  } else {
+    select.style.color = "#4ade80";
+    textInputs.forEach(inp => {
+      inp.className = "modal-in input-beli";
+      if(inp.classList.contains("btc-in") || inp.className.includes("btc")) {
+        inp.className = "btc-in input-beli";
+      }
+    });
+  }
+  hitungDCA();
+  simpanDataPerKoinOtomatis();
+}
+</script>
+
+<script>
+function ambilKeyKoinAktif() {
+  let selectEl = document.getElementById("selectKoin").value;
+  if (selectEl === "KUSTOM") {
+    let namaKustom = document.getElementById("koinKustomNama").value.trim().toUpperCase();
+    return "DCA_STORAGE_" + (namaKustom || "KUSTOM");
+  }
+  return "DCA_STORAGE_" + selectEl;
+}
+
+function transferKeKalkulatorScalping() {
+  let elemModalScalp = document.getElementById("m_capital");
+  let elemHargaScalp = document.getElementById("m_buyPrice");
+
+  if (elemModalScalp && elemHargaScalp) {
+    elemModalScalp.value = new Intl.NumberFormat('id-ID').format(Math.round(globalSisaModalMurni));
+    elemHargaScalp.value = new Intl.NumberFormat('id-ID').format(Math.round(globalRataRataBeliMurni));
+
+    if (typeof hitungMini === "function") {
+      hitungMini();
+    }
+    alert("⚡ Sukses! Data sisa modal & harga rata-rata beli berhasil dikirim ke posisi yang tepat!");
+  } else {
+    let modalFormated = new Intl.NumberFormat('id-ID').format(Math.round(globalSisaModalMurni));
+    let hargaFormated = new Intl.NumberFormat('id-ID').format(Math.round(globalRataRataBeliMurni));
+    alert("Kalkulator bawah tidak ditemukan. Salin manual:\nModal: " + modalFormated + "\nHarga Beli: " + hargaFormated);
+  }
+}
+
+function bersihkanKoinSaldoNol() {
+  let koinList = ["BTC", "ETH", "SOL", "BNB", "XRP"];
+  let terhapusCount = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    let key = localStorage.key(i);
+    if (key.startsWith("DCA_STORAGE_") && !koinList.includes(key.replace("DCA_STORAGE_", ""))) {
+      koinList.push(key.replace("DCA_STORAGE_", ""));
+    }
+  }
+  if(confirm("Apakah Anda yakin ingin membersihkan memori koin yang saldonya sudah 0?")) {
+    koinList.forEach(koin => {
+      let saved = localStorage.getItem("DCA_STORAGE_" + koin);
+      if(saved) {
+        let config = JSON.parse(saved);
+        let tBeli = 0, tJual = 0;
+        if(config.rows) {
+          config.rows.forEach(r => {
+            let koinVal = parseAngka(r.btc);
+            if(r.tipe === "BELI") tBeli += koinVal;
+            else if(r.tipe === "JUAL") tJual += koinVal;
+          });
+        }
+        if((tBeli - tJual) <= 0) {
+          localStorage.removeItem("DCA_STORAGE_" + koin);
+          terhapusCount++;
+        }
+      }
+    });
+    alert("🧹 Berhasil membersihkan " + terhapusCount + " data memori koin kosongan!");
+    muatDataPerKoin();
+  }
+}
+
+function gantiMataKoin() {
+  let selectEl = document.getElementById("selectKoin").value;
+  let kustomInput = document.getElementById("koinKustomNama");
+  if (selectEl === "KUSTOM") { kustomInput.style.display = "block"; } 
+  else { kustomInput.style.display = "none"; }
+  muatDataPerKoin();
+}
+
+function gantiMataKoinKustom() {
+  updateLabelTeks();
+  hitungDCA();
+  simpanDataPerKoinOtomatis();
+}
+
+function updateLabelTeks() {
+  let selectEl = document.getElementById("selectKoin").value;
+  let namaKoin = selectEl === "KUSTOM" ? (document.getElementById("koinKustomNama").value.trim().toUpperCase() || "KOIN") : selectEl;
+  document.querySelectorAll(".label-koin").forEach(label => { label.innerText = namaKoin; });
+}
+</script>
+
+
+<script>
+function hitungDCA() {
+  let rows = document.querySelectorAll("#dcaTableBody tr");
+  let totalBeliModal = 0, totalBeliKoin = 0;
+  let totalJualKoin = 0, cashInflowJual = 0; 
+
+  rows.forEach(row => {
+    let tipe = row.querySelector(".type-in").value;
+    let inputs = row.querySelectorAll("input");
+    if(inputs.length >= 3) {
+      let modal = parseAngka(inputs[0].value);
+      let koin = parseAngka(inputs[1].value);
+      if (tipe === "BELI") { 
+        totalBeliModal += modal; 
+        totalBeliKoin += koin; 
+      } else if (tipe === "JUAL") { 
+        totalJualKoin += koin; 
+        cashInflowJual += modal; 
+      }
+    }
+  });
+
+  // 1. Dapatkan harga rata-rata murni dari aktivitas BELI historis
+  let rataRataBeli = totalBeliKoin > 0 ? totalBeliModal / totalBeliKoin : 0;
+  
+  // 2. Sisa koin riil setelah dikurangi penjualan
+  let sisaKoin = Math.max(0, totalBeliKoin - totalJualKoin);
+  
+  // 3. Perhitungan modal riil yang tertinggal berdasarkan sisa koin
+  let modalSisaKoin = sisaKoin * rataRataBeli;
+  
+  globalSisaModalMurni = modalSisaKoin;
+  globalRataRataBeliMurni = rataRataBeli;
+
+  // 4. Simulasi Real-Time Harga Pasar
+  let hargaPasarSekarang = parseAngka(document.getElementById("hargaJualSekarang").value);
+  let nilaiSisaAsetSekarang = sisaKoin * hargaPasarSekarang;
+  
+  // 5. Perhitungan profit/loss akumulatif yang jujur
+  let untungRugiBersih = (cashInflowJual + nilaiSisaAsetSekarang) - totalBeliModal;
+  let persentaseNet = rataRataBeli > 0 ? ((hargaPasarSekarang - rataRataBeli) / rataRataBeli) * 100 : 0;
+
+  let formatter = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
+  let selectEl = document.getElementById("selectKoin").value;
+  let simbolKoin = selectEl === "KUSTOM" ? (document.getElementById("koinKustomNama").value.trim().toUpperCase() || "KOIN") : selectEl;
+
+  // Cetak hasil ke layar pembungkus ringkasan
+  document.getElementById("resTotalModal").innerText = formatter.format(modalSisaKoin); 
+  document.getElementById("resTotalBTC").innerText = sisaKoin.toLocaleString('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 8}) + " " + simbolKoin;
+  document.getElementById("resRataRata").innerText = formatter.format(rataRataBeli);
+  document.getElementById("resNilaiSekarang").innerText = formatter.format(nilaiSisaAsetSekarang);
+
+  let persenEl = document.getElementById("resPersentase");
+  persenEl.innerText = (persentaseNet > 0 ? "+" : "") + persentaseNet.toFixed(2) + "%";
+  
+  let nominalEl = document.getElementById("resNominalProfitLoss");
+  nominalEl.innerText = (untungRugiBersih > 0 ? "+" : "") + formatter.format(untungRugiBersih);
+
+  persenEl.className = persentaseNet > 0 ? "persen-untung" : (persentaseNet < 0 ? "persen-rugi" : "persen-netral"); 
+  nominalEl.className = untungRugiBersih > 0 ? "persen-untung" : (untungRugiBersih < 0 ? "persen-rugi" : "persen-netral");
+}
+</script>
+
+
+<script>
+function tambahBaris(valTipe = "BELI", valModal = "0", valBtc = "0", valNote = "") {
+  let tbody = document.getElementById("dcaTableBody");
+  let row = tbody.insertRow(-1);
+  let isJual = valTipe === "JUAL";
+  let warnaKelas = isJual ? "input-jual" : "input-beli";
+  
+  row.innerHTML = `
+    <td>
+      <select class="type-in" onchange="gantiTipeBaris(this)" style="color: ${isJual ? '#f87171' : '#4ade80'}">
+        <option value="BELI" ${!isJual ? 'selected' : ''}>BELI</option>
+        <option value="JUAL" ${isJual ? 'selected' : ''}>JUAL</option>
+      </select>
+    </td>
+    <td><input type="text" class="modal-in ${warnaKelas}" value="${valModal}" oninput="formatDanHitung(this)"></td>
+    <td><input type="text" class="btc-in ${warnaKelas}" value="${valBtc}" oninput="formatBTC(this)"></td>
+    <td><input type="text" class="note-in" value="${valNote}" placeholder="misal: TP1" oninput="simpanDataPerKoinOtomatis()"></td>
+    <td><button class="btn-hapus-baris" onclick="hapusBaris(this)">×</button></td>
+  `;
+  hitungDCA();
+}
+
+function hapusBaris(btn) {
+  let tbody = document.getElementById("dcaTableBody");
+  if(tbody.rows.length > 1) {
+    btn.parentNode.parentNode.remove();
+    hitungDCA();
+    simpanDataPerKoinOtomatis();
+  } else { alert("Minimal harus menyisakan 1 baris!"); }
+}
+
+function simpanDataPerKoinOtomatis() {
+  let storageKey = ambilKeyKoinAktif();
+  let dataRows = [];
+  document.querySelectorAll("#dcaTableBody tr").forEach(row => {
+    let inputs = row.querySelectorAll("input");
+    if(inputs.length >= 3) {
+      dataRows.push({ 
+        tipe: row.querySelector(".type-in").value, 
+        modal: inputs[0].value, 
+        btc: inputs[1].value, 
+        note: inputs[2].value 
+      });
+    }
+  });
+  localStorage.setItem(storageKey, JSON.stringify({ hargaJual: document.getElementById("hargaJualSekarang").value, rows: dataRows }));
+}
+
+function simpanDataManual() { 
+  simpanDataPerKoinOtomatis(); 
+  alert("💾 Semua riwayat transaksi beserta catatan telah berhasil disimpan!"); 
+}
+
+function muatDataPerKoin() {
+  updateLabelTeks();
+  let saved = localStorage.getItem(ambilKeyKoinAktif());
+  let tbody = document.getElementById("dcaTableBody");
+  tbody.innerHTML = "";
+  
+  if(saved) {
+    let config = JSON.parse(saved);
+    document.getElementById("hargaJualSekarang").value = config.hargaJual || "0";
+    if(config.rows && config.rows.length > 0) { 
+      config.rows.forEach(r => { tambahBaris(r.tipe, r.modal, r.btc, r.note || ""); }); 
+    } else { 
+      tambahBaris("BELI", "0", "0", ""); 
+    }
+  } else {
+    document.getElementById("hargaJualSekarang").value = "0";
+    tambahBaris("BELI", "0", "0", "");
+  }
+  hitungDCA();
+}
+
+function resetKalkulatorKoinAktif() {
+  if(confirm("Hapus seluruh riwayat transaksi beserta catatan pada koin ini?")) {
+    localStorage.removeItem(ambilKeyKoinAktif());
+    muatDataPerKoin();
+  }
+}
+
+function salinRingkasan() {
+  let txt = `*Hasil Kalkulasi DCA & Penjualan Koin*\n` +
+            `Total Modal Beli: ${document.getElementById("resTotalModal").innerText}\n` +
+            `Sisa Aset Koin: ${document.getElementById("resTotalBTC").innerText}\n` +
+            `Harga Rata Beli: ${document.getElementById("resRataRata").innerText}\n` +
+            `Estimasi Jual: Rp ${document.getElementById("hargaJualSekarang").value}\n` +
+            `Estimasi Untung/Rugi Riil: ${document.getElementById("resNominalProfitLoss").innerText} (${document.getElementById("resPersentase").innerText})`;
+  navigator.clipboard.writeText(txt).then(() => { alert("Ringkasan berhasil disalin!"); });
+}
+
+window.addEventListener('DOMContentLoaded', () => { muatDataPerKoin(); });
+</script>
 
