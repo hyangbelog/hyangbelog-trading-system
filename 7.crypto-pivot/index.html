@@ -1,83 +1,29 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <!-- Ini saja yang penting ditambahkan agar skala tulisan pas di HP -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Crypto Pivot & Risk Tracker Live</title>
-  
-  <style>
-    /* Mengunci agar warna latar belakang dasar halaman berwarna hitam pekat */
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      background-color: #000000 !important;
-      color: #c9d1d9;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      box-sizing: border-box;
-    }
-    
-    /* Tambahan agar konten tidak mepet ke pinggir layar HP */
-    .container {
-      padding: 12px;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    /* Memastikan label dan box input/select tersusun rapi ke bawah */
-    .input-group {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .input-group label {
-      font-size: 0.75rem;
-      font-weight: bold;
-      margin-bottom: 4px;
-      color: #8b949e;
-    }
-
-    /* Mempercantik kotak dropdown agar nyaman disentuh jari di HP */
-    .input-group select {
-      padding: 8px;
-      background-color: #161b22;
-      color: #ffffff;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      outline: none;
-    }
-  </style>
-</head>
-<body>
+<!doctype html>
+        
+    Crypto Pivot & Risk Tracker Live
 
 <div class="container">
     <h3>Crypto Pivot & Risk Tracker</h3>
     
-    <!-- FITUR BARU: Dropdown Pilihan Koin dan Mata Uang (Sudah Fix 2 Kolom Mobile) -->
-    <div class="grid-inputs" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px;">
-        
+    <!-- FITUR BARU: Dropdown Pilihan Koin dan Mata Uang -->
+    <div class="grid-inputs" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 4px;">
         <div class="input-group">
             <label for="pilih-koin">PILIH KOIN</label>
             <select id="pilih-koin" onchange="gantiKoinAtauMataUang()">
-                <option value="BTC">BTC (Bitcoin)</option>
-                <option value="ETH">ETH (Ethereum)</option>
-                <option value="SOL">SOL (Solana)</option>
-                <option value="BNB">BNB (Binance Coin)</option>
+                <option value="BTC" />BTC (Bitcoin)
+                <option value="ETH" />ETH (Ethereum)
+                <option value="SOL" />SOL (Solana)
+                <option value="BNB" />BNB (Binance Coin)
             </select>
         </div>
-
         <div class="input-group">
             <label for="pilih-mata-uang">MATA UANG (PASAR)</label>
             <select id="pilih-mata-uang" onchange="gantiKoinAtauMataUang()">
-                <option value="IDR">IDR (Rupiah - Tokocrypto)</option>
-                <option value="USDT">USDT (Dollar - Binance)</option>
+                <option value="IDR" />IDR (Rupiah - Tokocrypto)
+                <option value="USDT" />USDT (Dollar - Binance)
             </select>
         </div>
-
     </div>
-
     
     <div class="grid-inputs">
         <!-- Kolom HB dikunci (readonly) karena sudah otomatis terisi live -->
@@ -642,117 +588,133 @@ function bukaIndodax() {
 
 
    function kirimWA() {
-  const hb = document.getElementById('hb').value;
-  const koin = document.getElementById('pilih-koin').value;
-  const pasar = document.getElementById('pilih-mata-uang').value;
+  const hb = document.getElementById('hb')?.value || "-";
+  const koin = document.getElementById('pilih-koin')?.value || "BTC";
+  const pasar = document.getElementById('pilih-mata-uang')?.value || "IDR";
+  
+  const valR1 = document.getElementById('r1')?.value || "";
+  const valS1 = document.getElementById('s1')?.value || "";
 
-  // Mengambil data murni beserta emoji dari tabel dasbor Anda
-  const r1 = document.getElementById('pct-r1').innerText;
-  const s1 = document.getElementById('pct-s1').innerText;
+  // 1. Mengambil data persentase murni dari tabel tengah
+  let pctR1 = document.getElementById('pct-r1')?.innerText || "";
+  let pctS1 = document.getElementById('pct-s1')?.innerText || "";
+  pctR1 = pctR1.replace(/[🟢🔴🟡🟠🔵⚪⚫]/g, "").trim();
+  pctS1 = pctS1.replace(/[🟢🔴🟡🟠🔵⚪⚫]/g, "").trim();
 
-  // 1. MENGAMBIL LINK WEB HALAMAN AKTIF SECARA OTOMATIS
-const linkAktifWeb = window.location.href;
+  // 2. KOREKSI LOGIKA WARNA: Hijau untuk Beli, Merah untuk Jual
+  const angkaHB = parseFloat(hb.replace(/\./g, '')) || 0; 
+  const angkaR1 = parseFloat(valR1.replace(/\./g, '')) || 0;
+  const angkaS1 = parseFloat(valS1.replace(/\./g, '')) || 0;
 
-// 2. MENYUSUN TEKS (Sudah ditambahkan link web di baris paling bawah)
-const text = `*Crypto Update (${koin}/${pasar})*\nHB: ${hb}\n\n*Target %:*\nR1: ${r1}\nS1: ${s1}\n\n_Via Crypto Pivot & Risk Tracker_\nAnalisis Live Selengkapnya:\n${linkAktifWeb}`;
+  let statusRekomendasi = "";
+  
+  if (angkaHB >= angkaR1) {
+    statusRekomendasi = "🔴 *REKOMENDASI: SAATNYA JUAL!*"; // Diubah menjadi MERAH
+  } else if (angkaHB <= angkaS1) {
+    statusRekomendasi = "🟢 *REKOMENDASI: SAATNYA BELI!*"; // Diubah menjadi HIJAU
+  } else {
+    statusRekomendasi = "🟡 *STATUS: WAIT & SEE (PANTAU PASAR)*";
+  }
 
-// 3. PROSES PENGIRIMAN SEGERA KE WHATSAPP (Aman dari Blokir Iframe GitHub)
-const urlWhatsApp = "https://wa.me" + encodeURIComponent(text);
+  // 3. Logika Waktu & Jam Cetak Otomatis
+  const waktuSekarang = new Date();
+  const formatTanggal = waktuSekarang.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  const formatJam = waktuSekarang.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false }) + ' WIB';
 
-// Buka WhatsApp di tab/aplikasi baru agar tidak diblokir oleh sistem keamanan GitHub
-window.open(urlWhatsApp, '_blank');
+  const linkAktifWeb = window.location.href;
 
-} // <--- Penutup fungsi pembungkus utama (misal: kirimWA)
+  // 4. STRUKTUR PESAN SIMPEL & MEMANCING KLIK
+  const text = `*Crypto Update (${koin}/${pasar})*\n📅 ${formatTanggal} | 🕒 ${formatJam}\nHB: ${hb}\n\n${statusRekomendasi}\n\nJarak R1: ${pctR1}\nJarak S1: ${pctS1}\n\n_Via Crypto Pivot & Risk Tracker_\n\nLihat Peta Energi Pasar & Detail Posisi di:\n${linkAktifWeb}`;
 
-function pivotResetForm() {
-    // Mengosongkan paksa nilai teks di semua kolom input utama
-    document.getElementById('hb').value = "";
-    document.getElementById('r2').value = "";
-    document.getElementById('r1').value = "";
-    document.getElementById('s1').value = "";
-    document.getElementById('s2').value = "";
-
-    // Mengembalikan tampilan teks tabel analisis jarak ke kondisi strip (-)
-    const fields = [
-        'dist-r2', 'pct-r2', 'dist-r1', 'pct-r1', 
-        'dist-s1', 'pct-s1', 'dist-s2', 'pct-s2', 
-        'beli-1', 'beli-2', 'beli-3', 
-        'jual-1', 'jual-2', 'jual-3'
-    ];
-    
-    fields.forEach(id => {
-        const elemen = document.getElementById(id);
-        if (elemen) elemen.innerText = "-";
+  if (navigator.share) {
+    navigator.share({ title: 'Crypto Update', text: text }).catch(console.error);
+  } else {
+    navigator.clipboard.writeText(text).then(function() {
+      alert('Teks Teaser Simpel berhasil disalin!');
     });
+  }
 }
 
 
+
+
+
+// Fungsi cadangan mandiri untuk menyalin teks jika menu bawaan HP error
+function salinTeksKeClipboard(teksMurni) {
+  navigator.clipboard.writeText(teksMurni).then(function() {
+    alert('Teks + Link Web berhasil disalin ke clipboard! Silakan tempel (paste) langsung di obrolan WhatsApp Anda.');
+  }).catch(function(error) {
+    alert('Gagal menyalin teks secara otomatis. Silakan periksa izin browser Anda.');
+    console.error(error);
+  });
+}
+
+
+
+             function pivotResetForm() {
+        // Mengosongkan paksa nilai teks di semua kolom input utama
+        document.getElementById('hb').value = "";
+        document.getElementById('r2').value = "";
+        document.getElementById('r1').value = "";
+        document.getElementById('s1').value = "";
+        document.getElementById('s2').value = "";
+        
+        // Mengembalikan tampilan teks tabel analisis jarak ke kondisi strip (-)
+        const fields = ['dist-r2', 'pct-r2', 'dist-r1', 'pct-r1', 'dist-s1', 'pct-s1', 'dist-s2', 'pct-s2', 'beli-1', 'beli-2', 'beli-3', 'jual-1', 'jual-2', 'jual-3'];
+        fields.forEach(id => {
+            const elemen = document.getElementById(id);
+            if (elemen) elemen.innerText = "-";
+        });
+        
+        // Mengosongkan lebar visual sub-bar persentase menggunakan gabungan string biasa agar aman di HP
+        ['r2', 'r1', 's1', 's2'].forEach(id => {
+            const barfill = document.getElementById('bar-' + id);
+            if (barfill) barfill.style.width = "0%";
+        });
+        
+        // Mengembalikan pesan petunjuk di bawah tabel
+        document.getElementById('summary').innerText = "Masukkan Harga Bergerak (HB) untuk memulai.";
+    }
+
+
+
     window.onload = function() {
-    const inputHB = document.getElementById('hb');
-    if (inputHB) {
-        inputHB.removeAttribute('readonly');
-        
-        // Perbaikan Gaya Visual HB: Mengubah warna ke putih soft dan menaikkan ukuran font sebesar 1px
-        inputHB.style.background = "#0d1117";
-        inputHB.style.color = "#e0e6ed";
-        inputHB.style.fontSize = "0.78rem";
-        inputHB.style.fontWeight = "bold";
-        
-        // PERBAIKAN: Cara yang benar dan stabil agar format rupiah langsung aktif saat diketik
-        inputHB.oninput = function() {
-            formatInputRupiah(this);
-        };
-        
-        inputHB.value = "";
-    }
+        const inputHB = document.getElementById('hb');
+        if (inputHB) {
+            inputHB.removeAttribute('readonly');
+            
+            // Perbaikan Gaya Visual HB: Mengubah warna ke putih soft dan menaikkan ukuran font sebesar 1px (dari 0.72rem ke 0.78rem)
+            inputHB.style.background = "#0d1117"; 
+            inputHB.style.color = "#e0e6ed"; 
+            inputHB.style.fontSize = "0.78rem"; 
+            inputHB.style.fontWeight = "bold";
+            
+            inputHB.setAttribute('oninput', 'formatInputRupiah(this)');
+            inputHB.value = "";
+        }
 
-       // =========================================================================
-    // 1. Memulihkan koin terakhir yang aktif dibuka sebelum halaman di-refresh
-    // =========================================================================
-    const dataAktif = localStorage.getItem('koin_terakhir_aktif');
-    if (dataAktif) {
-        const posisi = JSON.parse(dataAktif);
-        
-        const elemenKoin = document.getElementById('pilih-koin');
-        if (elemenKoin) elemenKoin.value = posisi.koin;
-        
-        const elemenPasar = document.getElementById('pilih-mata-uang');
-        if (elemenPasar) elemenPasar.value = posisi.pasar;
-    }
+        // Memulihkan koin terakhir yang aktif dibuka sebelum halaman di-refresh
+        const dataAktif = localStorage.getItem('koin_terakhir_aktif');
+        if (dataAktif) {
+            const posisi = JSON.parse(dataAktif);
+            document.getElementById('pilih-koin').value = posisi.koin;
+            document.getElementById('pilih-mata-uang').value = posisi.pasar;
+        }
 
-    // =========================================================================
-    // 2. Memulihkan data S/R yang tersimpan khusus untuk koin aktif tersebut
-    // =========================================================================
-    const elemenKoinAktif = document.getElementById('pilih-koin');
-    const elemenPasarAktif = document.getElementById('pilih-mata-uang');
-
-    if (elemenKoinAktif && elemenPasarAktif) {
-        const koin = elemenKoinAktif.value;
-        const pasar = elemenPasarAktif.value;
+        // Memulihkan data S/R yang tersimpan khusus untuk koin aktif tersebut
+        const koin = document.getElementById('pilih-koin').value;
+        const pasar = document.getElementById('pilih-mata-uang').value;
         const savedData = localStorage.getItem(`pref_${koin}_${pasar}`);
-
+        
         if (savedData) {
             const data = JSON.parse(savedData);
-            if (document.getElementById('r2')) document.getElementById('r2').value = data.r2;
-            if (document.getElementById('r1')) document.getElementById('r1').value = data.r1;
-            if (document.getElementById('s1')) document.getElementById('s1').value = data.s1;
-            if (document.getElementById('s2')) document.getElementById('s2').value = data.s2;
+            document.getElementById('r2').value = data.r2;
+            document.getElementById('r1').value = data.r1;
+            document.getElementById('s1').value = data.s1;
+            document.getElementById('s2').value = data.s2;
         }
-    }
-
-           // =========================================================================
-    // 3. Menampilkan instruksi awal dan memicu perhitungan otomatis
-    // =========================================================================
-    const elemenSummary = document.getElementById('summary');
-    if (ele nomenSummary) {
-        elemenSummary.innerText = "Masukkan Harga Bergerak (HB) untuk memulai.";
-    }
-    
-    // Jalankan kalkulasi otomatis berdasarkan data koin/pasar yang berhasil dipulihkan di atas
-    if (typeof hitungData === "function") {
+        
+        document.getElementById('summary').innerText = "Masukkan Harga Bergerak (HB) untuk memulai.";
         hitungData();
     }
-
-} // <--- KURUNG PENUTUP WINDOW.ONLOAD YANG ASLI SEHARUSNYA DI SINI KHUSUS UNTUK MENUTUP SEMUANYA9
-
 </script></div></!doctype>
