@@ -621,6 +621,7 @@ function bukaIndodax() {
 
 
    function kirimWA() {
+  cfunction kirimWA() {
   const hb = document.getElementById('hb').value;
   const koin = document.getElementById('pilih-koin').value;
   const pasar = document.getElementById('pilih-mata-uang').value;
@@ -635,24 +636,18 @@ function bukaIndodax() {
   // 2. MENYUSUN TEKS (Sudah ditambahkan link web di baris paling bawah)
   const text = `*Crypto Update (${koin}/${pasar})*\nHB: ${hb}\n\n*Target %:*\nR1: ${r1}\nS1: ${s1}\n\n_Via Crypto Pivot & Risk Tracker_\n\nAnalisis Live Selengkapnya:\n${linkAktifWeb}`;
 
-  // 3. PROSES PENGIRIMAN / BERBAGI
-  if (navigator.share) {
-    navigator.share({ 
-      title: 'Crypto Update', 
-      text: text 
-    })
-    .catch(console.error);
+    // 3. PROSES PENGIRIMAN SEGERA KE WHATSAPP (MENEMBUS IFRAME)
+  const urlWhatsApp = "https://whatsapp.com" + encodeURIComponent(text);
+
+  if (window.top) {
+    window.top.location.href = urlWhatsApp;
   } else {
-    navigator.clipboard.writeText(text).then(function() {
-      alert('Teks + Link Web berhasil disalin ke clipboard! Silakan paste langsung di WhatsApp.');
-    });
+    window.location.href = urlWhatsApp;
   }
-}
+} // <--- PASTIKAN TANDA INI ADA UNTUK MENUTUP FUNGSI kirimWA()
 
-
-
-
-             function pivotResetForm() {
+function pivotResetForm() {
+ 
         // Mengosongkan paksa nilai teks di semua kolom input utama
         document.getElementById('hb').value = "";
         document.getElementById('r2').value = "";
