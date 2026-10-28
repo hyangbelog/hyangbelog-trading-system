@@ -8,143 +8,479 @@
     <style>
         body { font-family: -apple-system, sans-serif; background: transparent !important; margin: 0; padding: 5px; }
         .wrapper { width: 100%; max-width: 420px; margin: 0 auto; box-sizing: border-box; }
-  
-        /* Judul Section */
-        .section-title { background: #0070f3; color: #ffffff; padding: 5px; border-radius: 4px; font-weight: bold; text-align: center; margin: 2px 0 6px 0; font-size: 0.85rem; letter-spacing: 0.5px; }
-        .sub-title { font-weight: bold; color: #718096; margin: 4px 0 2px 0; font-size: 0.72rem; display: block; }
-        
-        /* Form & Tombol */
-        select, button { width: 100%; padding: 6px; margin-bottom: 6px; border-radius: 4px; border: 1px solid #1f2937; background: #1f2937; color: #fff; font-size: 0.78rem; box-sizing: border-box; }
-        button { background: #0070f3; color: #fff; font-weight: bold; border: none; cursor: pointer; }
-        button:active { background: #0056b3; }
-        
-        /* Box Monitor Running */
-        .box-harga { background: #0b111e; padding: 6px; border-radius: 4px; text-align: center; border: 1px solid #0070f3; margin-bottom: 6px; }
-        .box-harga p { margin: 0 0 1px 0; color: #718096; font-size: 0.7rem; }
-        .box-harga h3 { margin: 0; color: #ffffff; font-size: 1.1rem; }
-        .live-dot { display: inline-block; width: 5px; height: 5px; background: #3b82f6; border-radius: 50%; margin-left: 3px; box-shadow: 0 0 5px #0070f3; }
-        
-        /* Grid Layout Super Rapat & Tipis */
-        .row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-        .box-out { background: #1f2937; padding: 5px 8px; border-radius: 4px; border: 1px solid #1f2937; text-align: left; }
-        .box-out label { font-size: 0.68rem; color: #718096; display: block; margin-bottom: 1px; }
-        .box-out span { display: block; font-size: 0.8rem; font-weight: bold; }
-        
-        /* Warna Kontras Data */
-        .color-tp { color: #3b82f6; }
-        .color-sl { color: #ef4444; }
-        .color-val { color: #e2e8f0; }
-    </style>
-</head>
-<body>
 
-<div class="wrapper">
-    <!-- Bagian 1: Price Action -->
-    <div class="section-title">PRICE ACTION LIVE</div>
+
+<div class="blibe-pa-container">
+    <div class="blibe-pa-header">
+        <h3>📊 Kalkulator Price Action Pro</h3>
+    </div>
     
-    <select id="pilihanKoin">
-        <option value="btc">Bitcoin (BTC / IDR)</option>
-        <option value="eth">Ethereum (ETH / IDR)</option>
-        <option value="sol">Solana (SOL / IDR)</option>
-        <option value="ada">Cardano (ADA / IDR)</option>
-        <option value="xrpl">XRP (XRP / IDR)</option>
-    </select>
-
-    <button onclick="prosesDataLive()">Ambil Harga & Hitung</button>
-
-    <div class="box-harga">
-        <p>Harga Bergerak (HB) <span class="live-dot"></span></p>
-        <h3 id="hargaLive">Rp 0</h3>
-    </div>
-
-    <span class="sub-title">Rencana Trading:</span>
-    <div class="row-grid">
-        <div class="box-out">
-            <label>Take Profit (5%):</label>
-            <span id="targetTP" class="color-tp">Rp 0</span>
+    <div class="blibe-pa-body">
+        <!-- ZONA 1: SPOT SUPPORT & RESISTANCE -->
+        <div class="blibe-pa-section-title">1. ZONA KEY LEVEL (S/R)</div>
+        <div class="blibe-pa-row-split">
+            <div class="blibe-pa-group">
+                <label>SPOT RESISTANCE</label>
+                <div class="blibe-pa-input-wrap">
+                    <span class="blibe-pa-addon">Rp</span>
+                    <input type="number" id="blibe-pa-spot-r" value="1490000000" oninput="prosesPriceActionAll()" />
+                </div>
+            </div>
+            <div class="blibe-pa-group">
+                <label>SPOT SUPPORT</label>
+                <div class="blibe-pa-input-wrap">
+                    <span class="blibe-pa-addon">Rp</span>
+                    <input type="number" id="blibe-pa-spot-s" value="1473687040" oninput="prosesPriceActionAll()" />
+                </div>
+            </div>
         </div>
-        <div class="box-out">
-            <label>Stop Loss (2%):</label>
-            <span id="targetSL" class="color-sl">Rp 0</span>
-        </div>
-    </div>
 
-    <!-- Bagian 2: Pivot Tracker -->
-    <div class="section-title" style="margin-top: 10px;">PIVOT & RISK TRACKER</div>
-    
-    <span class="sub-title">Level Resisten (Batas Atas):</span>
-    <div class="row-grid">
-        <div class="box-out">
-            <label>Resisten 2 (R2)</label>
-            <span id="outputR2" class="color-val">Rp 0</span>
+        <!-- ZONA 2: KOMBINASI DUA CANDLE -->
+        <div class="blibe-pa-section-title" style="margin-top: 4px;">2. DATA LILIN (CANDLESTICK)</div>
+        <div class="blibe-pa-candle-grid">
+            <!-- Candle 1 (Sebelumnya) -->
+            <div class="blibe-pa-cbox">
+                <span class="blibe-cbox-title">CANDLE 1 (LALU)</span>
+                <div class="blibe-pa-group">
+                    <label>OPEN</label>
+                    <div class="blibe-pa-input-wrap"><span class="blibe-pa-addon">Rp</span><input type="number" id="blibe-c1-open" value="1479744000" oninput="prosesPriceActionAll()" /></div>
+                </div>
+                <div class="blibe-pa-group" style="margin-bottom: 0;">
+                    <label>CLOSE</label>
+                    <div class="blibe-pa-input-wrap"><span class="blibe-pa-addon">Rp</span><input type="number" id="blibe-c1-close" value="1474314000" oninput="prosesPriceActionAll()" /></div>
+                </div>
+            </div>
+            <!-- Candle 2 (Sekarang) -->
+            <div class="blibe-pa-cbox">
+                <span class="blibe-cbox-title">CANDLE 2 (KINI)</span>
+                <div class="blibe-pa-row-split" style="gap:4px; margin-bottom: 3px;">
+                    <div class="blibe-pa-group" style="margin-bottom:0;"><label>OPEN</label><div class="blibe-pa-input-wrap"><input type="number" id="blibe-c2-open" value="1475041000" oninput="prosesPriceActionAll()" /></div></div>
+                    <div class="blibe-pa-group" style="margin-bottom:0;"><label>HIGH</label><div class="blibe-pa-input-wrap"><input type="number" id="blibe-c2-high" value="1477211000" oninput="prosesPriceActionAll()" /></div></div>
+                </div>
+                <div class="blibe-pa-row-split" style="gap:4px;">
+                    <div class="blibe-pa-group" style="margin-bottom:0;"><label>LOW</label><div class="blibe-pa-input-wrap"><input type="number" id="blibe-c2-low" value="1473001000" oninput="prosesPriceActionAll()" /></div></div>
+                    <div class="blibe-pa-group" style="margin-bottom:0;"><label>CLOSE</label><div class="blibe-pa-input-wrap"><input type="number" id="blibe-c2-close" value="1474475000" oninput="prosesPriceActionAll()" /></div></div>
+                </div>
+            </div>
         </div>
-        <div class="box-out">
-            <label>Resisten 1 (R1)</label>
-            <span id="outputR1" class="color-val">Rp 0</span>
-        </div>
-    </div>
 
-    <span class="sub-title">Level Support (Batas Bawah):</span>
-    <div class="row-grid">
-        <div class="box-out">
-            <label>Support 1 (S1)</label>
-            <span id="outputS1" class="color-val">Rp 0</span>
+        <!-- PANEL MATRIKS VALIDASI & SKOR -->
+        <div class="blibe-pa-analysis-box">
+            <div class="blibe-pa-score-row">
+                <span>Sinyal: <strong id="blibe-pa-pola" class="blibe-text-warn">-</strong></span>
+                <span>Skor: <strong id="blibe-pa-skor" class="blibe-text-warn">0%</strong></span>
+            </div>
+            <div id="blibe-pa-narasi" style="font-size: 0.68rem; color: #b0bec5; line-height: 1.2;">-</div>
         </div>
-        <div class="box-out">
-            <label>Support 2 (S2)</label>
-            <span id="outputS2" class="color-val">Rp 0</span>
+
+        <!-- ZONA 3: MANAJEMEN RISIKO & INPUT FLEKSIBEL -->
+        <div class="blibe-pa-section-title" style="margin-top: 5px;">3. MANAJEMEN RISIKO (FLEKSIBEL)</div>
+        <div class="blibe-pa-row-split" style="margin-bottom: 3px;">
+            <div class="blibe-pa-group">
+                <label>TOTAL SALDO (EQUITY)</label>
+                <div class="blibe-pa-input-wrap">
+                    <span class="blibe-pa-addon">Rp</span>
+                    <input type="number" id="blibe-pa-balance" value="10000000" oninput="hitungManajemenRisiko()" />
+                </div>
+            </div>
+            <div class="blibe-pa-group">
+                <label>RESIKO TRADE (%)</label>
+                <div class="blibe-pa-input-wrap">
+                    <input type="number" id="blibe-pa-risk-pct" value="1" step="0.1" oninput="hitungManajemenRisiko()" />
+                    <span class="blibe-pa-addon">%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="blibe-pa-row-split" style="margin-bottom: 3px;">
+            <div class="blibe-pa-group">
+                <label>ENTRY (BELI)</label>
+                <div class="blibe-pa-input-wrap"><span class="blibe-pa-addon">Rp</span><input type="number" id="blibe-pa-entry" value="1473687040" oninput="hitungManajemenRisiko()" /></div>
+            </div>
+            <div class="blibe-pa-group">
+                <label>TARGET TP (%)</label>
+                <div class="blibe-pa-input-wrap"><input type="number" id="blibe-pa-tp-pct" value="4.5" step="0.1" oninput="overridePersen(&#39;tp&#39;)" /><span class="blibe-pa-addon">%</span></div>
+            </div>
+        </div>
+        <div class="blibe-pa-row-split" style="margin-bottom: 3px;">
+            <div class="blibe-pa-group">
+                <label>HARGA TP (RP)</label>
+                <div class="blibe-pa-input-wrap"><span class="blibe-pa-addon">Rp</span><input type="number" id="blibe-pa-tp-price" value="1490000000" oninput="overrideHarga(&#39;tp&#39;)" /></div>
+            </div>
+            <div class="blibe-pa-group">
+                <label>JARAK SL (%)</label>
+                <div class="blibe-pa-input-wrap"><input type="number" id="blibe-pa-sl-pct" value="2.0" step="0.1" oninput="overridePersen(&#39;sl&#39;)" /><span class="blibe-pa-addon">%</span></div>
+            </div>
+        </div>
+        <div class="blibe-pa-group" style="margin-bottom: 6px;">
+            <label>HARGA AMAN STOP LOSS (RP)</label>
+            <div class="blibe-pa-input-wrap"><span class="blibe-pa-addon">Rp</span><input type="number" id="blibe-pa-sl-price" value="0" oninput="overrideHarga(&#39;sl&#39;)" /></div>
+        </div>
+
+        <!-- KONTROL UTAMA -->
+        <div class="blibe-pa-actions">
+            <button type="button" class="blibe-pa-btn btn-blibe-reset" onclick="resetPriceActionPro()">Reset</button>
+            <button type="button" class="blibe-pa-btn btn-blibe-calc" onclick="prosesPriceActionAll()">Hitung</button>
+        </div>
+
+        <!-- OUTPUT FINANSIAL -->
+        <div class="blibe-pa-results">
+            <div class="blibe-pa-res-item">
+                <span>Rasio Risk-to-Reward (R:R):</span>
+                <strong id="blibe-res-rr" class="blibe-text-warn">1 : 0.0</strong>
+            </div>
+            <div class="blibe-pa-res-item">
+                <span>Uang Siap Rugi (Risk):</span>
+                <strong id="blibe-res-risk-cash" class="blibe-text-danger">Rp 0</strong>
+            </div>
+            <div class="blibe-pa-res-total">
+                <span>Belanja Maksimal:</span>
+                <strong id="blibe-res-pos-size" class="blibe-text-success">Rp 0</strong>
+            </div>
         </div>
     </div>
 </div>
 
-<script>
-async function prosesDataLive() {
-    const koin = document.getElementById('pilihanKoin').value;
-    
-    try {
-        const respon = await fetch(`https://indodax.com/api/ticker/${koin}_idr`);
-        if (!respon.ok) {
-            throw new Error(`HTTP ${respon.status}`);
-        }
 
-        const data = await respon.json();
-        const ticker = data.ticker || data;
-        const hargaTerakhir = parseFloat(ticker.last);
-        const hargaTertinggi = parseFloat(ticker.high);
-        const hargaTerendah = parseFloat(ticker.low);
-
-        if (!Number.isFinite(hargaTerakhir) || !Number.isFinite(hargaTertinggi) || !Number.isFinite(hargaTerendah)) {
-            throw new Error('Data harga tidak valid');
-        }
-        
-        // Tampilkan Harga Live
-        document.getElementById('hargaLive').innerText = `Rp ${hargaTerakhir.toLocaleString('id-ID')}`;
-        
-        // Perhitungan TP & SL
-        const tp = hargaTerakhir * 1.05;
-        const sl = hargaTerakhir * 0.98;
-        document.getElementById('targetTP').innerText = `Rp ${Math.round(tp).toLocaleString('id-ID')}`;
-        document.getElementById('targetSL').innerText = `Rp ${Math.round(sl).toLocaleString('id-ID')}`;
-        
-        // Perhitungan Pivot Point Standard
-        const pivotPoint = (hargaTertinggi + hargaTerendah + hargaTerakhir) / 3;
-        const r1 = (2 * pivotPoint) - hargaTerendah;
-        const r2 = pivotPoint + (hargaTertinggi - hargaTerendah);
-        const s1 = (2 * pivotPoint) - hargaTertinggi;
-        const s2 = pivotPoint - (hargaTertinggi - hargaTerendah);
-        
-        // Tampilkan Hasil Pivot dengan Pembulatan Rapi
-        document.getElementById('outputR2').innerText = `Rp ${Math.round(r2).toLocaleString('id-ID')}`;
-        document.getElementById('outputR1').innerText = `Rp ${Math.round(r1).toLocaleString('id-ID')}`;
-        document.getElementById('outputS1').innerText = `Rp ${Math.round(s1).toLocaleString('id-ID')}`;
-        document.getElementById('outputS2').innerText = `Rp ${Math.round(s2).toLocaleString('id-ID')}`;
-        
-    } catch (error) {
-        alert("Gagal memuat data live INDODAX.");
-        console.error(error);
-    }
+<style>
+.blibe-pa-container {
+    background-color: #0b1622;
+    color: #d1d4dc;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    border-radius: 6px;
+    max-width: 480px;
+    margin: 5px auto;
+    border: 1px solid #172a3d;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+    overflow: hidden;
+    box-sizing: border-box;
 }
+.blibe-pa-header {
+    background-color: #0d1e30;
+    padding: 6px;
+    text-align: center;
+    border-bottom: 2px solid #12253a;
+}
+.blibe-pa-header h3 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #00b0ff;
+    font-weight: bold;
+}
+.blibe-pa-body {
+    padding: 6px 8px;
+}
+.blibe-pa-section-title {
+    font-size: 0.65rem;
+    color: #00b0ff;
+    font-weight: bold;
+    margin-bottom: 4px;
+    border-left: 2px solid #007aff;
+    padding-left: 4px;
+}
+.blibe-pa-candle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+.blibe-pa-cbox {
+    background-color: #09111b;
+    border: 1px solid #142436;
+    border-radius: 4px;
+    padding: 4px;
+}
+.blibe-cbox-title {
+    display: block;
+    font-size: 0.58rem;
+    color: #00b0ff;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 4px;
+    border-bottom: 1px solid #142436;
+    padding-bottom: 2px;
+}
+.blibe-pa-group {
+    margin-bottom: 4px;
+}
+.blibe-pa-group label {
+    display: block;
+    font-size: 0.58rem;
+    color: #848e9c;
+    margin-bottom: 1px;
+    font-weight: 600;
+}
+.blibe-pa-input-wrap {
+    display: flex;
+    align-items: center;
+    background-color: #070f17;
+    border: 1px solid #1b2f44;
+    border-radius: 3px;
+    padding: 0 4px;
+    height: 25px;
+}
+.blibe-pa-input-wrap:focus-within {
+    border-color: #007aff;
+}
+.blibe-pa-input-wrap input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 0.78rem;
+    outline: none;
+    padding: 0;
+    font-weight: 500;
+}
+.blibe-pa-addon {
+    color: #5f6c7d;
+    font-size: 0.68rem;
+    user-select: none;
+    padding: 0 1px;
+    white-space: nowrap;
+}
+.blibe-pa-row-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+.blibe-pa-analysis-box {
+    background-color: #07121e;
+    border: 1px dashed #1b3552;
+    border-radius: 4px;
+    padding: 5px 6px;
+    font-size: 0.72rem;
+    margin-top: 2px;
+    margin-bottom: 4px;
+}
+.blibe-pa-score-row {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    border-bottom: 1px dashed #1b3552;
+    padding-bottom: 2px;
+    margin-bottom: 2px;
+}
+.blibe-pa-actions {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 6px;
+    margin: 6px 0;
+}
+.blibe-pa-btn {
+    height: 28px;
+    border: none;
+    border-radius: 3px;
+    font-size: 0.78rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+.btn-blibe-reset {
+    background-color: #263238;
+    color: #cfd8dc;
+}
+.btn-blibe-calc {
+    background-color: #007aff;
+    color: #ffffff;
+}
+.blibe-pa-results {
+    background-color: #060c13;
+    border-radius: 4px;
+    padding: 4px 8px;
+    border: 1px solid #12253a;
+}
+.blibe-pa-res-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    padding: 2px 0;
+    color: #b0bec5;
+}
+.blibe-pa-res-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #172a3d;
+    margin-top: 2px;
+    padding-top: 3px;
+    font-size: 0.78rem;
+    color: #ffffff;
+}
+.blibe-text-warn { color: #ffb74d; }
+.blibe-text-danger { color: #ff5252; }
+.blibe-text-success { color: #00e676; font-size: 0.85rem; font-weight: bold; white-space: nowrap; }
+</style>
+
+
+<script>
+function prosesPriceActionAll() {
+    const spotR = parseFloat(document.getElementById('blibe-pa-spot-r').value) || 0;
+    const spotS = parseFloat(document.getElementById('blibe-pa-spot-s').value) || 0;
+    const c1O = parseFloat(document.getElementById('blibe-c1-open').value) || 0;
+    const c1C = parseFloat(document.getElementById('blibe-c1-close').value) || 0;
+    const c2O = parseFloat(document.getElementById('blibe-c2-open').value) || 0;
+    const c2H = parseFloat(document.getElementById('blibe-c2-high').value) || 0;
+    const c2L = parseFloat(document.getElementById('blibe-c2-low').value) || 0;
+    const c2C = parseFloat(document.getElementById('blibe-c2-close').value) || 0;
+
+    const polaEl = document.getElementById('blibe-pa-pola');
+    const skorEl = document.getElementById('blibe-pa-skor');
+    const narasiEl = document.getElementById('blibe-pa-narasi');
+
+    let namaPola = "NORMAL";
+    let skorValiditas = 50;
+    let narasiTeks = "Harga bergerak normal di dalam rentang pasar.";
+    let statusPola = "normal";
+
+    if (c1O > 0 && c2C > 0 && c2H >= c2L) {
+        const c1IsBullish = c1C >= c1O;
+        const c2IsBullish = c2C >= c2O;
+        const c1MaxBody = Math.max(c1O, c1C);
+        const c1MinBody = Math.min(c1O, c1C);
+        const c2Body = Math.abs(c2C - c2O);
+
+        if (!c1IsBullish && c2IsBullish && c2C > c1MaxBody && c2O < c1MinBody) {
+            namaPola = "BULLISH ENGULFING"; statusPola = "bullish";
+            narasiTeks = "Sinyal naik kuat! Candle hijau membungkus penuh candle merah sebelumnya.";
+        } else if (c1IsBullish && !c2IsBullish && c2C < c1MinBody && c2O > c1MaxBody) {
+            namaPola = "BEARISH ENGULFING"; statusPola = "bearish";
+            narasiTeks = "Sinyal turun tajam! Candle merah membungkus penuh candle hijau sebelumnya.";
+        } else if (c2H <= Math.max(c1O, c1C) && c2L >= Math.min(c1O, c1C)) {
+            namaPola = "INSIDE BAR"; statusPola = "normal";
+            narasiTeks = "Pasar konsolidasi. Bersiap masuk jika harga menembus batas candle 1.";
+        } else if (!c1IsBullish && c2IsBullish && Math.abs(c2L - c1C) / c2L < 0.005) {
+            namaPola = "TWEEZER BOTTOM"; statusPola = "bullish";
+            narasiTeks = "Lantai harga kokoh! Dua candle menolak turun di level terendah yang hampir sama.";
+        } else {
+            let upShadow2 = c2H - Math.max(c2O, c2C);
+            let loShadow2 = Math.min(c2O, c2C) - c2L;
+
+            if (loShadow2 >= (c2Body * 1.5) && upShadow2 <= (c2Body * 0.5)) {
+                namaPola = c2IsBullish ? "BULLISH HAMMER" : "HANGING MAN";
+                statusPola = c2IsBullish ? "bullish" : "bearish";
+                narasiTeks = "Penolakan ekor bawah dominan, ada dorongan belanja masuk.";
+            } else if (upShadow2 >= (c2Body * 1.5) && loShadow2 <= (c2Body * 0.5)) {
+                namaPola = "SHOOTING STAR"; statusPola = "bearish";
+                narasiTeks = "Penolakan ekor atas tajam, tekanan jual membendung kenaikan.";
+            } else {
+                namaPola = c2IsBullish ? "CANDLE BULLISH" : "CANDLE BEARISH";
+                statusPola = c2IsBullish ? "bullish" : "bearish";
+            }
+        }
+
+        if (spotS > 0 && spotR > 0) {
+            const jarakKeSupport = Math.abs(c2C - spotS) / c2C;
+            const jarakKeResistance = Math.abs(spotR - c2C) / c2C;
+
+            if (statusPola === "bullish" && jarakKeSupport <= 0.05) {
+                skorValiditas = 100;
+                narasiTeks += " [SETUP KUAT: Terkonfirmasi di tumpuan Support!]";
+            } else if (statusPola === "bearish" && jarakKeResistance <= 0.05) {
+                skorValiditas = 100;
+                narasiTeks += " [SETUP REJECTION: Terkonfirmasi di atap Resistance!]";
+            } else if (statusPola === "bullish" && c2C >= (spotR - (spotR * 0.02))) {
+                skorValiditas = 25;
+                narasiTeks += " [RISIKO TINGGI: Dekat Resistance terdekat. Rawan Fakeout!]";
+            } else if (jarakKeSupport > 0.05 && jarakKeResistance > 0.05) {
+                skorValiditas = 60;
+                narasiTeks += " [KONTEKS LEMAH: Terbentuk di tengah ruang kosong pasar.]";
+            } else {
+                skorValiditas = 75;
+            }
+        }
+
+        polaEl.innerText = namaPola;
+        skorEl.innerText = skorValiditas + "%";
+        skorEl.className = skorValiditas >= 75 ? "blibe-text-success" : (skorValiditas >= 50 ? "blibe-text-warn" : "blibe-text-danger");
+        polaEl.className = (statusPola === "bullish") ? "blibe-text-success" : ((statusPola === "bearish") ? "blibe-text-danger" : "blibe-text-warn");
+        narasiEl.innerText = narasiTeks;
+
+        document.getElementById('blibe-pa-entry').value = Math.round(c2C);
+        let autoSL = statusPola === "bearish" ? (c2H * 1.002) : (c2L * 0.998);
+        document.getElementById('blibe-pa-sl-price').value = Math.round(autoSL);
+        document.getElementById('blibe-pa-tp-price').value = Math.round(spotR > 0 ? spotR : c2C * 1.03);
+    }
+    hitungManajemenRisikoInternal();
+}
+
+function overridePersen(tipe) {
+    const entry = parseFloat(document.getElementById('blibe-pa-entry').value) || 0;
+    if (entry <= 0) return;
+    if (tipe === 'tp') {
+        const tpPct = parseFloat(document.getElementById('blibe-pa-tp-pct').value) || 0;
+        document.getElementById('blibe-pa-tp-price').value = Math.round(entry * (1 + (tpPct / 100)));
+    } else if (tipe === 'sl') {
+        const slPct = parseFloat(document.getElementById('blibe-pa-sl-pct').value) || 0;
+        document.getElementById('blibe-pa-sl-price').value = Math.round(entry * (1 - (slPct / 100)));
+    }
+    hitungManajemenRisikoInternal();
+}
+
+function overrideHarga(tipe) {
+    const entry = parseFloat(document.getElementById('blibe-pa-entry').value) || 0;
+    if (entry <= 0) return;
+    if (tipe === 'tp') {
+        const tpPrice = parseFloat(document.getElementById('blibe-pa-tp-price').value) || 0;
+        document.getElementById('blibe-pa-tp-pct').value = (((tpPrice - entry) / entry) * 100).toFixed(2);
+    } else if (tipe === 'sl') {
+        const slPrice = parseFloat(document.getElementById('blibe-pa-sl-price').value) || 0;
+        document.getElementById('blibe-pa-sl-pct').value = (((entry - slPrice) / entry) * 100).toFixed(2);
+    }
+    hitungManajemenRisikoInternal();
+}
+
+function hitungManajemenRisiko() { hitungManajemenRisikoInternal(); }
+
+function hitungManajemenRisikoInternal() {
+    const balance = parseFloat(document.getElementById('blibe-pa-balance').value) || 0;
+    const riskPct = parseFloat(document.getElementById('blibe-pa-risk-pct').value) || 0;
+    const entry = parseFloat(document.getElementById('blibe-pa-entry').value) || 0;
+    const tpPrice = parseFloat(document.getElementById('blibe-pa-tp-price').value) || 0;
+    const slPrice = parseFloat(document.getElementById('blibe-pa-sl-price').value) || 0;
+    
+    const rrEl = document.getElementById('blibe-res-rr');
+    const riskCashEl = document.getElementById('blibe-res-risk-cash');
+    const posSizeEl = document.getElementById('blibe-res-pos-size');
+
+    if (balance <= 0 || entry <= 0 || slPrice <= 0 || entry === slPrice) {
+        rrEl.innerText = "1 : 0.0"; riskCashEl.innerText = "Rp 0"; posSizeEl.innerText = "Rp 0";
+        return;
+    }
+
+    const jarakSL = Math.abs(entry - slPrice);
+    const jarakTP = Math.abs(tpPrice - entry);
+    const rasioReward = jarakSL > 0 ? (jarakTP / jarakSL).toFixed(1) : 0;
+    
+    rrEl.innerText = "1 : " + rasioReward;
+    rrEl.className = parseFloat(rasioReward) < 1.5 ? "blibe-text-danger" : "blibe-text-success";
+
+    const slPctReal = (jarakSL / entry) * 100;
+    const riskCash = balance * (riskPct / 100);
+    const positionSize = riskCash / (slPctReal / 100);
+    const formatRupiah = (angka) => "Rp " + Math.round(angka).toLocaleString('id-ID');
+
+    riskCashEl.innerText = formatRupiah(riskCash);
+    posSizeEl.innerText = positionSize > balance ? formatRupiah(balance) + " (Max)" : formatRupiah(positionSize);
+}
+
+function resetPriceActionPro() {
+    document.getElementById('blibe-pa-spot-r').value = 0;
+    document.getElementById('blibe-pa-spot-s').value = 0;
+    document.getElementById('blibe-c1-open').value = 0;
+    document.getElementById('blibe-c1-close').value = 0;
+    document.getElementById('blibe-c2-open').value = 0;
+    document.getElementById('blibe-c2-high').value = 0;
+    document.getElementById('blibe-c2-low').value = 0;
+    document.getElementById('blibe-c2-close').value = 0;
+    document.getElementById('blibe-pa-balance').value = 0;
+    document.getElementById('blibe-pa-risk-pct').value = 1;
+    document.getElementById('blibe-pa-tp-pct').value = "4.5";
+    document.getElementById('blibe-pa-sl-pct').value = "2.0";
+    prosesPriceActionAll();
+}
+
+window.addEventListener('DOMContentLoaded', () => { prosesPriceActionAll(); });
 </script>
 
-</body>
-</html>
+
+
