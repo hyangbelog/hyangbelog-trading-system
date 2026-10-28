@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <!-- Ini saja yang penting ditambahkan agar skala tulisan pas di HP -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Pivot & Risk Tracker Live</title>
+  
+  <style>
+    /* Mengunci agar warna latar belakang dasar halaman berwarna hitam pekat */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      background-color: #000000 !important;
+      color: #c9d1d9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+    <h3>Crypto Pivot & Risk Tracker</h3>
+    
+    <!-- FITUR BARU: Dropdown Pilihan Koin dan Mata Uang -->
+    <div class="grid-inputs" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 4px;">
+        <div class="input-group">
+            <label for="pilih-koin">PILIH KOIN</label>
+            <select id="pilih-koin" onchange="gantiKoinAtauMataUang()">
+                <option value="BTC" />BTC (Bitcoin)
+                <option value="ETH" />ETH (Ethereum)
+                <option value="SOL" />SOL (Solana)
+                <option value="BNB" />BNB (Binance Coin)
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="pilih-mata-uang">MATA UANG (PASAR)</label>
+            <select id="pilih-mata-uang" onchange="gantiKoinAtauMataUang()">
+                <option value="IDR" />IDR (Rupiah - Tokocrypto)
+                <option value="USDT" />USDT (Dollar - Binance)
+            </select>
+        </div>
+    </div>
+    
+    <div class="grid-inputs">
+        <!-- Kolom HB dikunci (readonly) karena sudah otomatis terisi live -->
+        <div class="input-group full-width row-layout">
+            <label for="hb">Harga Bergerak (HB) <span id="status-live" style="color:#2196f3; font-size:9px;">● LIVE</span></label>
+            <input type="text" id="hb" value="-" readonly style="background:#090d13; color:#2196f3; font-weight:bold;" />
+        </div>
+        <div class="input-group">
+            <label for="r2">Resisten 2 (R2)</label>
+            <input type="text" id="r2" value="1.524.523.010" oninput="formatInputRupiah(this)" />
+        </div>
+        <div class="input-group">
+            <label for="r1">Resisten 1 (R1)</label>
+            <input type="text" id="r1" value="1.489.000.000" oninput="formatInputRupiah(this)" />
+        </div>
+        <div class="input-group">
+            <label for="s1">Support 1 (S1)</label>
+            <input type="text" id="s1" value="1.460.118.020" oninput="formatInputRupiah(this)" />
+        </div>
+        <div class="input-group">
+            <label for="s2">Support 2 (S2)</label>
+            <input type="text" id="s2" value="1.450.000.000" oninput="formatInputRupiah(this)" />
+        </div>
+    </div>
+
+    <!-- ACCORDION 1: ANALISIS JARAK -->
+    <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion('acc-jarak', 'panah-jarak')">
+            <span>📊 Analisis Jarak & Persentase</span>
+            <span id="panah-jarak" class="panah-icon">▼</span>
+        </div>
+        <div id="acc-jarak" class="accordion-content">
+            <table class="table-res">
+                <thead>
+                    <tr><th>Target</th><th>Jarak</th><th>Visual % & Bar</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="pos-r">R2</td><td id="dist-r2">-</td>
+                        <td>
+                            <div id="pct-r2">-</div>
+                            <div class="sub-bar-container"><div id="bar-r2" class="sub-bar-fill"></div></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="pos-r">R1</td><td id="dist-r1">-</td>
+                        <td>
+                            <div id="pct-r1">-</div>
+                            <div class="sub-bar-container"><div id="bar-r1" class="sub-bar-fill"></div></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="pos-s">S1</td><td id="dist-s1">-</td>
+                        <td>
+                            <div id="pct-s1">-</div>
+                            <div class="sub-bar-container"><div id="bar-s1" class="sub-bar-fill"></div></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="pos-s">S2</td><td id="dist-s2">-</td>
+                        <td>
+                            <div id="pct-s2">-</div>
+                            <div class="sub-bar-container"><div id="bar-s2" class="sub-bar-fill"></div></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ACCORDION 2: RENCANA POSISI -->
+    <div class="accordion-item">
+        <div class="accordion-header" onclick="toggleAccordion('acc-posisi', 'panah-posisi')">
+            <span>🎯 Rencana Posisi Bertingkat</span>
+            <span id="panah-posisi" class="panah-icon">▼</span>
+        </div>
+        <div id="acc-posisi" class="accordion-content">
+            <table class="table-res">
+                <thead>
+                    <tr><th>Aksi</th><th>Target Harga</th><th>Ket.</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td class="pos-r">Jual 3</td><td id="jual-3">-</td><td class="info-text">R3 Max</td></tr>
+                    <tr><td class="pos-r">Jual 2</td><td id="jual-2">-</td><td class="info-text">R2 Mid</td></tr>
+                    <tr><td class="pos-r">Jual 1</td><td id="jual-1">-</td><td class="info-text">R1 Low</td></tr>
+                    <tr style="border-top: 1px dashed var(--border-color);">
+                        <td class="pos-s">Beli 1</td><td id="beli-1">-</td><td class="info-text">S1 Low</td></tr>
+                    <tr><td class="pos-s">Beli 2</td><td id="beli-2">-</td><td class="info-text">S2 Mid</td></tr>
+                    <tr><td class="pos-s">Beli 3</td><td id="beli-3">-</td><td class="info-text">S3 Max</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="summary-text" id="summary">
+        Menghubungkan ke bursa, memuat harga live...
+    </div>
+
+    <div class="bar-flex-container-main">
+        <div id="main-bar-profit" class="bar-main-fill profit-color">(50%) Buy</div>
+        <div id="main-bar-loss" class="bar-main-fill loss-color">(50%) Sel</div>
+    </div>
+
+            <div class="btn-group">
+        <button type="button" class="btn-calc-pivot" onclick="hitungData()">Simpan/Kunci S/R</button>
+        <button class="btn-wa" onclick="kirimWA()">Kirim WA</button>
+        <button type="button" class="btn-reset-pivot" onclick="pivotResetForm()">Reset</button>
+        <button type="button" class="btn-indodax" onclick="bukaIndodax()" style="background-color: #00B4D8; color: white; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">🌐Indodax</button>
+      </div>
+
+
+
+<style>
+:root {
+        --bg-color: #0d1117;
+        --card-bg: #161b22;
+        --border-color: #30363d;
+        --text-main: #c9d1d9;
+        --text-muted: #8b949e;
+        --accent-green: #238636;
+        --accent-red: #da3633;
+        --accent-blue: #1f6feb;
+        --table-header-bg: #21262d; 
+        --text-soft-white: #e0e6ed; 
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        margin: 0;
+        padding: 0px; 
+        display: flex;
+        justify-content: center;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 400px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 6px; 
+        box-sizing: border-box;
+    }
+
+    h3 {
+        margin: 0 0 5px 0; 
+        text-align: center;
+        font-size: 0.85rem;
+        color: #ffffff;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 2px;
+    }
+
+    .grid-inputs {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 3px; 
+        margin-bottom: 4px;
+    }
+
+    .input-group { display: flex; flex-direction: column; }
+    .input-group.full-width { grid-column: span 2; }
+    
+    .row-layout {
+        flex-direction: row !important;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        margin-bottom: 1px;
+    }
+    .row-layout label { margin-bottom: 0; white-space: nowrap; }
+    .row-layout input { flex-grow: 1; text-align: right; }
+
+    label {
+        font-size: 0.62rem;
+        color: var(--text-muted);
+        margin-bottom: 0px;
+        font-weight: 600;
+    }
+
+    input, select {
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        color: #ffffff;
+        padding: 3px 5px; 
+        border-radius: 4px;
+        font-size: 0.72rem;
+        outline: none;
+    }
+
+    select {
+        cursor: pointer;
+        padding: 2px 4px;
+    }
+
+    .accordion-item {
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        margin-bottom: 3px; 
+        overflow: hidden;
+    }
+
+    .accordion-header {
+        background: #21262d;
+        color: #ffffff;
+        padding: 4px 6px; 
+        font-size: 0.68rem;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .panah-icon {
+        color: #2196f3;
+        font-size: 8px;
+        transition: transform 0.3s ease;
+        transform: rotate(0deg);
+    }
+
+    .accordion-content {
+        display: none;
+        background: #000000; 
+        padding: 1px 2px;
+        width: 100%;
+        box-sizing: border-box;
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .table-res {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.68rem;
+        margin: 0;
+    }
+
+    .table-res thead th {
+        background-color: var(--table-header-bg);
+        color: var(--text-soft-white);
+        font-weight: bold;
+    }
+
+    .table-res th, .table-res td {
+        padding: 2px 4px; 
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+        vertical-align: middle;
+    }
+
+    .pos-r { color: var(--accent-red); font-weight: 600; }
+    .pos-s { color: var(--accent-green); font-weight: 600; }
+    .info-text { color: var(--text-muted); font-size: 0.62rem; }
+
+    .sub-bar-container {
+        width: 100%;
+        background-color: #222;
+        border-radius: 3px;
+        height: 3px; 
+        margin-top: 1px;
+        overflow: hidden;
+    }
+
+    .sub-bar-fill {
+        width: 0%;
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.3s ease, background-color 0.3s ease;
+    }
+
+    .bar-flex-container-main {
+        display: flex;
+        width: 100%;
+        height: 14px; 
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 4px 0;
+        font-size: 0.6rem;
+        font-weight: bold;
+        text-align: center;
+        line-height: 14px;
+        color: #ffffff;
+    }
+
+    .bar-main-fill { transition: width 0.3s ease; }
+    .profit-color { background-color: var(--accent-green); }
+    .loss-color { background-color: var(--accent-red); }
+
+    .summary-text {
+        margin: 3px 0;
+        font-size: 0.68rem;
+        background: var(--bg-color);
+        padding: 3px 5px;
+        border-radius: 4px;
+        border-left: 3px solid var(--accent-blue);
+        line-height: 1.2;
+    }
+
+    .btn-group {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+        margin-top: 4px;
+    }
+
+    button {
+        padding: 4px; 
+        border: none;
+        border-radius: 4px;
+        font-size: 0.68rem;
+        font-weight: bold;
+        cursor: pointer;
+        color: #ffffff;
+    }
+
+    .btn-calc-pivot {
+  background-color: #ff9f00 !important; /* Latar belakang kuning */
+  border: 1px solid #ff9f00 !important;
+  color: #ffffff !important;            /* Warna teks diubah menjadi putih bersih */
+}
+
+
+.btn-wa { background-color: var(--accent-green); }
+.btn-reset-pivot {
+  background-color: var(--accent-red) !important;
+  border: 1px solid var(--accent-red) !important;
+  color: var(--text-soft-white) !important;
+}
+
+</style>
+
+
+<script>
+
+function bukaIndodax() {
+    // 1. Mengambil nama koin otomatis dari pilihan di layar
+    let elemenKoin = document.getElementById('pilihKoin');
+    let namaKoin = elemenKoin ? elemenKoin.value.toLowerCase() : "btc";
+    let pasanganPasar = namaKoin + "_idr";
+
+    // 2. Angka harga target beli
+    let targetHarga = "1460118020";
+
+    // 3. Jumlah minimal pembelian
+    let targetJumlah = "10000";
+
+    // 4. URL Jembatan Vercel yang sudah diperbaiki (Ditambahkan pencegah cache)
+    const URL_JEMBATAN = 'https://vercel.app' + Date.now();
+
+    console.log("Mencoba menghubungkan ke URL:", URL_JEMBATAN);
+
+    // 5. Mengirimkan sinyal tes koneksi ke Vercel
+    fetch(URL_JEMBATAN, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            pair: pasanganPasar,
+            action: 'buy',
+            price: targetHarga,
+            amount: targetJumlah
+        })
+    })
+    .then(response => {
+        console.log("Status Respon HTTP Backend:", response.status);
+        if (!response.ok) {
+            throw new Error("Server Vercel merespon dengan kode error HTTP: " + response.status);
+        }
+        return response.json();
+    })
+    .then(hasil => {
+        console.log("Respon Asli Indodax/Vercel:", hasil);
+        
+        // Memeriksa hasil sukses dari backend Express Anda
+        if (hasil.success === 1 || hasil.success === true || hasil.return) {
+            alert("Koneksi Sukses! Jembatan berhasil terhubung ke akun Indodax Anda.");
+        } else {
+            alert("Jembatan Terhubung, tapi Indodax Menolak.\nAlasan: " + (hasil.error || hasil.message || JSON.stringify(hasil)));
+        }
+    })
+    .catch(error => {
+        console.error("Detail Error Pelacakan:", error);
+        alert("Gagal Terhubung ke Jembatan Vercel.\n\nDetail Error: " + error.message + "\n\nSolusi: Pastikan Anda sudah Clear Cache browser HP Anda.");
+    });
+}
+
+
+
+    function toggleAccordion(contentId, panahId) {
+        const content = document.getElementById(contentId);
+        const panah = document.getElementById(panahId);
+        if (content.style.display === "table" || content.style.display === "block") {
+            content.style.display = "none";
+            panah.style.transform = "rotate(0deg)";
+        } else {
+            content.style.display = "table"; 
+            panah.style.transform = "rotate(-180deg)";
+        }
+    }
+
+    function formatInputRupiah(input) {
+    let nilaiBersih = input.value.replace(/[^0-9]/g, ""); 
+    
+    if (nilaiBersih === "") {
+        input.value = "";
+        return;
+    }
+    
+    let nilaiFormat = new Intl.NumberFormat('id-ID').format(parseFloat(nilaiBersih));
+    input.value = nilaiFormat;
+    
+    hargaMentahLiveGlobal = parseFloat(nilaiBersih);
+    hitungData(); 
+}
+
+
+    function formatKustomMataUang(angka, pasar) {
+        if (pasar === "IDR") {
+            return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(angka);
+        } else {
+            return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(angka);
+        }
+    }
+
+    function dapatkanAngkaMurni(id) {
+        const textVal = document.getElementById(id).value;
+        if (!textVal) return 0;
+        return parseFloat(textVal.replace(/\./g, "").replace(/,/g, "")) || 0;
+    }
+
+
+      function hitungData() {
+        const hb = dapatkanAngkaMurni('hb');
+        const r2 = dapatkanAngkaMurni('r2');
+        const r1 = dapatkanAngkaMurni('r1');
+        const s1 = dapatkanAngkaMurni('s1');
+        const s2 = dapatkanAngkaMurni('s2');
+        const pasar = document.getElementById('pilih-mata-uang').value;
+        const koin = document.getElementById('pilih-koin').value;
+
+        if (!hb || !r1 || !s1) return;
+
+        const targets = [
+            { id: 'r2', val: r2, tipe: 'R' }, { id: 'r1', val: r1, tipe: 'R' },
+            { id: 's1', val: s1, tipe: 'S' }, { id: 's2', val: s2, tipe: 'S' }
+        ];
+
+        let pctAbsolutR1 = 0; let pctAbsolutS1 = 0;
+
+        targets.forEach(t => {
+            const distAbsolut = Math.abs(t.val - hb);
+            let pct = ((t.val - hb) / hb) * 100;
+            if (t.tipe === 'R' && pct < 0) pct = pct; 
+            if (t.tipe === 'S' && pct > 0) pct = -pct; 
+
+            const sign = pct >= 0 ? "+" : "";
+            const pctAbsolut = Math.abs(pct);
+            
+            if (t.id === 'r1') pctAbsolutR1 = pctAbsolut;
+            if (t.id === 's1') pctAbsolutS1 = pctAbsolut;
+
+            const cellPct = document.getElementById(`pct-${t.id}`);
+            const barFill = document.getElementById(`bar-${t.id}`);
+            
+            document.getElementById(`dist-${t.id}`).innerText = formatKustomMataUang(distAbsolut, pasar);
+            
+            let colorHex = ""; let emojiStatus = "";
+            let batasFee = pasar === "IDR" ? 0.30 : 0.25;
+            
+            if (pctAbsolut <= batasFee) {
+                colorHex = "#da3633"; emojiStatus = "🔴";
+            } else if (pctAbsolut > batasFee && pctAbsolut <= 0.60) {
+                colorHex = "#ff9800"; emojiStatus = "🟡";
+            } else {
+                colorHex = "#238636"; emojiStatus = "🟢";
+            }
+            
+            cellPct.innerText = `${emojiStatus} ${sign}${pct.toFixed(2)}%`;
+            cellPct.style.color = colorHex;
+
+            let lebarBar = (pctAbsolut / 5) * 100;
+            if (lebarBar > 100) lebarBar = 100;
+            barFill.style.width = `${lebarBar}%`;
+            barFill.style.backgroundColor = colorHex;
+        });
+
+        let totalJarakS1R1 = pctAbsolutR1 + pctAbsolutS1;
+        let mainPctProfit = totalJarakS1R1 > 0 ? (pctAbsolutR1 / totalJarakS1R1) * 100 : 50;
+        let mainPctRisk = 100 - mainPctProfit;
+
+        document.getElementById('main-bar-profit').style.width = `${mainPctProfit.toFixed(0)}%`;
+        document.getElementById('main-bar-profit').innerText = `Buy (${mainPctProfit.toFixed(0)}%)`;
+        document.getElementById('main-bar-loss').style.width = `${mainPctRisk.toFixed(0)}%`;
+        document.getElementById('main-bar-loss').innerText = `Sel (${mainPctRisk.toFixed(0)}%)`;
+
+        document.getElementById('beli-1').innerText = formatKustomMataUang(s1 * 1.002, pasar);
+        document.getElementById('beli-2').innerText = formatKustomMataUang(s1, pasar);
+        document.getElementById('beli-3').innerText = formatKustomMataUang(s2, pasar);
+        document.getElementById('jual-1').innerText = formatKustomMataUang(r1, pasar);
+        document.getElementById('jual-2').innerText = formatKustomMataUang(r1 + ((r2 - r1) / 2), pasar);
+        document.getElementById('jual-3').innerText = formatKustomMataUang(r2, pasar);
+
+        let prediksi = (hb > r1) ? "Bullish Kuat (Kejar R2)" : (hb < s1) ? "Breakdown Bearish (Jebol S1)" : "Sideways / Konsolidasi (S1-R1)";
+        
+        let listJarak = [
+            { nama: 'R2', nilai: Math.abs(r2 - hb), pct: ((r2 - hb) / hb) * 100, tipe: 'R' },
+            { nama: 'R1', nilai: Math.abs(r1 - hb), pct: ((r1 - hb) / hb) * 100, tipe: 'R' },
+            { nama: 'S1', nilai: Math.abs(s1 - hb), pct: ((s1 - hb) / hb) * 100, tipe: 'S' },
+            { nama: 'S2', nilai: Math.abs(s2 - hb), pct: ((s2 - hb) / hb) * 100, tipe: 'S' }
+        ];
+        listJarak.sort((a, b) => a.nilai - b.nilai);
+        
+        let dataTerdekat = listJarak[0];
+        let realPct = dataTerdekat.tipe === 'S' ? -Math.abs(dataTerdekat.pct) : Math.abs(dataTerdekat.pct);
+        let signTerdekat = realPct > 0 ? "+" : "";
+        let teksTerdekat = `${dataTerdekat.nama} (${signTerdekat}${realPct.toFixed(2)}%)`;
+
+        document.getElementById('summary').innerHTML = `<strong>Tren:</strong> ${prediksi} | Terdekat ke <strong>${teksTerdekat}</strong>.`;
+        
+        // Perbaikan Utama: Menyimpan data spesifik berdasarkan nama koin unik (misal: preferensi_BTC atau preferensi_ETH)
+        localStorage.setItem(`pref_${koin}_${pasar}`, JSON.stringify({
+            r2: document.getElementById('r2').value,
+            r1: document.getElementById('r1').value,
+            s1: document.getElementById('s1').value,
+            s2: document.getElementById('s2').value
+        }));
+        // Menyimpan status koin terakhir yang sedang aktif dibuka
+        localStorage.setItem('koin_terakhir_aktif', JSON.stringify({ koin: koin, pasar: pasar }));
+    }
+
+    function gantiKoinAtauMataUang() {
+        const koin = document.getElementById('pilih-koin').value;
+        const pasar = document.getElementById('pilih-mata-uang').value;
+        
+        // Cek apakah ada data lama yang tersimpan khusus untuk koin ini
+        const dataTersimpan = localStorage.getItem(`pref_${koin}_${pasar}`);
+        
+        if (dataTersimpan) {
+            const data = JSON.parse(dataTersimpan);
+            document.getElementById('r2').value = data.r2;
+            document.getElementById('r1').value = data.r1;
+            document.getElementById('s1').value = data.s1;
+            document.getElementById('s2').value = data.s2;
+        } else {
+            // Jika koin baru pertama kali dibuka dan belum ada simpanan, kosongkan kolom S/R agar tidak memakai angka koin lain
+            ['r2', 'r1', 's1', 's2'].forEach(id => document.getElementById(id).value = "");
+            const fields = ['dist-r2', 'pct-r2', 'dist-r1', 'pct-r1', 'dist-s1', 'pct-s1', 'dist-s2', 'pct-s2', 'beli-1', 'beli-2', 'beli-3', 'jual-1', 'jual-2', 'jual-3'];
+            fields.forEach(id => document.getElementById(id).innerText = "-");
+            ['r2', 'r1', 's1', 's2'].forEach(id => document.getElementById(`bar-${id}`).style.width = "0%");
+        }
+        
+        document.getElementById('hb').value = "";
+        document.getElementById('summary').innerText = `Koin diganti ke ${koin}/${pasar}. Masukkan HB baru.`;
+        hitungData();
+    }
+
+
+   function kirimWA() {
+  const hb = document.getElementById('hb').value;
+  const koin = document.getElementById('pilih-koin').value;
+  const pasar = document.getElementById('pilih-mata-uang').value;
+
+  // Mengambil data murni beserta emoji dari tabel dasbor Anda
+  const r1 = document.getElementById('pct-r1').innerText;
+  const s1 = document.getElementById('pct-s1').innerText;
+
+  // 1. MENGAMBIL LINK WEB HALAMAN AKTIF SECARA OTOMATIS
+  const linkAktifWeb = window.location.href;
+
+  // 2. MENYUSUN TEKS (Sudah ditambahkan link web di baris paling bawah)
+  const text = `*Crypto Update (${koin}/${pasar})*\nHB: ${hb}\n\n*Target %:*\nR1: ${r1}\nS1: ${s1}\n\n_Via Crypto Pivot & Risk Tracker_\n\nAnalisis Live Selengkapnya:\n${linkAktifWeb}`;
+
+  // 3. PROSES PENGIRIMAN / BERBAGI
+  if (navigator.share) {
+    navigator.share({ 
+      title: 'Crypto Update', 
+      text: text 
+    })
+    .catch(console.error);
+  } else {
+    navigator.clipboard.writeText(text).then(function() {
+      alert('Teks + Link Web berhasil disalin ke clipboard! Silakan paste langsung di WhatsApp.');
+    });
+  }
+}
+
+
+
+
+             function pivotResetForm() {
+        // Mengosongkan paksa nilai teks di semua kolom input utama
+        document.getElementById('hb').value = "";
+        document.getElementById('r2').value = "";
+        document.getElementById('r1').value = "";
+        document.getElementById('s1').value = "";
+        document.getElementById('s2').value = "";
+        
+        // Mengembalikan tampilan teks tabel analisis jarak ke kondisi strip (-)
+        const fields = ['dist-r2', 'pct-r2', 'dist-r1', 'pct-r1', 'dist-s1', 'pct-s1', 'dist-s2', 'pct-s2', 'beli-1', 'beli-2', 'beli-3', 'jual-1', 'jual-2', 'jual-3'];
+        fields.forEach(id => {
+            const elemen = document.getElementById(id);
+            if (elemen) elemen.innerText = "-";
+        });
+        
+        // Mengosongkan lebar visual sub-bar persentase menggunakan gabungan string biasa agar aman di HP
+        ['r2', 'r1', 's1', 's2'].forEach(id => {
+            const barfill = document.getElementById('bar-' + id);
+            if (barfill) barfill.style.width = "0%";
+        });
+        
+        // Mengembalikan pesan petunjuk di bawah tabel
+        document.getElementById('summary').innerText = "Masukkan Harga Bergerak (HB) untuk memulai.";
+    }
+
+
+
+    window.onload = function() {
+        const inputHB = document.getElementById('hb');
+        if (inputHB) {
+            inputHB.removeAttribute('readonly');
+            
+            // Perbaikan Gaya Visual HB: Mengubah warna ke putih soft dan menaikkan ukuran font sebesar 1px (dari 0.72rem ke 0.78rem)
+            inputHB.style.background = "#0d1117"; 
+            inputHB.style.color = "#e0e6ed"; 
+            inputHB.style.fontSize = "0.78rem"; 
+            inputHB.style.fontWeight = "bold";
+            
+            inputHB.setAttribute('oninput', 'formatInputRupiah(this)');
+            inputHB.value = "";
+        }
+
+        // Memulihkan koin terakhir yang aktif dibuka sebelum halaman di-refresh
+        const dataAktif = localStorage.getItem('koin_terakhir_aktif');
+        if (dataAktif) {
+            const posisi = JSON.parse(dataAktif);
+            document.getElementById('pilih-koin').value = posisi.koin;
+            document.getElementById('pilih-mata-uang').value = posisi.pasar;
+        }
+
+        // Memulihkan data S/R yang tersimpan khusus untuk koin aktif tersebut
+        const koin = document.getElementById('pilih-koin').value;
+        const pasar = document.getElementById('pilih-mata-uang').value;
+        const savedData = localStorage.getItem(`pref_${koin}_${pasar}`);
+        
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            document.getElementById('r2').value = data.r2;
+            document.getElementById('r1').value = data.r1;
+            document.getElementById('s1').value = data.s1;
+            document.getElementById('s2').value = data.s2;
+        }
+        
+        document.getElementById('summary').innerText = "Masukkan Harga Bergerak (HB) untuk memulai.";
+        hitungData();
+    }
+</script></div></!doctype>
