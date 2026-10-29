@@ -3,13 +3,22 @@
 <head>
     <!-- URUTAN NO 1: Taruh script minimalis ini di sini -->
     <style>
-      *, *::before, *::after {
-        box-sizing: border-box !important;
-      }
-      body {
-        overflow-x: hidden !important;
-      }
-    </style>
+  /* KOREKSI KHUSUS: HANYA UNTUK KOTAK INPUT ATAS AGAR PAS DI HP */
+  *, *::before, *::after {
+    box-sizing: border-box !important;
+  }
+  body {
+    overflow-x: hidden !important;
+  }
+  /* Memaksa elemen dropdown dan kotak input HB & SR agar lebarnya pas layar */
+  .grid-inputs select,
+  .grid-inputs input,
+  #hb, #r1, #r2, #s1, #s2 {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+</style>
+
 
     <!-- Baris kode Anda selanjutnya (meta tags, title, link css bawaan, dll) -->
     <meta charset="UTF-8">
