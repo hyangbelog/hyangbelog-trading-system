@@ -734,55 +734,50 @@ function gantiKoinAtauMataUang() {
     intervalHargaLive = setInterval(() => ambilHargaLive(koin, mataUang), 3000); // Update setiap 3 detik
 }
 
-function ambilHargaLive(koin, mataUang) {
+// FUNGSI MANDIRI AMBIL HARGA LIVE TANPA BENTROK
+function ambilHargaLiveBursa() {
+    const koin = document.getElementById("pilih-koin").value;
+    const mataUang = document.getElementById("pilih-mata-uang").value;
     const inputHB = document.getElementById("hb");
     const statusLive = document.getElementById("status-live");
 
-    // FORMULASI ENDPOINT BURSA 
-    // Indodax menggunakan format pasangan huruf kecil (misal: btcidr)
+    if (!inputHB) return;
+
+    // JIKA PASAR IDR (TEMBAK INDODAX)
     if (mataUang === "IDR") {
         const pairIndodax = `${koin.toLowerCase()}idr`;
         fetch(`https://indodax.com{pairIndodax}`)
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if (data.ticker && data.ticker.last) {
-                    let hargaBursa = parseFloat(data.ticker.last);
-                    inputHB.value = formatAngkaKeRupiah(hargaBursa);
+                    let harga = parseFloat(data.ticker.last);
+                    // Format ribuan rupiah Indonesia
+                    inputHB.value = new Intl.NumberFormat("id-ID").format(harga);
                     if (statusLive) statusLive.innerText = "● LIVE (INDODAX)";
-                    
-                    // Otomatis picu kalkulasi ulang data S/R jika fungsi hitungData ada
-                    if (typeof hitungData === "function") hitungData();
                 }
             })
-            .catch(err => console.error("Gagal memuat API Indodax:", err));
+            .catch(err => console.error("Gagal load API Indodax:", err));
 
-    // Tokocrypto (Binance Cloud) menggunakan format huruf besar (misal: BTCUSDT)
+    // JIKA PASAR USDT (TEMBAK TOKOCRYPTO)
     } else if (mataUang === "USDT") {
         const pairToko = `${koin}USDT`;
         fetch(`https://tokocrypto.site{pairToko}`)
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if (data.price) {
-                    let hargaBursa = parseFloat(data.price);
-                    inputHB.value = hargaBursa.toLocaleString("en-US"); // Format Dollar
+                    let harga = parseFloat(data.price);
+                    // Format ribuan dollar US
+                    inputHB.value = harga.toLocaleString("en-US");
                     if (statusLive) statusLive.innerText = "● LIVE (TOKOCRYPTO)";
-                    
-                    if (typeof hitungData === "function") hitungData();
                 }
             })
-            .catch(err => console.error("Gagal memuat API Tokocrypto:", err));
+            .catch(err => console.error("Gagal load API Tokocrypto:", err));
     }
 }
 
-// Fungsi bantu pelengkap untuk merapikan ribuan angka nominal IDR
-function formatAngkaKeRupiah(angka) {
-    return new Intl.NumberFormat("id-ID").format(angka);
-}
+// Menjalankan pencarian harga live otomatis setiap 5 detik
+setInterval(ambilHargaLiveBursa, 5000);
 
-// Jalankan otomatis saat halaman web pertama kali dimuat
-window.addEventListener("DOMContentLoaded", () => {
-    gantiKoinAtauMataUang();
-});
 
 </script>
 
