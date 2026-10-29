@@ -1,161 +1,41 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <!-- URUTAN NO 1: Taruh script minimalis ini di sini -->
+    <style>
+      *, *::before, *::after {
+        box-sizing: border-box !important;
+      }
+      body {
+        overflow-x: hidden !important;
+      }
+    </style>
+
+    <!-- Baris kode Anda selanjutnya (meta tags, title, link css bawaan, dll) -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Pivot & Risk Tracker Live</title>
+    <title>Crypto Pivot & Risk Tracker</title>
 
-    <!-- SCRIPT CSS PENDEK UNTUK DISISIPKAN BIAR PAS DI HP -->
-    <style>
-        * {
-            box-sizing: border-box !important;
-        }
-        body {
-            margin: 0 !important;
-            padding: 10px !important;
-            background-color: #0d1117 !important; 
-            color: #c9d1d9 !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            display: flex;
-            justify-content: center;
-            overflow-x: hidden; 
-        }
-        .container {
-            width: 100% !important;
-            max-width: 450px !important; 
-            background-color: #161b22 !important; 
-            border: 1px solid #30363d !important;
-            border-radius: 12px !important;
-            padding: 15px !important;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important;
-        }
-        h3 {
-            text-align: center;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            font-size: 18px;
-            letter-spacing: 0.5px;
-            color: #ffffff;
-        }
-        .grid-inputs {
-            display: grid !important;
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 10px !important;
-            margin-bottom: 15px !important;
-        }
-        .input-group.full-width {
-            grid-column: span 2 !important;
-        }
-        .input-group label {
-            display: block !important;
-            font-size: 11px !important;
-            color: #8b949e !important;
-            margin-bottom: 4px !important;
-            font-weight: 500;
-        }
-        .input-group input, .input-group select {
-            width: 100% !important;
-            background-color: #21262d !important;
-            border: 1px solid #30363d !important;
-            color: #ffffff !important;
-            padding: 8px 10px !important;
-            border-radius: 6px !important;
-            font-size: 13px !important;
-            outline: none;
-        }
-        .input-group input:focus, .input-group select:focus {
-            border-color: #58a6ff !important;
-        }
-        
-        /* Navigasi Tombol Bawah Biar Sejajar Presisi */
-        .btn-group {
-            display: grid !important;
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 8px !important;
-            margin-top: 15px !important;
-        }
-        .btn-group button {
-            padding: 10px 5px !important;
-            border-radius: 6px !important;
-            border: none !important;
-            font-size: 12px !important;
-            font-weight: bold !important;
-            cursor: pointer;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-        
-        /* Pengaturan Warna Default Tombol Kustom Anda */
-        .btn-calc-pivot { background-color: #d97706 !important; color: black !important; }
-        .btn-wa { background-color: #16a34a !important; }
-        .btn-reset-pivot { background-color: #dc2626 !important; }
-        
-        /* Bar persentase profit & risk */
-        .bar-flex-container-main {
-            display: flex !important;
-            width: 100% !important;
-            border-radius: 6px !important;
-            overflow: hidden !important;
-            margin: 12px 0 !important;
-            font-size: 11px !important;
-            font-weight: bold !important;
-            text-align: center !important;
-            color: white !important;
-        }
-        .bar-main-fill {
-            padding: 6px 0 !important;
-            flex: 1;
-        }
-        .profit-color { background-color: #16a34a !important; }
-        .loss-color { background-color: #dc2626 !important; }
-
-        /* Pengaturan komponen tabel data */
-        .table-res {
-            width: 100% !important;
-            border-collapse: collapse !important;
-            font-size: 12px !important;
-            margin: 8px 0;
-        }
-        .table-res th, .table-res td {
-            padding: 6px !important;
-            text-align: left;
-        }
-        .summary-text {
-            font-size: 11px;
-            color: #8b949e;
-            text-align: center;
-            margin: 10px 0;
-            padding: 6px;
-            background-color: #090d13;
-            border-radius: 6px;
-        }
-    </style>
-</head>
-
-<body>
 
 <div class="container">
     <h3>Crypto Pivot & Risk Tracker</h3>
     
     <!-- FITUR BARU: Dropdown Pilihan Koin dan Mata Uang -->
-    <div class="grid-inputs" style="margin-bottom: 4px;">
+    <div class="grid-inputs" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 4px;">
         <div class="input-group">
             <label for="pilih-koin">PILIH KOIN</label>
             <select id="pilih-koin" onchange="gantiKoinAtauMataUang()">
-                <option value="BTC">BTC (Bitcoin)</option>
-                <option value="ETH">ETH (Ethereum)</option>
-                <option value="SOL">SOL (Solana)</option>
-                <option value="BNB">BNB (Binance Coin)</option>
+                <option value="BTC" />BTC (Bitcoin)
+                <option value="ETH" />ETH (Ethereum)
+                <option value="SOL" />SOL (Solana)
+                <option value="BNB" />BNB (Binance Coin)
             </select>
         </div>
         <div class="input-group">
             <label for="pilih-mata-uang">MATA UANG (PASAR)</label>
             <select id="pilih-mata-uang" onchange="gantiKoinAtauMataUang()">
-                <option value="IDR">IDR (Rupiah - Tokocrypto)</option>
-                <option value="USDT">USDT (Dollar - Binance)</option>
+                <option value="IDR" />IDR (Rupiah - Tokocrypto)
+                <option value="USDT" />USDT (Dollar - Binance)
             </select>
         </div>
     </div>
@@ -197,28 +77,28 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td class="pos-r" style="color:#dc2626;">R2</td><td id="dist-r2">-</td>
+                        <td class="pos-r">R2</td><td id="dist-r2">-</td>
                         <td>
                             <div id="pct-r2">-</div>
                             <div class="sub-bar-container"><div id="bar-r2" class="sub-bar-fill"></div></div>
                         </td>
                     </tr>
                     <tr>
-                        <td class="pos-r" style="color:#dc2626;">R1</td><td id="dist-r1">-</td>
+                        <td class="pos-r">R1</td><td id="dist-r1">-</td>
                         <td>
                             <div id="pct-r1">-</div>
                             <div class="sub-bar-container"><div id="bar-r1" class="sub-bar-fill"></div></div>
                         </td>
                     </tr>
                     <tr>
-                        <td class="pos-s" style="color:#16a34a;">S1</td><td id="dist-s1">-</td>
+                        <td class="pos-s">S1</td><td id="dist-s1">-</td>
                         <td>
                             <div id="pct-s1">-</div>
                             <div class="sub-bar-container"><div id="bar-s1" class="sub-bar-fill"></div></div>
                         </td>
                     </tr>
                     <tr>
-                        <td class="pos-s" style="color:#16a34a;">S2</td><td id="dist-s2">-</td>
+                        <td class="pos-s">S2</td><td id="dist-s2">-</td>
                         <td>
                             <div id="pct-s2">-</div>
                             <div class="sub-bar-container"><div id="bar-s2" class="sub-bar-fill"></div></div>
@@ -229,8 +109,7 @@
         </div>
     </div>
 
-
-   <!-- ACCORDION 2: RENCANA POSISI -->
+    <!-- ACCORDION 2: RENCANA POSISI -->
     <div class="accordion-item">
         <div class="accordion-header" onclick="toggleAccordion('acc-posisi', 'panah-posisi')">
             <span>🎯 Rencana Posisi Bertingkat</span>
@@ -242,13 +121,13 @@
                     <tr><th>Aksi</th><th>Target Harga</th><th>Ket.</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td class="pos-r" style="color:#dc2626;">Jual 3</td><td id="jual-3">-</td><td class="info-text">R3 Max</td></tr>
-                    <tr><td class="pos-r" style="color:#dc2626;">Jual 2</td><td id="jual-2">-</td><td class="info-text">R2 Mid</td></tr>
-                    <tr><td class="pos-r" style="color:#dc2626;">Jual 1</td><td id="jual-1">-</td><td class="info-text">R1 Low</td></tr>
-                    <tr style="border-top: 1px dashed #30363d;">
-                        <td class="pos-s" style="color:#16a34a;">Beli 1</td><td id="beli-1">-</td><td class="info-text">S1 Low</td></tr>
-                    <tr><td class="pos-s" style="color:#16a34a;">Beli 2</td><td id="beli-2">-</td><td class="info-text">S2 Mid</td></tr>
-                    <tr><td class="pos-s" style="color:#16a34a;">Beli 3</td><td id="beli-3">-</td><td class="info-text">S3 Max</td></tr>
+                    <tr><td class="pos-r">Jual 3</td><td id="jual-3">-</td><td class="info-text">R3 Max</td></tr>
+                    <tr><td class="pos-r">Jual 2</td><td id="jual-2">-</td><td class="info-text">R2 Mid</td></tr>
+                    <tr><td class="pos-r">Jual 1</td><td id="jual-1">-</td><td class="info-text">R1 Low</td></tr>
+                    <tr style="border-top: 1px dashed var(--border-color);">
+                        <td class="pos-s">Beli 1</td><td id="beli-1">-</td><td class="info-text">S1 Low</td></tr>
+                    <tr><td class="pos-s">Beli 2</td><td id="beli-2">-</td><td class="info-text">S2 Mid</td></tr>
+                    <tr><td class="pos-s">Beli 3</td><td id="beli-3">-</td><td class="info-text">S3 Max</td></tr>
                 </tbody>
             </table>
         </div>
@@ -260,21 +139,17 @@
 
     <div class="bar-flex-container-main">
         <div id="main-bar-profit" class="bar-main-fill profit-color">(50%) Buy</div>
-        <div id="main-bar-loss" class="bar-main-fill loss-color">(50%) Sell</div>
+        <div id="main-bar-loss" class="bar-main-fill loss-color">(50%) Sel</div>
     </div>
 
-    <div class="btn-group">
+            <div class="btn-group">
         <button type="button" class="btn-calc-pivot" onclick="hitungData()">Simpan/Kunci S/R</button>
-        <button type="button" class="btn-wa" onclick="kirimWA()">Kirim WA</button>
+        <button class="btn-wa" onclick="kirimWA()">Kirim WA</button>
         <button type="button" class="btn-reset-pivot" onclick="pivotResetForm()">Reset</button>
-        <button type="button" class="btn-indodax" onclick="bukaIndodax()" style="background-color: #00B4D8; color: white; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">🌐 Indodax</button>
-    </div>
-</div>
+        <button type="button" class="btn-indodax" onclick="bukaIndodax()" style="background-color: #00B4D8; color: white; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">🌐Indodax</button>
+      </div>
 
-<!-- TEMPATKAN SCRIPT LOGIKA JAVASCRIPT (.JS) HITUNGAN ANDA DI BAWAH SINI JIKA ADA -->
 
-</body>
-</html>
 
 <style>
 :root {
@@ -826,6 +701,3 @@ function bukaIndodax() {
         hitungData();
     }
 </script></div></!doctype>
-
-
-
