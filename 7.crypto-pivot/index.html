@@ -779,6 +779,61 @@ function ambilHargaLiveBursa() {
 setInterval(ambilHargaLiveBursa, 5000);
 
 
+<script>
+    // ==========================================
+    // API LIVE PRICE TICKER BEBAS BLOKIR (CORS)
+    // ==========================================
+    function ambilHargaLiveBursa() {
+        const koin = document.getElementById("pilih-koin").value;
+        const mataUang = document.getElementById("pilih-mata-uang").value;
+        const inputHB = document.getElementById("hb");
+        const statusLive = document.getElementById("status-live");
+
+        if (!inputHB) return;
+
+        if (mataUang === "IDR") {
+            const pair = `${koin.toLowerCase()}_idr`;
+            
+            // JALUR RESMI ALTERNATIF INDODAX (Tembus blokir browser HP)
+            fetch(`https://indodax.com/api/summaries`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.tickers && data.tickers[pair]) {
+                        let harga = parseFloat(data.tickers[pair].last);
+                        
+                        // Masukkan angka ke kotak Harga Bergerak (HB) dengan format Rupiah
+                        inputHB.value = new Intl.NumberFormat("id-ID").format(harga);
+                        
+                        if (statusLive) statusLive.innerText = "● LIVE (INDODAX)";
+                        
+                        // Otomatis jalankan fungsi hitung data kalkulator Anda jika ada
+                        if (typeof hitungData === "function") hitungData();
+                    }
+                })
+                .catch(err => {
+                    console.error("Gagal load data market Indodax:", err);
+                    if (statusLive) statusLive.innerText = "● ERROR API";
+                });
+        }
+    }
+
+    // Hubungkan ke fungsi dropdown ganti koin bawaan Anda
+    function gantiKoinAtauMataUang() {
+        const statusLive = document.getElementById("status-live");
+        if (statusLive) statusLive.innerText = "● LOADING...";
+        ambilHargaLiveBursa();
+    }
+
+    // Jalankan otomatis setiap 5 detik agar harga terus berdenyut live
+    clearInterval(window.liveTickerInterval);
+    window.liveTickerInterval = setInterval(ambilHargaLiveBursa, 5000);
+
+    // Pemicu saat halaman pertama kali dibuka di HP
+    window.addEventListener("DOMContentLoaded", () => {
+        ambilHargaLiveBursa();
+    });
+
+
 </script>
 
 <!-- 3 TOMBOL BURSA DI SINI (PERSIS DI BAWAH BOX DAN DI ATAS NAVIGASI GLOBAL) →
