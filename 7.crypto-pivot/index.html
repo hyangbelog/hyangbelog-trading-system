@@ -25,7 +25,6 @@
 </style>
 
 
-
     <!-- Baris kode Anda selanjutnya (meta tags, title, link css bawaan, dll) -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -157,13 +156,17 @@
         <div id="main-bar-loss" class="bar-main-fill loss-color">(50%) Sel</div>
     </div>
 
-            <div class="btn-group">
-        <button type="button" class="btn-calc-pivot" onclick="hitungData()">Simpan/Kunci S/R</button>
-        <button class="btn-wa" onclick="kirimWA()">Kirim WA</button>
-        <button type="button" class="btn-reset-pivot" onclick="pivotResetForm()">Reset</button>
-        <button type="button" class="btn-indodax" onclick="bukaIndodax()" style="background-color: #00B4D8; color: white; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">🌐Indodax</button>
-      </div>
+                          <button class="btn-wa" onclick="kirimWA()" style="flex: 1; padding: 10px 2px; font-size: 11px; font-weight: bold; border-radius: 4px; border: none; cursor: pointer;">Kirim WA</button>
+        <button type="button" class="btn-reset-pivot" onclick="pivotResetForm()" style="flex: 1; padding: 10px 2px; font-size: 11px; font-weight: bold; border-radius: 4px; border: none; cursor: pointer;">Reset</button>
+    </div>
 
+    <!-- BARIS KEDUA: 4 TOMBOL REFERRAL YANG SEJAJAR RAPI -->
+    <div class="btn-group" style="display: flex; justify-content: space-between; gap: 4px; width: 100%;">
+        <button type="button" onclick="bukaIndodax()" style="flex: 1; padding: 10px 1px; font-size: 10px; font-weight: bold; background-color: #00B4D8; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;">Indodax</button>
+        <button type="button" onclick="window.open('https://tokocrypto.com', '_blank')" style="flex: 1; padding: 10px 1px; font-size: 10px; font-weight: bold; background-color: #85BB65; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;">Tokocrypto</button>
+        <button type="button" onclick="window.open('https://bibit.id', '_blank')" style="flex: 1; padding: 10px 1px; font-size: 10px; font-weight: bold; background-color: #2E7D32; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;">Bibit</button>
+        <button type="button" onclick="window.open('https://reku.id', '_blank')" style="flex: 1; padding: 10px 1px; font-size: 10px; font-weight: bold; background-color: #1E3A8A; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;">Reku</button>
+    </div>
 
 
 <style>
