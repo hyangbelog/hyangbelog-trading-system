@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ="id">
+<html lang="id">
 <head>
     <!-- URUTAN NO 1: Taruh script minimalis ini di sini -->
     <style>
@@ -714,124 +714,10 @@ function bukaIndodax() {
        hitungData();
     }
 
-// ==========================================
-// CONFIGURASI API LIVE PRICE TICKER
-// ==========================================
-let intervalHargaLive;
 
-function gantiKoinAtauMataUang() {
-    const koin = document.getElementById("pilih-koin").value;
-    const mataUang = document.getElementById("pilih-mata-uang").value;
-    const statusLive = document.getElementById("status-live");
-    const summary = document.getElementById("summary");
-
-    if (statusLive) statusLive.innerText = "● LOADING...";
-    if (summary) summary.innerText = `Memuat harga live ${koin}/${mataUang}...`;
-
-    // Hentikan interval lama jika ada, lalu mulai interval pembaruan baru
-    clearInterval(intervalHargaLive);
-    ambilHargaLive(koin, mataUang);
-    intervalHargaLive = setInterval(() => ambilHargaLive(koin, mataUang), 3000); // Update setiap 3 detik
-}
-
-// FUNGSI MANDIRI AMBIL HARGA LIVE TANPA BENTROK
-function ambilHargaLiveBursa() {
-    const koin = document.getElementById("pilih-koin").value;
-    const mataUang = document.getElementById("pilih-mata-uang").value;
-    const inputHB = document.getElementById("hb");
-    const statusLive = document.getElementById("status-live");
-
-    if (!inputHB) return;
-
-    // JIKA PASAR IDR (TEMBAK INDODAX)
-    if (mataUang === "IDR") {
-        const pairIndodax = `${koin.toLowerCase()}idr`;
-        fetch(`https://indodax.com{pairIndodax}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.ticker && data.ticker.last) {
-                    let harga = parseFloat(data.ticker.last);
-                    // Format ribuan rupiah Indonesia
-                    inputHB.value = new Intl.NumberFormat("id-ID").format(harga);
-                    if (statusLive) statusLive.innerText = "● LIVE (INDODAX)";
-                }
-            })
-            .catch(err => console.error("Gagal load API Indodax:", err));
-
-    // JIKA PASAR USDT (TEMBAK TOKOCRYPTO)
-    } else if (mataUang === "USDT") {
-        const pairToko = `${koin}USDT`;
-        fetch(`https://tokocrypto.site{pairToko}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.price) {
-                    let harga = parseFloat(data.price);
-                    // Format ribuan dollar US
-                    inputHB.value = harga.toLocaleString("en-US");
-                    if (statusLive) statusLive.innerText = "● LIVE (TOKOCRYPTO)";
-                }
-            })
-            .catch(err => console.error("Gagal load API Tokocrypto:", err));
-    }
-}
 
 // Menjalankan pencarian harga live otomatis setiap 5 detik
 setInterval(ambilHargaLiveBursa, 5000);
-
-
-<script>
-    // ==========================================
-    // API LIVE PRICE TICKER BEBAS BLOKIR (CORS)
-    // ==========================================
-    function ambilHargaLiveBursa() {
-        const koin = document.getElementById("pilih-koin").value;
-        const mataUang = document.getElementById("pilih-mata-uang").value;
-        const inputHB = document.getElementById("hb");
-        const statusLive = document.getElementById("status-live");
-
-        if (!inputHB) return;
-
-        if (mataUang === "IDR") {
-            const pair = `${koin.toLowerCase()}_idr`;
-            
-            // JALUR RESMI ALTERNATIF INDODAX (Tembus blokir browser HP)
-            fetch(`https://indodax.com/api/summaries`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.tickers && data.tickers[pair]) {
-                        let harga = parseFloat(data.tickers[pair].last);
-                        
-                        // Masukkan angka ke kotak Harga Bergerak (HB) dengan format Rupiah
-                        inputHB.value = new Intl.NumberFormat("id-ID").format(harga);
-                        
-                        if (statusLive) statusLive.innerText = "● LIVE (INDODAX)";
-                        
-                        // Otomatis jalankan fungsi hitung data kalkulator Anda jika ada
-                        if (typeof hitungData === "function") hitungData();
-                    }
-                })
-                .catch(err => {
-                    console.error("Gagal load data market Indodax:", err);
-                    if (statusLive) statusLive.innerText = "● ERROR API";
-                });
-        }
-    }
-
-    // Hubungkan ke fungsi dropdown ganti koin bawaan Anda
-    function gantiKoinAtauMataUang() {
-        const statusLive = document.getElementById("status-live");
-        if (statusLive) statusLive.innerText = "● LOADING...";
-        ambilHargaLiveBursa();
-    }
-
-    // Jalankan otomatis setiap 5 detik agar harga terus berdenyut live
-    clearInterval(window.liveTickerInterval);
-    window.liveTickerInterval = setInterval(ambilHargaLiveBursa, 5000);
-
-    // Pemicu saat halaman pertama kali dibuka di HP
-    window.addEventListener("DOMContentLoaded", () => {
-        ambilHargaLiveBursa();
-    });
 
 
 </script>
