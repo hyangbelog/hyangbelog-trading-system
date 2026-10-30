@@ -1,6 +1,6 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
+<!doctype html>
+
+
     <!-- URUTAN NO 1: Taruh script minimalis ini di sini -->
     <style>
   /* KOREKSI KHUSUS: HANYA UNTUK KOTAK INPUT ATAS AGAR PAS DI HP */
@@ -26,9 +26,9 @@
 
 
     <!-- Baris kode Anda selanjutnya (meta tags, title, link css bawaan, dll) -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Pivot & Risk Tracker</title>
+    
+    
+    Crypto Pivot & Risk Tracker
 
 
 <div class="container">
@@ -527,13 +527,18 @@ function bukaIndodax() {
             let colorHex = ""; let emojiStatus = "";
             let batasFee = pasar === "IDR" ? 0.30 : 0.25;
             
-            if (pctAbsolut <= batasFee) {
-                colorHex = "#da3633"; emojiStatus = "🔴";
-            } else if (pctAbsolut > batasFee && pctAbsolut <= 0.60) {
-                colorHex = "#ff9800"; emojiStatus = "🟡";
-            } else {
-                colorHex = "#238636"; emojiStatus = "🟢";
-            }
+            // GANTI BLOK IF-ELSE YANG LAMA DENGAN KODE DI BAWAH INI:
+if (pct === 0) {
+    colorHex = "#ff9800"; // Kuning / Jingga
+    emojiStatus = "🟡";
+} else if (pct < 0) {
+colorHex = "#da3633"; // Merah (Plus)
+    emojiStatus = "🔴";
+} else {
+    colorHex = "#238636"; // Hijau (Minus)
+    emojiStatus = "🟢";
+    }
+
             
             cellPct.innerText = `${emojiStatus} ${sign}${pct.toFixed(2)}%`;
             cellPct.style.color = colorHex;
@@ -745,8 +750,5 @@ setInterval(ambilHargaLiveBursa, 5000);
 </div>
 
 </div> <!-- Tag penutup container utama -->
-</body>
-</html>
 
-
-
+</div></!doctype>
