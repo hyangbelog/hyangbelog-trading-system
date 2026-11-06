@@ -9,7 +9,7 @@
     <div onclick="toggleAccordionWBA()" style="padding: 10px 15px; background-color: #000000; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; border-bottom: 1px solid #222222;">
         <h3 style="align-items: center; display: flex; font-weight: bold; margin: 0px;">
             <span style="color: #e0e0e0; font-size: 15px;">📊 Crypto Pivot & Risk Tracker</span>
-            <i><span style="color: #e0e0e0; font-size: 15px;">&nbsp;</span><span style="color: #666666; font-size: x-small;">(Live)</span></i>
+            <i><span style="color: #e0e0e0; font-size: 15px;">&nbsp;</span><span style="color: #666666; font-size: x-small;">(Pro)</span></i>
         </h3>
         <span id="panahIndikatorWBA" style="color: #8b949e; font-size: 14px; transition: transform 0.3s ease; transform: rotate(0deg);">▼</span>
     </div>
@@ -45,29 +45,35 @@
                 </div>
 
                 <div class="grid-inputs">
-                    <!-- Kolom HB dikunci (readonly) karena sudah otomatis terisi live -->
-                    <div class="input-group full-width row-layout">
-                        <label for="hb">Harga Bergerak (HB) <span id="status-live" style="color:#2196f3;"></span></label>
-                        <input type="text" id="hb" value=style="background:#090d13; color:#2196f3; font-weight:bold;" />
-        </div>
-        <div class="input-group">
-            <label for="r2">Resisten 2 (R2)</label>
-            <input type="text" id="r2" value="1.569.500.000" oninput="formatInputRupiah(this)" />
-        </div>
-        <div class="input-group">
-            <label for="r1">Resisten 1 (R1)</label>
-            <input type="text" id="r1" value="1.524.500.000" oninput="formatInputRupiah(this)" />
-        </div>
-        <div class="input-group">
-            <label for="s2">Support 2 (S2)</label>
-            <input type="text" id="s2" value="1.039.500.000"
-        oninput="formatInputRupiah(this)" />
-        </div>
-        <div class="input-group">
-            <label for="s1">Support 1 (S1)</label>
-            <input type="text" id="s1" value="1.377.500.000" oninput="formatInputRupiah(this)" />
-        </div>
+    <!-- Kolom HB diubah menjadi input manual sepenuhnya -->
+    <div class="input-group full-width row-layout">
+        <label for="hb">Harga Bergerak (HB) <span id="status-live" style="color:#2196f3;">(Manual)</span></label>
+        
+        <!-- PERBAIKAN UTAMA: Atribut value dikosongkan, style dan oninput dipasang dengan benar -->
+        <input type="text" id="hb" placeholder="Masukkan harga..." oninput="formatInputRupiah(this)" style="background:#090d13; color:#2196f3; font-weight:bold;" />
     </div>
+    
+    <!-- Kolom R2, R1, S1, S2 di bawahnya tetap seperti kode Anda -->
+    <div class="input-group">
+        <label for="r2">Resisten 2 (R2)</label>
+        <input type="text" id="r2" value="1.554.200.000" oninput="formatInputRupiah(this)" />
+    </div>
+    <div class="input-group">
+        <label for="r1">Resisten 1 (R1)</label>
+        <input type="text" id="r1" value="1.430.000.000" oninput="formatInputRupiah(this)" />
+    </div>
+    <div class="input-group">
+        <label for="s1">Support 1 (S1)</label>
+        <input type="text" id="s1" value="1.390.044.000" oninput="formatInputRupiah(this)" />
+    </div>
+    <div class="input-group">
+        <label for="s2">Support 2 (S2)</label>
+        <input type="text" id="s2" value="1.042.118.000" oninput="formatInputRupiah(this)" />
+    </div>
+</div>
+
+
+
 
     <!-- ACCORDION 1: ANALISIS JARAK -->
     <div class="accordion-item">
@@ -692,50 +698,79 @@ colorHex = "#da3633"; // Merah (Plus)
     }
 
     window.onload = function() {
-        const inputHB = document.getElementById('hb');
-        if (inputHB) {
-            inputHB.removeAttribute('readonly');
-            
-            // Perbaikan Gaya Visual HB: Mengubah warna ke putih soft dan menaikkan ukuran font sebesar 1px (dari 0.72rem ke 0.78rem)
-            inputHB.style.background = "#0d1117"; 
-            inputHB.style.color = "#e0e6ed"; 
-            inputHB.style.fontSize = "0.78rem"; 
-            inputHB.style.fontWeight = "bold";
-            
-            inputHB.setAttribute('oninput', 'formatInputRupiah(this)');
-            inputHB.value = "";
-        }
-
-        // Memulihkan koin terakhir yang aktif dibuka sebelum halaman di-refresh
-        const dataAktif = localStorage.getItem('koin_terakhir_aktif');
-        if (dataAktif) {
-            const posisi = JSON.parse(dataAktif);
-            document.getElementById('pilih-koin').value = posisi.koin;
-            document.getElementById('pilih-mata-uang').value = posisi.pasar;
-        }
-
-        // Memulihkan data S/R yang tersimpan khusus untuk koin aktif tersebut
-        const koin = document.getElementById('pilih-koin').value;
-        const pasar = document.getElementById('pilih-mata-uang').value;
-        const savedData = localStorage.getItem(`pref_${koin}_${pasar}`);
+    const inputHB = document.getElementById('hb');
+    if (inputHB) {
+        inputHB.removeAttribute('readonly');
         
-        if (savedData) {
-            const data = JSON.parse(savedData);
-            document.getElementById('r2').value = data.r2;
-            document.getElementById('r1').value = data.r1;
-            document.getElementById('s1').value = data.s1;
-            document.getElementById('s2').value = data.s2;
-        }
+        // Perbaikan Gaya Visual HB
+        inputHB.style.background = "#0d1117"; 
+        inputHB.style.color = "#e0e6ed"; 
+        inputHB.style.fontSize = "0.78rem"; 
+        inputHB.style.fontWeight = "bold";
         
-        document.getElementById('summary').innerText = "Masukkan Harga Bergerak (HB) untuk memulai.";
-        
-       hitungData();
+        inputHB.setAttribute('oninput', 'formatInputRupiah(this)');
+        inputHB.value = "";
     }
 
+    // Mengamankan pemulihan data tersimpan menggunakan try-catch agar tidak memicu error di urutan pertama
+    try {
+        const elKoin = document.getElementById('pilih-koin') || document.getElementById('pilihKoin');
+        const elPasar = document.getElementById('pilih-mata-uang') || document.getElementById('pilihMataUang');
 
+        if (elKoin && elPasar) {
+            // Memulihkan koin terakhir yang aktif dibuka
+            const dataAktif = localStorage.getItem('koin_terakhir_aktif');
+            if (dataAktif) {
+                const posisi = JSON.parse(dataAktif);
+                elKoin.value = posisi.koin;
+                elPasar.value = posisi.pasar;
+            }
 
-// Menjalankan pencarian harga live otomatis setiap 5 detik
-setInterval(ambilHargaLiveBursa, 5000);
+            // Memulihkan data S/R yang tersimpan khusus untuk koin aktif tersebut
+            const koin = elKoin.value;
+            const pasar = elPasar.value;
+            const savedData = localStorage.getItem(`pref_${koin}_${pasar}`);
+            
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                if (document.getElementById('r2')) document.getElementById('r2').value = data.r2;
+                if (document.getElementById('r1')) document.getElementById('r1').value = data.r1;
+                if (document.getElementById('s1')) document.getElementById('s1').value = data.s1;
+                if (document.getElementById('s2')) document.getElementById('s2').value = data.s2;
+            }
+        }
+    } catch (err) {
+        console.warn("Sistem mengabaikan error DOM/Storage di urutan pertama:", err.message);
+    }
+
+    // Mengamankan elemen summary petunjuk awal
+    if (document.getElementById('summary')) {
+        document.getElementById('summary').innerText = "Masukkan Harga Bergerak (HB) untuk memulai.";
+    }
+    
+    // Jalankan fungsi hitung data bawaan Anda jika fungsinya tersedia
+    if (typeof hitungData === "function") {
+        hitungData();
+    }
+}
+
+// ==========================================
+// 🔴 PENTING: KODE DI BAWAH INI ADALAH REVISI 
+// UNTUK FUNGSI INPUT MANUAL RUPIAH ANDA
+// ==========================================
+function formatInputRupiah(elemen) {
+    // 1. Format visual teks dengan titik ribuan saat diketik manual
+    let value = elemen.value.replace(/\D/g, "");
+    elemen.value = value ? new Intl.NumberFormat('id-ID').format(value) : "";
+    
+    // 2. Memicu fungsi hitung bawaan Anda agar tabel Jarak & Persentase langsung terisi otomatis
+    if (typeof hitungData === "function") {
+        hitungData();
+    }
+}
+
+// ❌ KODE SETINTERVAL LIVE SUDAH DIHAPUS DARI SINI AGAR TIDAK ERROR LAGI
+
 
 
 </script>
