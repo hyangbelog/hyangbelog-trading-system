@@ -655,22 +655,40 @@ colorHex = "#da3633"; // Merah (Plus)
   // 1. MENGAMBIL LINK WEB HALAMAN AKTIF SECARA OTOMATIS
   const linkAktifWeb = window.location.href;
 
-  // 2. MENYUSUN TEKS (Sudah ditambahkan link web di baris paling bawah)
-  const text = `*Crypto Update (${koin}/${pasar})*\nHB: ${hb}\n\n*Target %:*\nR1: ${r1}\nS1: ${s1}\n\n_Via Crypto Pivot & Risk Tracker_\n\nAnalisis Live Selengkapnya:\n${linkAktifWeb}`;
+  // 2. MENYUSUN TEKS
+  const text = `*Crypto Update (${koin}/${pasar})*\n` +
+               `HB: ${hb}\n\n` +
+               `*Target %:*\n` +
+               `R1: ${r1}\n` +
+               `S1: ${s1}\n\n` +
+               `_Via Crypto Pivot & Risk Tracker_\n\n` +
+               `Analisis Live Selengkapnya:\n${linkAktifWeb}`;
 
-  // 3. PROSES PENGIRIMAN / BERBAGI
+  // 3. PROSES PENGIRIMAN / BERBAGI (DIPERBAIKI)
   if (navigator.share) {
-    navigator.share({ 
-      title: 'Crypto Update', 
-      text: text 
+    navigator.share({
+      title: 'Crypto Update',
+      text: text
     })
-    .catch(console.error);
-  } else {
-    navigator.clipboard.writeText(text).then(function() {
-      alert('Teks + Link Web berhasil disalin ke clipboard! Silakan paste langsung di WhatsApp.');
+    .then(() => console.log('Berhasil membagikan data!'))
+    .catch((error) => {
+      console.log('Gagal share via API, dialihkan ke WA...', error);
+      // Jika fitur share error karena masalah HTTPS/Izin, langsung tembak ke WhatsApp
+      bukaWhatsAppLangsung(text);
     });
+  } else {
+    // Jika browser tidak mendukung Web Share API, langsung kirim ke WhatsApp
+    bukaWhatsAppLangsung(text);
   }
 }
+
+// Fungsi tambahan untuk memicu aplikasi WhatsApp secara instan
+function bukaWhatsAppLangsung(teksPesan) {
+  // Kosongkan nomor phone jika ingin pengguna memilih sendiri kontak di WA mereka
+  const urlWA = `https://whatsapp.com{encodeURIComponent(teksPesan)}`;
+  window.open(urlWA, '_blank');
+}
+
 
              function pivotResetForm() {
         // Mengosongkan paksa nilai teks di semua kolom input utama
@@ -824,3 +842,4 @@ function formatInputRupiah(elemen) {
         }
     }
 </script>
+
