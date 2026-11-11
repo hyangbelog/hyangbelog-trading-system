@@ -242,7 +242,6 @@
 
 <script>
     let hargaMentahLiveGlobal = 0;
-    let wsBursa = null;
     let kursIdrLive = 16250;
 
     function toggleAccordion(contentId, panahId) {
@@ -359,7 +358,7 @@
         ];
         listJarak.sort((a, b) => a.nilai - b.nilai);
 
-        let dataTerdekat = listJarak;
+        let dataTerdekat = listJarak[0];
         let realPct = dataTerdekat.tipe === 'S' ? -Math.abs(dataTerdekat.pct) : Math.abs(dataTerdekat.pct);
         let signTerdekat = realPct > 0 ? "+" : "";
         document.getElementById('summary').innerHTML = "<strong>Tren:</strong> " + prediksi + " | Terdekat ke <strong>" + dataTerdekat.nama + " (" + signTerdekat + realPct.toFixed(2) + "%)</strong>.";
@@ -372,42 +371,37 @@
     }
 
 
-   async function muatKursIDR() {
-        try {
-            const res = await fetch("https://er-api.com");
-            const data = await res.json();
-            if (data && data.rates && data.rates.IDR) kursIdrLive = data.rates.IDR;
-        } catch (e) {}
-    }
-
-    function ambilHargaLiveBursa() {
-        const koin = document.getElementById('pilih-koin').value.toLowerCase();
+   async function ambilHargaLiveBursa() {
+        const koin = document.getElementById('pilih-koin').value.toUpperCase();
         const pasar = document.getElementById('pilih-mata-uang').value;
         const statusLive = document.getElementById('status-live');
         const inputHB = document.getElementById('hb');
 
-        if (wsBursa) wsBursa.close();
+        try {
+            // Menggunakan API Coinbase yang bebas blokir CORS & bebas blokir operator seluler Indonesia
+            const targetCurrency = (pasar === "IDR") ? "IDR" : "USDT";
+            const urlApi = "https://coinbase.com" + koin + "-" + targetCurrency + "/spot";
+            
+            const res = await fetch(urlApi);
+            const json = await res.json();
 
-        wsBursa = new WebSocket("wss://://binance.com" + koin + "usdt@ticker");
-
-        wsBursa.onopen = function() {
-            if (statusLive) { statusLive.style.color = "#238636"; statusLive.innerText = "● LIVE"; }
-        };
-
-        wsBursa.onmessage = function(event) {
-            const data = JSON.parse(event.data);
-            if (data && data.c) {
-                let hargaUsdt = parseFloat(data.c);
-                let hargaAkhir = (pasar === "IDR") ? (hargaUsdt * kursIdrLive) : hargaUsdt;
-                hargaMentahLiveGlobal = hargaAkhir;
-                inputHB.value = formatKustomMataUang(hargaAkhir, pasar);
+            if (json && json.data && json.data.amount) {
+                let hargaLive = parseFloat(json.data.amount);
+                hargaMentahLiveGlobal = hargaLive;
+                inputHB.value = formatKustomMataUang(hargaLive, pasar);
+                
+                if (statusLive) {
+                    statusLive.style.color = "#238636";
+                    statusLive.innerText = "● LIVE";
+                }
                 hitungData();
             }
-        };
-
-        wsBursa.onerror = function() {
-            if (statusLive) { statusLive.style.color = "#da3633"; statusLive.innerText = "● OFFLINE"; }
-        };
+        } catch (err) {
+            if (statusLive) {
+                statusLive.style.color = "#da3633";
+                statusLive.innerText = "● OFFLINE";
+            }
+        }
     }
 
     function gantiKoinAtauMataUang() {
@@ -428,7 +422,7 @@
         }
 
         document.getElementById('hb').value = "";
-        document.getElementById('summary').innerText = "Menghubungkan live " + koin + "/" + pasar + "...";
+        document.getElementById('summary').innerText = "Mengambil harga live " + koin + "/" + pasar + "...";
         ambilHargaLiveBursa();
     }
 
@@ -484,11 +478,12 @@
             document.getElementById('s1').value = data.s1;
             document.getElementById('s2').value = data.s2;
         }
-        muatKursIDR();
         ambilHargaLiveBursa();
+        setInterval(ambilHargaLiveBursa, 5000);
     });
 </script>
 </body>
 </html>
+
 
 
