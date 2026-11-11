@@ -269,6 +269,7 @@
             input.value = nilaiBersih;
             hargaMentahLiveGlobal = parseFloat(nilaiBersih) || 0;
         }
+        simpanOtomatisSR();
         hitungData();
     }
 
@@ -289,6 +290,26 @@
             : (parseFloat(el.value.replace(/,/g, "")) || 0);
     }
 
+    function simpanOtomatisSR() {
+        const koin = document.getElementById('pilih-koin').value;
+        const pasar = document.getElementById('pilih-mata-uang').value;
+        localStorage.setItem("pref_" + koin + "_" + pasar, JSON.stringify({
+            r2: document.getElementById('r2').value,
+            r1: document.getElementById('r1').value,
+            s1: document.getElementById('s1').value,
+            s2: document.getElementById('s2').value
+        }));
+        localStorage.setItem('koin_terakhir_aktif', JSON.stringify({ koin: koin, pasar: pasar }));
+    }
+
+    function simpanKunciManual() {
+        simpanOtomatisSR();
+        hitungData();
+        const koin = document.getElementById('pilih-koin').value;
+        const pasar = document.getElementById('pilih-mata-uang').value;
+        document.getElementById('summary').innerHTML = "✅ Level S/R untuk <strong>" + koin + "/" + pasar + "</strong> berhasil disimpan & dikunci!";
+    }
+
     function hitungData() {
         const hb = dapatkanAngkaMurni('hb');
         const r2 = dapatkanAngkaMurni('r2');
@@ -296,7 +317,6 @@
         const s1 = dapatkanAngkaMurni('s1');
         const s2 = dapatkanAngkaMurni('s2');
         const pasar = document.getElementById('pilih-mata-uang').value;
-        const koin = document.getElementById('pilih-koin').value;
 
         if (!hb || !r1 || !s1) return;
 
@@ -363,12 +383,6 @@
         let realPct = dataTerdekat.tipe === 'S' ? -Math.abs(dataTerdekat.pct) : Math.abs(dataTerdekat.pct);
         let signTerdekat = realPct > 0 ? "+" : "";
         document.getElementById('summary').innerHTML = "<strong>Tren:</strong> " + prediksi + " | Terdekat ke <strong>" + dataTerdekat.nama + " (" + signTerdekat + realPct.toFixed(2) + "%)</strong>.";
-
-        localStorage.setItem("pref_" + koin + "_" + pasar, JSON.stringify({
-            r2: document.getElementById('r2').value, r1: document.getElementById('r1').value,
-            s1: document.getElementById('s1').value, s2: document.getElementById('s2').value
-        }));
-        localStorage.setItem('koin_terakhir_aktif', JSON.stringify({ koin: koin, pasar: pasar }));
     }
 
 
@@ -391,22 +405,31 @@
 
         document.getElementById('hb').value = "";
         document.getElementById('summary').innerText = "Koin diganti ke " + koin + "/" + pasar + ". Masukkan HB baru.";
-        hitungData();
+        simpanOtomatisSR();
     }
 
     function kirimWA() {
-        const hb = document.getElementById('hb').value;
+        const hb = document.getElementById('hb').value || "-";
         const koin = document.getElementById('pilih-koin').value;
         const pasar = document.getElementById('pilih-mata-uang').value;
-        const r1 = document.getElementById('pct-r1').innerText;
-        const s1 = document.getElementById('pct-s1').innerText;
-        const text = "*Crypto Update (" + koin + "/" + pasar + ")*\nHB: " + hb + "\n\n*Target %:*\nR1: " + r1 + "\nS1: " + s1 + "\n\n_Via Crypto Pivot & Risk Tracker_\n\nAnalisis Live Selengkapnya:\n" + window.location.href;
+        const r2 = document.getElementById('r2').value || "-";
+        const r1 = document.getElementById('r1').value || "-";
+        const s1 = document.getElementById('s1').value || "-";
+        const s2 = document.getElementById('s2').value || "-";
+        const pctR1 = document.getElementById('pct-r1').innerText;
+        const pctS1 = document.getElementById('pct-s1').innerText;
 
-        if (navigator.share) {
-            navigator.share({ title: 'Crypto Update', text: text }).catch(console.error);
-        } else {
-            navigator.clipboard.writeText(text).then(() => alert('Teks + Link Web berhasil disalin!'));
-        }
+        const text = "*Crypto Update (" + koin + "/" + pasar + ")*\n" +
+                     "HB: " + hb + "\n\n" +
+                     "*Level S/R:*\n" +
+                     "R2: " + r2 + "\n" +
+                     "R1: " + r1 + " (" + pctR1 + ")\n" +
+                     "S1: " + s1 + " (" + pctS1 + ")\n" +
+                     "S2: " + s2 + "\n\n" +
+                     "_Via Crypto Pivot & Risk Tracker_";
+
+        const waUrl = "https://whatsapp.com" + encodeURIComponent(text);
+        window.open(waUrl, '_blank');
     }
 
     function pivotResetForm() {
@@ -419,10 +442,17 @@
             const bar = document.getElementById('bar-' + id);
             if (bar) bar.style.width = "0%";
         });
+        simpanOtomatisSR();
         document.getElementById('summary').innerText = "Masukkan Harga Bergerak (HB) untuk memulai.";
     }
 
     document.addEventListener("DOMContentLoaded", function() {
+        // Hubungkan tombol Simpan/Kunci S/R ke fungsi simpanKunciManual
+        const btnSimpan = document.querySelector('.btn-calc-pivot');
+        if (btnSimpan) {
+            btnSimpan.setAttribute('onclick', 'simpanKunciManual()');
+        }
+
         const inputHB = document.getElementById('hb');
         if (inputHB) {
             inputHB.style.background = "#0d1117";
@@ -452,5 +482,6 @@
 </script>
 </body>
 </html>
+
 
 
