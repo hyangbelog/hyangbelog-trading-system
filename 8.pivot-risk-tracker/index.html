@@ -64,10 +64,9 @@
             margin-bottom: 2px;
         }
         .row-layout label { margin-bottom: 0; white-space: nowrap; flex-shrink: 0; }
-        .row-layout input { flex: 1; min-width: 0; text-align: right; }
+        .row-layout input { flex: 1; min-width: 0; text-align: left; }
         label { font-size: 0.65rem; color: var(--text-muted); margin-bottom: 2px; font-weight: 600; }
-
-       input, select {
+        input, select {
             width: 100%;
             max-width: 100%;
             min-width: 0;
@@ -131,11 +130,13 @@
         .ref-buttons button { flex: 1; padding: 8px 4px; font-size: 11px; border-radius: 6px; }
     </style>
 </head>
+
+
 <body>
 <div class="container">
     <h3>Crypto Pivot & Risk Tracker</h3>
 
-   <div class="grid-inputs">
+    <div class="grid-inputs">
         <div class="input-group">
             <label for="pilih-koin">PILIH KOIN</label>
             <select id="pilih-koin" onchange="gantiKoinAtauMataUang()">
@@ -156,8 +157,8 @@
 
     <div class="grid-inputs">
         <div class="input-group full-width row-layout">
-            <label for="hb">Harga Bergerak (HB) <span id="status-live" style="color:#2196f3; font-size:9px;">● LIVE</span></label>
-            <input type="text" id="hb" value="" placeholder="Menghubungkan..." oninput="formatInputRupiah(this)">
+            <label for="hb">Harga Bergerak (HB) <span id="status-live" style="color:#2196f3; font-size:9px;">● MANUAL</span></label>
+            <input type="text" id="hb" value="" placeholder="Ketik harga..." oninput="formatInputRupiah(this)">
         </div>
         <div class="input-group">
             <label for="r2">Resisten 2 (R2)</label>
@@ -219,7 +220,7 @@
         </div>
     </div>
 
-    <div class="summary-text" id="summary">Menghubungkan ke bursa, memuat harga live...</div>
+    <div class="summary-text" id="summary">Masukkan Harga Bergerak (HB) untuk memulai.</div>
 
     <div class="bar-flex-container-main">
         <div id="main-bar-profit" class="bar-main-fill profit-color" style="width: 50%;">Buy (50%)</div>
@@ -240,9 +241,9 @@
     </div>
 </div>
 
+
 <script>
     let hargaMentahLiveGlobal = 0;
-    let kursIdrLive = 16250;
 
     function toggleAccordion(contentId, panahId) {
         const content = document.getElementById(contentId);
@@ -371,40 +372,7 @@
     }
 
 
-   async function ambilHargaLiveBursa() {
-        const koin = document.getElementById('pilih-koin').value.toUpperCase();
-        const pasar = document.getElementById('pilih-mata-uang').value;
-        const statusLive = document.getElementById('status-live');
-        const inputHB = document.getElementById('hb');
-
-        try {
-            // Menggunakan API Coinbase yang bebas blokir CORS & bebas blokir operator seluler Indonesia
-            const targetCurrency = (pasar === "IDR") ? "IDR" : "USDT";
-            const urlApi = "https://coinbase.com" + koin + "-" + targetCurrency + "/spot";
-            
-            const res = await fetch(urlApi);
-            const json = await res.json();
-
-            if (json && json.data && json.data.amount) {
-                let hargaLive = parseFloat(json.data.amount);
-                hargaMentahLiveGlobal = hargaLive;
-                inputHB.value = formatKustomMataUang(hargaLive, pasar);
-                
-                if (statusLive) {
-                    statusLive.style.color = "#238636";
-                    statusLive.innerText = "● LIVE";
-                }
-                hitungData();
-            }
-        } catch (err) {
-            if (statusLive) {
-                statusLive.style.color = "#da3633";
-                statusLive.innerText = "● OFFLINE";
-            }
-        }
-    }
-
-    function gantiKoinAtauMataUang() {
+   function gantiKoinAtauMataUang() {
         const koin = document.getElementById('pilih-koin').value;
         const pasar = document.getElementById('pilih-mata-uang').value;
         const dataTersimpan = localStorage.getItem("pref_" + koin + "_" + pasar);
@@ -422,8 +390,8 @@
         }
 
         document.getElementById('hb').value = "";
-        document.getElementById('summary').innerText = "Mengambil harga live " + koin + "/" + pasar + "...";
-        ambilHargaLiveBursa();
+        document.getElementById('summary').innerText = "Koin diganti ke " + koin + "/" + pasar + ". Masukkan HB baru.";
+        hitungData();
     }
 
     function kirimWA() {
@@ -451,7 +419,7 @@
             const bar = document.getElementById('bar-' + id);
             if (bar) bar.style.width = "0%";
         });
-        document.getElementById('summary').innerText = "Data di-reset. Menunggu harga live berikutnya...";
+        document.getElementById('summary').innerText = "Masukkan Harga Bergerak (HB) untuk memulai.";
     }
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -478,12 +446,11 @@
             document.getElementById('s1').value = data.s1;
             document.getElementById('s2').value = data.s2;
         }
-        ambilHargaLiveBursa();
-        setInterval(ambilHargaLiveBursa, 5000);
+        document.getElementById('summary').innerText = "Masukkan Harga Bergerak (HB) untuk memulai.";
+        hitungData();
     });
 </script>
 </body>
 </html>
-
 
 
