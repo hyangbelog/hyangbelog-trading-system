@@ -1,9 +1,9 @@
-<!doctype html>
-
-
-    
-    
-    Crypto Pivot & Risk Tracker
+<!DOCTYPE html>
+<html lang="id" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Crypto Pivot & Risk Tracker</title>
     <style>
         :root {
             --bg-color: #0d1117;
@@ -17,11 +17,7 @@
             --table-header-bg: #21262d;
             --text-soft-white: #e0e6ed;
         }
-
-        * {
-            box-sizing: border-box;
-        }
-
+        * { box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
@@ -34,7 +30,6 @@
             overflow-x: hidden;
             direction: ltr;
         }
-
         .container {
             width: 100%;
             max-width: 400px;
@@ -44,7 +39,6 @@
             padding: 8px;
             overflow: hidden;
         }
-
         h3 {
             margin: 0 0 6px 0;
             text-align: center;
@@ -53,7 +47,6 @@
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 4px;
         }
-
         .grid-inputs {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -61,17 +54,8 @@
             margin-bottom: 6px;
             width: 100%;
         }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
-
-        .input-group.full-width {
-            grid-column: span 2;
-        }
-
+        .input-group { display: flex; flex-direction: column; min-width: 0; }
+        .input-group.full-width { grid-column: span 2; }
         .row-layout {
             flex-direction: row !important;
             align-items: center;
@@ -79,27 +63,11 @@
             gap: 6px;
             margin-bottom: 2px;
         }
+        .row-layout label { margin-bottom: 0; white-space: nowrap; flex-shrink: 0; }
+        .row-layout input { flex: 1; min-width: 0; text-align: right; }
+        label { font-size: 0.65rem; color: var(--text-muted); margin-bottom: 2px; font-weight: 600; }
 
-        .row-layout label {
-            margin-bottom: 0;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .row-layout input {
-            flex: 1;
-            min-width: 0;
-            text-align: right;
-        }
-
-        label {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            margin-bottom: 2px;
-            font-weight: 600;
-        }
-
-        input, select {
+       input, select {
             width: 100%;
             max-width: 100%;
             min-width: 0;
@@ -112,19 +80,8 @@
             outline: none;
             direction: ltr;
         }
-
-        select {
-            cursor: pointer;
-            text-overflow: ellipsis;
-        }
-
-        .accordion-item {
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            margin-bottom: 5px;
-            overflow: hidden;
-        }
-
+        select { cursor: pointer; text-overflow: ellipsis; }
+        .accordion-item { border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 5px; overflow: hidden; }
         .accordion-header {
             background: #21262d;
             color: #ffffff;
@@ -137,212 +94,89 @@
             cursor: pointer;
             user-select: none;
         }
-
-        .panah-icon {
-            color: #2196f3;
-            font-size: 9px;
-            transition: transform 0.3s ease;
-            transform: rotate(0deg);
-        }
-
-        .accordion-content {
-            display: none;
-            background: #000000;
-            padding: 2px;
-            width: 100%;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .table-res {
-            width: 100%;
-            table-layout: fixed;
-            border-collapse: collapse;
-            font-size: 0.7rem;
-            margin: 0;
-        }
-
-        .table-res thead th {
-            background-color: var(--table-header-bg);
-            color: var(--text-soft-white);
-            font-weight: bold;
-        }
-
+        .panah-icon { color: #2196f3; font-size: 9px; transition: transform 0.3s ease; transform: rotate(0deg); }
+        .accordion-content { display: none; background: #000000; padding: 2px; width: 100%; border-top: 1px solid var(--border-color); }
+        .table-res { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 0.7rem; margin: 0; }
+        .table-res thead th { background-color: var(--table-header-bg); color: var(--text-soft-white); font-weight: bold; }
         .table-res th, .table-res td {
-            padding: 4px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-            vertical-align: middle;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            padding: 4px; text-align: left; border-bottom: 1px solid var(--border-color);
+            vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
-
         .pos-r { color: var(--accent-red); font-weight: 600; }
         .pos-s { color: var(--accent-green); font-weight: 600; }
         .info-text { color: var(--text-muted); font-size: 0.65rem; }
-
-        .sub-bar-container {
-            width: 100%;
-            background-color: #222;
-            border-radius: 3px;
-            height: 4px;
-            margin-top: 2px;
-            overflow: hidden;
-        }
-
-        .sub-bar-fill {
-            width: 0%;
-            height: 100%;
-            border-radius: 3px;
-            transition: width 0.3s ease, background-color 0.3s ease;
-        }
-
+        .sub-bar-container { width: 100%; background-color: #222; border-radius: 3px; height: 4px; margin-top: 2px; overflow: hidden; }
+        .sub-bar-fill { width: 0%; height: 100%; border-radius: 3px; transition: width 0.3s ease, background-color 0.3s ease; }
         .bar-flex-container-main {
-            display: flex;
-            width: 100%;
-            height: 16px;
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 6px 0;
-            font-size: 0.65rem;
-            font-weight: bold;
-            text-align: center;
-            line-height: 16px;
-            color: #ffffff;
+            display: flex; width: 100%; height: 16px; border-radius: 4px; overflow: hidden;
+            margin: 6px 0; font-size: 0.65rem; font-weight: bold; text-align: center; line-height: 16px; color: #ffffff;
         }
-
-        .bar-main-fill {
-            transition: width 0.3s ease;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-
+        .bar-main-fill { transition: width 0.3s ease; white-space: nowrap; overflow: hidden; }
         .profit-color { background-color: var(--accent-green); }
         .loss-color { background-color: var(--accent-red); }
-
         .summary-text {
-            margin: 5px 0;
-            font-size: 0.7rem;
-            background: var(--bg-color);
-            padding: 5px 6px;
-            border-radius: 4px;
-            border-left: 3px solid var(--accent-blue);
-            line-height: 1.3;
-            word-wrap: break-word;
+            margin: 5px 0; font-size: 0.7rem; background: var(--bg-color); padding: 5px 6px;
+            border-radius: 4px; border-left: 3px solid var(--accent-blue); line-height: 1.3; word-wrap: break-word;
         }
-
-        .btn-group {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 5px;
-            margin-top: 6px;
-        }
-
+        .btn-group { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; margin-top: 6px; }
         button {
-            width: 100%;
-            padding: 6px 4px;
-            border: none;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            cursor: pointer;
-            color: #ffffff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            width: 100%; padding: 6px 4px; border: none; border-radius: 4px; font-size: 0.7rem;
+            font-weight: bold; cursor: pointer; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-
-        .btn-calc-pivot {
-            background-color: #ff9f00 !important;
-            border: 1px solid #ff9f00 !important;
-            color: #ffffff !important;
-        }
-
-        .btn-wa {
-            background-color: var(--accent-green);
-        }
-
-        .btn-reset-pivot {
-            background-color: var(--accent-red) !important;
-            border: 1px solid var(--accent-red) !important;
-            color: var(--text-soft-white) !important;
-        }
-
-        .ref-text {
-            text-align: center;
-            font-size: 10px;
-            color: #8b949e;
-            margin: 12px auto 6px auto;
-        }
-
-        .ref-buttons {
-            display: flex;
-            justify-content: space-between;
-            gap: 6px;
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto 10px auto;
-        }
-
-        .ref-buttons button {
-            flex: 1;
-            padding: 8px 4px;
-            font-size: 11px;
-            border-radius: 6px;
-        }
+        .btn-calc-pivot { background-color: #ff9f00 !important; border: 1px solid #ff9f00 !important; color: #ffffff !important; }
+        .btn-wa { background-color: var(--accent-green); }
+        .btn-reset-pivot { background-color: var(--accent-red) !important; border: 1px solid var(--accent-red) !important; color: var(--text-soft-white) !important; }
+        .ref-text { text-align: center; font-size: 10px; color: #8b949e; margin: 12px auto 6px auto; }
+        .ref-buttons { display: flex; justify-content: space-between; gap: 6px; width: 100%; max-width: 400px; margin: 0 auto 10px auto; }
+        .ref-buttons button { flex: 1; padding: 8px 4px; font-size: 11px; border-radius: 6px; }
     </style>
-
-
-
+</head>
+<body>
 <div class="container">
     <h3>Crypto Pivot & Risk Tracker</h3>
 
-    <!-- Dropdown Pilihan Koin dan Mata Uang -->
-    <div class="grid-inputs">
+   <div class="grid-inputs">
         <div class="input-group">
             <label for="pilih-koin">PILIH KOIN</label>
             <select id="pilih-koin" onchange="gantiKoinAtauMataUang()">
-                <option value="BTC" />BTC (Bitcoin)
-                <option value="ETH" />ETH (Ethereum)
-                <option value="SOL" />SOL (Solana)
-                <option value="BNB" />BNB (Binance Coin)
+                <option value="BTC">BTC (Bitcoin)</option>
+                <option value="ETH">ETH (Ethereum)</option>
+                <option value="SOL">SOL (Solana)</option>
+                <option value="BNB">BNB (Binance Coin)</option>
             </select>
         </div>
         <div class="input-group">
             <label for="pilih-mata-uang">MATA UANG (PASAR)</label>
             <select id="pilih-mata-uang" onchange="gantiKoinAtauMataUang()">
-                <option value="IDR" />IDR (Rupiah - Tokocrypto)
-                <option value="USDT" />USDT (Dollar - Binance)
+                <option value="IDR">IDR (Rupiah - Tokocrypto)</option>
+                <option value="USDT">USDT (Dollar - Binance)</option>
             </select>
         </div>
     </div>
 
-    <!-- Input Harga Bergerak & Level Support/Resisten -->
     <div class="grid-inputs">
         <div class="input-group full-width row-layout">
             <label for="hb">Harga Bergerak (HB) <span id="status-live" style="color:#2196f3; font-size:9px;">● LIVE</span></label>
-            <input type="text" id="hb" value="" placeholder="Masukkan HB" oninput="formatInputRupiah(this)" />
+            <input type="text" id="hb" value="" placeholder="Menghubungkan..." oninput="formatInputRupiah(this)">
         </div>
         <div class="input-group">
             <label for="r2">Resisten 2 (R2)</label>
-            <input type="text" id="r2" value="1.520.000.000" oninput="formatInputRupiah(this)" />
+            <input type="text" id="r2" value="1.520.000.000" oninput="formatInputRupiah(this)">
         </div>
         <div class="input-group">
             <label for="r1">Resisten 1 (R1)</label>
-            <input type="text" id="r1" value="1.461.709.950" oninput="formatInputRupiah(this)" />
+            <input type="text" id="r1" value="1.461.709.950" oninput="formatInputRupiah(this)">
         </div>
         <div class="input-group">
             <label for="s2">Support 2 (S2)</label>
-            <input type="text" id="s2" value="1.440.999.940" oninput="formatInputRupiah(this)" />
+            <input type="text" id="s2" value="1.440.999.940" oninput="formatInputRupiah(this)">
         </div>
         <div class="input-group">
             <label for="s1">Support 1 (S1)</label>
-            <input type="text" id="s1" value="1.441.762.050" oninput="formatInputRupiah(this)" />
+            <input type="text" id="s1" value="1.441.762.050" oninput="formatInputRupiah(this)">
         </div>
     </div>
 
-
-   <!-- ACCORDION 1: ANALISIS JARAK -->
     <div class="accordion-item">
         <div class="accordion-header" onclick="toggleAccordion('acc-jarak', 'panah-jarak')">
             <span>📊 Analisis Jarak & Persentase</span>
@@ -351,51 +185,18 @@
         <div id="acc-jarak" class="accordion-content">
             <table class="table-res">
                 <thead>
-                    <tr>
-                        <th style="width: 20%;">Target</th>
-                        <th style="width: 38%;">Jarak</th>
-                        <th style="width: 42%;">Visual % & Bar</th>
-                    </tr>
+                    <tr><th style="width:20%;">Target</th><th style="width:38%;">Jarak</th><th style="width:42%;">Visual % & Bar</th></tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="pos-r">R2</td>
-                        <td id="dist-r2">-</td>
-                        <td>
-                            <div id="pct-r2">-</div>
-                            <div class="sub-bar-container"><div id="bar-r2" class="sub-bar-fill"></div></div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="pos-r">R1</td>
-                        <td id="dist-r1">-</td>
-                        <td>
-                            <div id="pct-r1">-</div>
-                            <div class="sub-bar-container"><div id="bar-r1" class="sub-bar-fill"></div></div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="pos-s">S1</td>
-                        <td id="dist-s1">-</td>
-                        <td>
-                            <div id="pct-s1">-</div>
-                            <div class="sub-bar-container"><div id="bar-s1" class="sub-bar-fill"></div></div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="pos-s">S2</td>
-                        <td id="dist-s2">-</td>
-                        <td>
-                            <div id="pct-s2">-</div>
-                            <div class="sub-bar-container"><div id="bar-s2" class="sub-bar-fill"></div></div>
-                        </td>
-                    </tr>
+                    <tr><td class="pos-r">R2</td><td id="dist-r2">-</td><td><div id="pct-r2">-</div><div class="sub-bar-container"><div id="bar-r2" class="sub-bar-fill"></div></div></td></tr>
+                    <tr><td class="pos-r">R1</td><td id="dist-r1">-</td><td><div id="pct-r1">-</div><div class="sub-bar-container"><div id="bar-r1" class="sub-bar-fill"></div></div></td></tr>
+                    <tr><td class="pos-s">S1</td><td id="dist-s1">-</td><td><div id="pct-s1">-</div><div class="sub-bar-container"><div id="bar-s1" class="sub-bar-fill"></div></div></td></tr>
+                    <tr><td class="pos-s">S2</td><td id="dist-s2">-</td><td><div id="pct-s2">-</div><div class="sub-bar-container"><div id="bar-s2" class="sub-bar-fill"></div></div></td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- ACCORDION 2: RENCANA POSISI -->
     <div class="accordion-item">
         <div class="accordion-header" onclick="toggleAccordion('acc-posisi', 'panah-posisi')">
             <span>🎯 Rencana Posisi Bertingkat</span>
@@ -404,19 +205,13 @@
         <div id="acc-posisi" class="accordion-content">
             <table class="table-res">
                 <thead>
-                    <tr>
-                        <th style="width: 25%;">Aksi</th>
-                        <th style="width: 48%;">Target Harga</th>
-                        <th style="width: 27%;">Ket.</th>
-                    </tr>
+                    <tr><th style="width:25%;">Aksi</th><th style="width:48%;">Target Harga</th><th style="width:27%;">Ket.</th></tr>
                 </thead>
                 <tbody>
                     <tr><td class="pos-r">Jual 3</td><td id="jual-3">-</td><td class="info-text">R3 Max</td></tr>
                     <tr><td class="pos-r">Jual 2</td><td id="jual-2">-</td><td class="info-text">R2 Mid</td></tr>
                     <tr><td class="pos-r">Jual 1</td><td id="jual-1">-</td><td class="info-text">R1 Low</td></tr>
-                    <tr style="border-top: 1px dashed var(--border-color);">
-                        <td class="pos-s">Beli 1</td><td id="beli-1">-</td><td class="info-text">S1 Low</td>
-                    </tr>
+                    <tr style="border-top: 1px dashed var(--border-color);"><td class="pos-s">Beli 1</td><td id="beli-1">-</td><td class="info-text">S1 Low</td></tr>
                     <tr><td class="pos-s">Beli 2</td><td id="beli-2">-</td><td class="info-text">S2 Mid</td></tr>
                     <tr><td class="pos-s">Beli 3</td><td id="beli-3">-</td><td class="info-text">S3 Max</td></tr>
                 </tbody>
@@ -424,27 +219,20 @@
         </div>
     </div>
 
-    <!-- Ringkasan & Progress Bar Buy/Sell -->
-    <div class="summary-text" id="summary">
-        Masukkan Harga Bergerak (HB) untuk memulai.
-    </div>
+    <div class="summary-text" id="summary">Menghubungkan ke bursa, memuat harga live...</div>
 
     <div class="bar-flex-container-main">
         <div id="main-bar-profit" class="bar-main-fill profit-color" style="width: 50%;">Buy (50%)</div>
         <div id="main-bar-loss" class="bar-main-fill loss-color" style="width: 50%;">Sell (50%)</div>
     </div>
 
-    <!-- Tombol Aksi Utama -->
     <div class="btn-group">
         <button type="button" class="btn-calc-pivot" onclick="hitungData()">Simpan/Kunci S/R</button>
         <button type="button" class="btn-wa" onclick="kirimWA()">Kirim WA</button>
         <button type="button" class="btn-reset-pivot" onclick="pivotResetForm()">Reset</button>
     </div>
 
-    <!-- Teks & 3 Tombol Referral Bursa -->
-    <p class="ref-text">
-        💡 <span style="color: #58a6ff; font-weight: bold;">Dukung Aplikasi Ini:</span> Daftar bursa melalui link resmi/referral kami di bawah:
-    </p>
+    <p class="ref-text">💡 <span style="color: #58a6ff; font-weight: bold;">Dukung Aplikasi Ini:</span> Daftar bursa melalui link resmi/referral kami di bawah:</p>
     <div class="ref-buttons">
         <button type="button" onclick="window.open('https://indodax.com', '_blank')" style="background-color: #00B4D8;">Indodax</button>
         <button type="button" onclick="window.open('https://tokocrypto.com', '_blank')" style="background-color: #85BB65;">Tokocrypto</button>
@@ -452,9 +240,10 @@
     </div>
 </div>
 
-
 <script>
     let hargaMentahLiveGlobal = 0;
+    let wsBursa = null;
+    let kursIdrLive = 16250;
 
     function toggleAccordion(contentId, panahId) {
         const content = document.getElementById(contentId);
@@ -472,12 +261,8 @@
         const pasar = document.getElementById('pilih-mata-uang').value;
         if (pasar === "IDR") {
             let nilaiBersih = input.value.replace(/[^0-9]/g, "");
-            if (nilaiBersih === "") {
-                input.value = "";
-                return;
-            }
-            let nilaiFormat = new Intl.NumberFormat('id-ID').format(parseFloat(nilaiBersih));
-            input.value = nilaiFormat;
+            if (nilaiBersih === "") { input.value = ""; return; }
+            input.value = new Intl.NumberFormat('id-ID').format(parseFloat(nilaiBersih));
             hargaMentahLiveGlobal = parseFloat(nilaiBersih);
         } else {
             let nilaiBersih = input.value.replace(/[^0-9.]/g, "");
@@ -499,11 +284,9 @@
         const el = document.getElementById(id);
         if (!el || !el.value) return 0;
         const pasar = document.getElementById('pilih-mata-uang').value;
-        if (pasar === "IDR") {
-            return parseFloat(el.value.replace(/\./g, "").replace(/,/g, "")) || 0;
-        } else {
-            return parseFloat(el.value.replace(/,/g, "")) || 0;
-        }
+        return pasar === "IDR"
+            ? (parseFloat(el.value.replace(/\./g, "").replace(/,/g, "")) || 0)
+            : (parseFloat(el.value.replace(/,/g, "")) || 0);
     }
 
     function hitungData() {
@@ -524,8 +307,7 @@
             { id: 's2', val: s2, tipe: 'S' }
         ];
 
-        let pctAbsolutR1 = 0;
-        let pctAbsolutS1 = 0;
+        let pctAbsolutR1 = 0, pctAbsolutS1 = 0;
 
         targets.forEach(t => {
             const distAbsolut = Math.abs(t.val - hb);
@@ -534,34 +316,20 @@
 
             const sign = pct >= 0 ? "+" : "";
             const pctAbsolut = Math.abs(pct);
-
             if (t.id === 'r1') pctAbsolutR1 = pctAbsolut;
             if (t.id === 's1') pctAbsolutS1 = pctAbsolut;
 
+            document.getElementById('dist-' + t.id).innerText = formatKustomMataUang(distAbsolut, pasar);
             const cellPct = document.getElementById('pct-' + t.id);
             const barFill = document.getElementById('bar-' + t.id);
 
-            document.getElementById('dist-' + t.id).innerText = formatKustomMataUang(distAbsolut, pasar);
-
-            let colorHex = "";
-            let emojiStatus = "";
-
-            if (pct === 0) {
-                colorHex = "#ff9800";
-                emojiStatus = "🟡";
-            } else if (pct < 0) {
-                colorHex = "#da3633";
-                emojiStatus = "🔴";
-            } else {
-                colorHex = "#238636";
-                emojiStatus = "🟢";
-            }
+            let colorHex = pct === 0 ? "#ff9800" : pct < 0 ? "#da3633" : "#238636";
+            let emojiStatus = pct === 0 ? "🟡" : pct < 0 ? "🔴" : "🟢";
 
             cellPct.innerText = emojiStatus + " " + sign + pct.toFixed(2) + "%";
             cellPct.style.color = colorHex;
 
-            let lebarBar = (pctAbsolut / 5) * 100;
-            if (lebarBar > 100) lebarBar = 100;
+            let lebarBar = Math.min((pctAbsolut / 5) * 100, 100);
             barFill.style.width = lebarBar + "%";
             barFill.style.backgroundColor = colorHex;
         });
@@ -583,7 +351,6 @@
         document.getElementById('jual-3').innerText = formatKustomMataUang(r2, pasar);
 
         let prediksi = (hb > r1) ? "Bullish Kuat (Kejar R2)" : (hb < s1) ? "Breakdown Bearish (Jebol S1)" : "Sideways / Konsolidasi (S1-R1)";
-
         let listJarak = [
             { nama: 'R2', nilai: Math.abs(r2 - hb), pct: ((r2 - hb) / hb) * 100, tipe: 'R' },
             { nama: 'R1', nilai: Math.abs(r1 - hb), pct: ((r1 - hb) / hb) * 100, tipe: 'R' },
@@ -592,24 +359,58 @@
         ];
         listJarak.sort((a, b) => a.nilai - b.nilai);
 
-        let dataTerdekat = listJarak[0];
+        let dataTerdekat = listJarak;
         let realPct = dataTerdekat.tipe === 'S' ? -Math.abs(dataTerdekat.pct) : Math.abs(dataTerdekat.pct);
         let signTerdekat = realPct > 0 ? "+" : "";
-        let teksTerdekat = dataTerdekat.nama + " (" + signTerdekat + realPct.toFixed(2) + "%)";
-
-        document.getElementById('summary').innerHTML = "<strong>Tren:</strong> " + prediksi + " | Terdekat ke <strong>" + teksTerdekat + "</strong>.";
+        document.getElementById('summary').innerHTML = "<strong>Tren:</strong> " + prediksi + " | Terdekat ke <strong>" + dataTerdekat.nama + " (" + signTerdekat + realPct.toFixed(2) + "%)</strong>.";
 
         localStorage.setItem("pref_" + koin + "_" + pasar, JSON.stringify({
-            r2: document.getElementById('r2').value,
-            r1: document.getElementById('r1').value,
-            s1: document.getElementById('s1').value,
-            s2: document.getElementById('s2').value
+            r2: document.getElementById('r2').value, r1: document.getElementById('r1').value,
+            s1: document.getElementById('s1').value, s2: document.getElementById('s2').value
         }));
         localStorage.setItem('koin_terakhir_aktif', JSON.stringify({ koin: koin, pasar: pasar }));
     }
 
 
-   function gantiKoinAtauMataUang() {
+   async function muatKursIDR() {
+        try {
+            const res = await fetch("https://er-api.com");
+            const data = await res.json();
+            if (data && data.rates && data.rates.IDR) kursIdrLive = data.rates.IDR;
+        } catch (e) {}
+    }
+
+    function ambilHargaLiveBursa() {
+        const koin = document.getElementById('pilih-koin').value.toLowerCase();
+        const pasar = document.getElementById('pilih-mata-uang').value;
+        const statusLive = document.getElementById('status-live');
+        const inputHB = document.getElementById('hb');
+
+        if (wsBursa) wsBursa.close();
+
+        wsBursa = new WebSocket("wss://://binance.com" + koin + "usdt@ticker");
+
+        wsBursa.onopen = function() {
+            if (statusLive) { statusLive.style.color = "#238636"; statusLive.innerText = "● LIVE"; }
+        };
+
+        wsBursa.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            if (data && data.c) {
+                let hargaUsdt = parseFloat(data.c);
+                let hargaAkhir = (pasar === "IDR") ? (hargaUsdt * kursIdrLive) : hargaUsdt;
+                hargaMentahLiveGlobal = hargaAkhir;
+                inputHB.value = formatKustomMataUang(hargaAkhir, pasar);
+                hitungData();
+            }
+        };
+
+        wsBursa.onerror = function() {
+            if (statusLive) { statusLive.style.color = "#da3633"; statusLive.innerText = "● OFFLINE"; }
+        };
+    }
+
+    function gantiKoinAtauMataUang() {
         const koin = document.getElementById('pilih-koin').value;
         const pasar = document.getElementById('pilih-mata-uang').value;
         const dataTersimpan = localStorage.getItem("pref_" + koin + "_" + pasar);
@@ -622,57 +423,41 @@
             document.getElementById('s2').value = data.s2;
         } else {
             ['r2', 'r1', 's1', 's2'].forEach(id => document.getElementById(id).value = "");
-            const fields = ['dist-r2', 'pct-r2', 'dist-r1', 'pct-r1', 'dist-s1', 'pct-s1', 'dist-s2', 'pct-s2', 'beli-1', 'beli-2', 'beli-3', 'jual-1', 'jual-2', 'jual-3'];
-            fields.forEach(id => document.getElementById(id).innerText = "-");
+            ['dist-r2', 'pct-r2', 'dist-r1', 'pct-r1', 'dist-s1', 'pct-s1', 'dist-s2', 'pct-s2', 'beli-1', 'beli-2', 'beli-3', 'jual-1', 'jual-2', 'jual-3'].forEach(id => document.getElementById(id).innerText = "-");
             ['r2', 'r1', 's1', 's2'].forEach(id => document.getElementById('bar-' + id).style.width = "0%");
         }
 
         document.getElementById('hb').value = "";
-        document.getElementById('summary').innerText = "Mengambil harga live " + koin + "/" + pasar + "...";
+        document.getElementById('summary').innerText = "Menghubungkan live " + koin + "/" + pasar + "...";
         ambilHargaLiveBursa();
     }
 
-       async function ambilHargaLiveBursa() {
-        const koin = document.getElementById('pilih-koin').value.toUpperCase();
+    function kirimWA() {
+        const hb = document.getElementById('hb').value;
+        const koin = document.getElementById('pilih-koin').value;
         const pasar = document.getElementById('pilih-mata-uang').value;
-        const statusLive = document.getElementById('status-live');
-        const inputHB = document.getElementById('hb');
+        const r1 = document.getElementById('pct-r1').innerText;
+        const s1 = document.getElementById('pct-s1').innerText;
+        const text = "*Crypto Update (" + koin + "/" + pasar + ")*\nHB: " + hb + "\n\n*Target %:*\nR1: " + r1 + "\nS1: " + s1 + "\n\n_Via Crypto Pivot & Risk Tracker_\n\nAnalisis Live Selengkapnya:\n" + window.location.href;
 
-        try {
-            let hargaLive = 0;
-
-            if (pasar === "IDR") {
-                // Menggunakan API CoinGecko yang mendukung IDR langsung tanpa blokir CORS
-                const mapId = { BTC: "bitcoin", ETH: "ethereum", SOL: "solana", BNB: "binancecoin" };
-                const coinId = mapId[koin] || "bitcoin";
-                const res = await fetch("https://coingecko.com" + coinId + "&vs_currencies=idr");
-                const data = await res.json();
-                if (data && data[coinId] && data[coinId].idr) {
-                    hargaLive = parseFloat(data[coinId].idr);
-                }
-            } else {
-                const res = await fetch("https://binance.com" + koin + "USDT");
-                const data = await res.json();
-                if (data && data.price) {
-                    hargaLive = parseFloat(data.price);
-                }
-            }
-
-            if (hargaLive > 0) {
-                hargaMentahLiveGlobal = hargaLive;
-                inputHB.value = formatKustomMataUang(hargaLive, pasar);
-                if (statusLive) {
-                    statusLive.style.color = "#238636";
-                    statusLive.innerText = "● LIVE";
-                }
-                hitungData();
-            }
-        } catch (err) {
-            if (statusLive) {
-                statusLive.style.color = "#da3633";
-                statusLive.innerText = "● OFFLINE";
-            }
+        if (navigator.share) {
+            navigator.share({ title: 'Crypto Update', text: text }).catch(console.error);
+        } else {
+            navigator.clipboard.writeText(text).then(() => alert('Teks + Link Web berhasil disalin!'));
         }
+    }
+
+    function pivotResetForm() {
+        ['hb', 'r2', 'r1', 's1', 's2'].forEach(id => document.getElementById(id).value = "");
+        ['dist-r2', 'pct-r2', 'dist-r1', 'pct-r1', 'dist-s1', 'pct-s1', 'dist-s2', 'pct-s2', 'beli-1', 'beli-2', 'beli-3', 'jual-1', 'jual-2', 'jual-3'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = "-";
+        });
+        ['r2', 'r1', 's1', 's2'].forEach(id => {
+            const bar = document.getElementById('bar-' + id);
+            if (bar) bar.style.width = "0%";
+        });
+        document.getElementById('summary').innerText = "Data di-reset. Menunggu harga live berikutnya...";
     }
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -683,18 +468,15 @@
             inputHB.style.fontSize = "0.78rem";
             inputHB.style.fontWeight = "bold";
         }
-
         const dataAktif = localStorage.getItem('koin_terakhir_aktif');
         if (dataAktif) {
             const posisi = JSON.parse(dataAktif);
             document.getElementById('pilih-koin').value = posisi.koin;
             document.getElementById('pilih-mata-uang').value = posisi.pasar;
         }
-
         const koin = document.getElementById('pilih-koin').value;
         const pasar = document.getElementById('pilih-mata-uang').value;
         const savedData = localStorage.getItem("pref_" + koin + "_" + pasar);
-
         if (savedData) {
             const data = JSON.parse(savedData);
             document.getElementById('r2').value = data.r2;
@@ -702,9 +484,8 @@
             document.getElementById('s1').value = data.s1;
             document.getElementById('s2').value = data.s2;
         }
-
+        muatKursIDR();
         ambilHargaLiveBursa();
-        setInterval(ambilHargaLiveBursa, 10000); // Update setiap 10 detik agar aman dari limit API
     });
 </script>
 </body>
