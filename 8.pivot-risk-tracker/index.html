@@ -312,7 +312,7 @@
         document.getElementById('summary').innerHTML = "✅ <strong>Tersimpan!</strong> S/R <strong>" + bursa + "</strong> (" + koin + "/" + pasar + ") dikunci.";
     }
 
-    function hitungData() {
+       function hitungData() {
         const hb = dapatkanAngkaMurni('hb');
         const r2 = dapatkanAngkaMurni('r2');
         const r1 = dapatkanAngkaMurni('r1');
@@ -329,29 +329,46 @@
             { id: 's2', val: s2, tipe: 'S' }
         ];
 
-        let pctAbsolutR1 = 0, pctAbsolutS1 = 0;
+        let pctAbsolutR1 = 0;
+        let pctAbsolutS1 = 0;
 
         targets.forEach(t => {
             const distAbsolut = Math.abs(t.val - hb);
             let pct = ((t.val - hb) / hb) * 100;
+            if (t.tipe === 'R' && pct < 0) pct = pct;
             if (t.tipe === 'S' && pct > 0) pct = -pct;
 
             const sign = pct >= 0 ? "+" : "";
             const pctAbsolut = Math.abs(pct);
+
             if (t.id === 'r1') pctAbsolutR1 = pctAbsolut;
             if (t.id === 's1') pctAbsolutS1 = pctAbsolut;
 
-            document.getElementById('dist-' + t.id).innerText = formatKustomMataUang(distAbsolut, pasar);
             const cellPct = document.getElementById('pct-' + t.id);
             const barFill = document.getElementById('bar-' + t.id);
 
-            let colorHex = pct === 0 ? "#ff9800" : pct < 0 ? "#da3633" : "#238636";
-            let emojiStatus = pct === 0 ? "🟡" : pct < 0 ? "🔴" : "🟢";
+            document.getElementById('dist-' + t.id).innerText = formatKustomMataUang(distAbsolut, pasar);
+
+            let colorHex = "";
+            let emojiStatus = "";
+            let batasFee = pasar === "IDR" ? 0.30 : 0.25;
+
+            if (pctAbsolut <= batasFee) {
+                colorHex = "#da3633";
+                emojiStatus = "🔴";
+            } else if (pctAbsolut > batasFee && pctAbsolut <= 0.60) {
+                colorHex = "#ff9800";
+                emojiStatus = "🟡";
+            } else {
+                colorHex = "#238636";
+                emojiStatus = "🟢";
+            }
 
             cellPct.innerText = emojiStatus + " " + sign + pct.toFixed(2) + "%";
             cellPct.style.color = colorHex;
 
-            let lebarBar = Math.min((pctAbsolut / 5) * 100, 100);
+            let lebarBar = (pctAbsolut / 5) * 100;
+            if (lebarBar > 100) lebarBar = 100;
             barFill.style.width = lebarBar + "%";
             barFill.style.backgroundColor = colorHex;
         });
@@ -381,7 +398,7 @@
         ];
         listJarak.sort((a, b) => a.nilai - b.nilai);
 
-        let dataTerdekat = listJarak[0];
+        let dataTerdekat = listJarak;
         let realPct = dataTerdekat.tipe === 'S' ? -Math.abs(dataTerdekat.pct) : Math.abs(dataTerdekat.pct);
         let signTerdekat = realPct > 0 ? "+" : "";
         document.getElementById('summary').innerHTML = "<strong>Tren:</strong> " + prediksi + " | Terdekat ke <strong>" + dataTerdekat.nama + " (" + signTerdekat + realPct.toFixed(2) + "%)</strong>.";
@@ -487,4 +504,5 @@
 </script>
 </body>
 </html>
+
 
