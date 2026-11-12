@@ -196,6 +196,13 @@
                     <tr><td class="pos-r">R1</td><td id="dist-r1">-</td><td><div id="pct-r1">-</div><div class="sub-bar-container"><div id="bar-r1" class="sub-bar-fill"></div></div></td></tr>
                     <tr><td class="pos-s">S1</td><td id="dist-s1">-</td><td><div id="pct-s1">-</div><div class="sub-bar-container"><div id="bar-s1" class="sub-bar-fill"></div></div></td></tr>
                     <tr><td class="pos-s">S2</td><td id="dist-s2">-</td><td><div id="pct-s2">-</div><div class="sub-bar-container"><div id="bar-s2" class="sub-bar-fill"></div></div></td></tr>
+
+                   <tr style="border-top: 1px dashed var(--border-color); background: #11161d;">
+                        <td style="color: #58a6ff; font-weight: bold;">Range</td>
+                        <td id="range-s1r1" style="font-weight: bold;">-</td>
+                        <td id="status-layak" style="font-weight: bold;">-</td>
+                    </tr>
+
                 </tbody>
             </table>
         </div>
@@ -312,7 +319,7 @@
         document.getElementById('summary').innerHTML = "✅ <strong>Tersimpan!</strong> S/R <strong>" + bursa + "</strong> (" + koin + "/" + pasar + ") dikunci.";
     }
 
-    function hitungData() {
+       function hitungData() {
         const hb = dapatkanAngkaMurni('hb');
         const r2 = dapatkanAngkaMurni('r2');
         const r1 = dapatkanAngkaMurni('r1');
@@ -320,8 +327,47 @@
         const s2 = dapatkanAngkaMurni('s2');
         const pasar = document.getElementById('pilih-mata-uang').value;
 
+        // 1. Deteksi Awal Kelayakan Trading (Range S1 ke R1) - Langsung aktif meski HB kosong
+        let teksKelayakanRingkas = "";
+        if (r1 > 0 && s1 > 0 && r1 > s1) {
+            const selisihRange = r1 - s1;
+            const pctRange = (selisihRange / s1) * 100;
+            const elRange = document.getElementById('range-s1r1');
+            const elLayak = document.getElementById('status-layak');
+
+            let statusWarna = "";
+            let labelLayak = "";
+
+            if (pctRange < 0.60) {
+                statusWarna = "#da3633";
+                labelLayak = "🔴 " + pctRange.toFixed(2) + "% (Sempit)";
+                teksKelayakanRingkas = "🔴 Sempit (" + pctRange.toFixed(2) + "%)";
+            } else if (pctRange <= 1.20) {
+                statusWarna = "#ff9800";
+                labelLayak = "🟡 " + pctRange.toFixed(2) + "% (Ketat)";
+                teksKelayakanRingkas = "🟡 Ketat (" + pctRange.toFixed(2) + "%)";
+            } else {
+                statusWarna = "#238636";
+                labelLayak = "🟢 " + pctRange.toFixed(2) + "% (Layak)";
+                teksKelayakanRingkas = "🟢 Layak (" + pctRange.toFixed(2) + "%)";
+            }
+
+            if (elRange) elRange.innerText = formatKustomMataUang(selisihRange, pasar);
+            if (elLayak) {
+                elLayak.innerText = labelLayak;
+                elLayak.style.color = statusWarna;
+            }
+
+            // Jika HB belum diisi, tampilkan hasil deteksi awal di kotak ringkasan
+            if (!hb) {
+                document.getElementById('summary').innerHTML = "<strong>Range S1-R1:</strong> " + teksKelayakanRingkas + " | Ketik HB untuk analisis arah.";
+                return;
+            }
+        }
+
         if (!hb || !r1 || !s1) return;
 
+        // 2. Perhitungan Jarak HB ke Masing-Masing Target
         const targets = [
             { id: 'r2', val: r2, tipe: 'R' },
             { id: 'r1', val: r1, tipe: 'R' },
@@ -373,7 +419,7 @@
         document.getElementById('jual-2').innerText = formatKustomMataUang(r1 + ((r2 - r1) / 2), pasar);
         document.getElementById('jual-3').innerText = formatKustomMataUang(r2, pasar);
 
-        let prediksi = (hb > r1) ? "Bullish Kuat (Kejar R2)" : (hb < s1) ? "Breakdown Bearish (Jebol S1)" : "Sideways / Konsolidasi (S1-R1)";
+        let prediksi = (hb > r1) ? "Bullish Kuat" : (hb < s1) ? "Breakdown Bearish" : "Sideways (S1-R1)";
         let listJarak = [
             { nama: 'R2', nilai: Math.abs(r2 - hb), pct: ((r2 - hb) / hb) * 100, tipe: 'R' },
             { nama: 'R1', nilai: Math.abs(r1 - hb), pct: ((r1 - hb) / hb) * 100, tipe: 'R' },
@@ -383,110 +429,12 @@
         listJarak.sort((a, b) => a.nilai - b.nilai);
 
         let dataTerdekat = listJarak[0];
+
         let realPct = dataTerdekat.tipe === 'S' ? -Math.abs(dataTerdekat.pct) : Math.abs(dataTerdekat.pct);
         let signTerdekat = realPct > 0 ? "+" : "";
-        document.getElementById('summary').innerHTML = "<strong>Tren:</strong> " + prediksi + " | Terdekat ke <strong>" + dataTerdekat.nama + " (" + signTerdekat + realPct.toFixed(2) + "%)</strong>.";
+
+        document.getElementById('summary').innerHTML = "<strong>" + prediksi + "</strong> | Dekat <strong>" + dataTerdekat.nama + " (" + signTerdekat + realPct.toFixed(2) + "%)</strong> | Range: <strong>" + teksKelayakanRingkas + "</strong>";
     }
-
-   function gantiKoinAtauMataUang() {
-        const bursa = document.getElementById('pilih-bursa').value;
-        const koin = document.getElementById('pilih-koin').value;
-        const pasar = document.getElementById('pilih-mata-uang').value;
-        let dataTersimpan = null;
-        try { dataTersimpan = localStorage.getItem("pref_" + bursa + "_" + koin + "_" + pasar); } catch (e) {}
-
-        if (dataTersimpan) {
-            const data = JSON.parse(dataTersimpan);
-            document.getElementById('r2').value = data.r2;
-            document.getElementById('r1').value = data.r1;
-            document.getElementById('s1').value = data.s1;
-            document.getElementById('s2').value = data.s2;
-        } else {
-            ['r2', 'r1', 's1', 's2'].forEach(id => document.getElementById(id).value = "");
-            ['dist-r2', 'pct-r2', 'dist-r1', 'pct-r1', 'dist-s1', 'pct-s1', 'dist-s2', 'pct-s2', 'beli-1', 'beli-2', 'beli-3', 'jual-1', 'jual-2', 'jual-3'].forEach(id => document.getElementById(id).innerText = "-");
-            ['r2', 'r1', 's1', 's2'].forEach(id => document.getElementById('bar-' + id).style.width = "0%");
-        }
-
-        document.getElementById('hb').value = "";
-        document.getElementById('summary').innerText = "[" + bursa + "] " + koin + "/" + pasar + " siap. Masukkan HB baru.";
-        simpanOtomatisSR();
-    }
-
-    function kirimWA() {
-        const bursa = document.getElementById('pilih-bursa').value;
-        const hb = document.getElementById('hb').value || "-";
-        const koin = document.getElementById('pilih-koin').value;
-        const pasar = document.getElementById('pilih-mata-uang').value;
-        const r2 = document.getElementById('r2').value || "-";
-        const r1 = document.getElementById('r1').value || "-";
-        const s1 = document.getElementById('s1').value || "-";
-        const s2 = document.getElementById('s2').value || "-";
-        const pctR1 = document.getElementById('pct-r1').innerText;
-        const pctS1 = document.getElementById('pct-s1').innerText;
-
-        const text = "*Crypto Update - " + bursa + " (" + koin + "/" + pasar + ")*\n" +
-                     "HB: " + hb + "\n\n" +
-                     "*Level S/R:*\n" +
-                     "R2: " + r2 + "\n" +
-                     "R1: " + r1 + " (" + pctR1 + ")\n" +
-                     "S1: " + s1 + " (" + pctS1 + ")\n" +
-                     "S2: " + s2 + "\n\n" +
-                     "_Via Crypto Pivot & Risk Tracker_";
-
-        const waUrl = "https://whatsapp.com" + encodeURIComponent(text);
-        const win = window.open(waUrl, '_blank');
-        if (!win) {
-            window.top.location.href = waUrl;
-        }
-    }
-
-    function pivotResetForm() {
-        const inputHB = document.getElementById('hb');
-        if (inputHB) {
-            inputHB.value = "";
-            inputHB.focus();
-        }
-        ['dist-r2', 'pct-r2', 'dist-r1', 'pct-r1', 'dist-s1', 'pct-s1', 'dist-s2', 'pct-s2', 'beli-1', 'beli-2', 'beli-3', 'jual-1', 'jual-2', 'jual-3'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.innerText = "-";
-        });
-        ['r2', 'r1', 's1', 's2'].forEach(id => {
-            const bar = document.getElementById('bar-' + id);
-            if (bar) bar.style.width = "0%";
-        });
-        document.getElementById('main-bar-profit').style.width = "50%";
-        document.getElementById('main-bar-profit').innerText = "Buy (50%)";
-        document.getElementById('main-bar-loss').style.width = "50%";
-        document.getElementById('main-bar-loss').innerText = "Sell (50%)";
-        document.getElementById('summary').innerText = "HB di-reset. Level S/R tetap terkunci, ketik HB baru.";
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const inputHB = document.getElementById('hb');
-        if (inputHB) {
-            inputHB.style.background = "#0d1117";
-            inputHB.style.color = "#e0e6ed";
-            inputHB.style.fontWeight = "bold";
-        }
-        try {
-            const dataAktif = localStorage.getItem('koin_terakhir_aktif');
-            if (dataAktif) {
-                const posisi = JSON.parse(dataAktif);
-                if (posisi.bursa) document.getElementById('pilih-bursa').value = posisi.bursa;
-                document.getElementById('pilih-koin').value = posisi.koin;
-                document.getElementById('pilih-mata-uang').value = posisi.pasar;
-            }
-            const bursa = document.getElementById('pilih-bursa').value;
-            const koin = document.getElementById('pilih-koin').value;
-            const pasar = document.getElementById('pilih-mata-uang').value;
-            const savedData = localStorage.getItem("pref_" + bursa + "_" + koin + "_" + pasar);
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                document.getElementById('r2').value = data.r2;
-                document.getElementById('r1').value = data.r1;
-                document.getElementById('s1').value = data.s1;
-                document.getElementById('s2').value = data.s2;
-            }
         } catch (e) {}
         hitungData();
     });
