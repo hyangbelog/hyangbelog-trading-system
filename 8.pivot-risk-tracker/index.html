@@ -404,10 +404,11 @@
         let mainPctProfit = totalJarakS1R1 > 0 ? (pctAbsolutR1 / totalJarakS1R1) * 100 : 50;
         let mainPctRisk = 100 - mainPctProfit;
 
-        document.getElementById('main-bar-profit').style.width = mainPctProfit.toFixed(0) + "%";
-        document.getElementById('main-bar-profit').innerText = "Buy (" + mainPctProfit.toFixed(0) + "%)";
+               document.getElementById('main-bar-profit').style.width = mainPctProfit.toFixed(0) + "%";
+        document.getElementById('main-bar-profit').innerText = mainPctProfit >= 15 ? "Buy (" + mainPctProfit.toFixed(0) + "%)" : "";
         document.getElementById('main-bar-loss').style.width = mainPctRisk.toFixed(0) + "%";
-        document.getElementById('main-bar-loss').innerText = "Sell (" + mainPctRisk.toFixed(0) + "%)";
+        document.getElementById('main-bar-loss').innerText = mainPctRisk >= 15 ? "Sell (" + mainPctRisk.toFixed(0) + "%)" : "";
+
 
         document.getElementById('beli-1').innerText = formatKustomMataUang(s1 * 1.002, pasar);
         document.getElementById('beli-2').innerText = formatKustomMataUang(s1, pasar);
