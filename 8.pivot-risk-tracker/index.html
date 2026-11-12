@@ -456,46 +456,32 @@
         }
     }
 
-    function pivotResetForm() {
-        ['hb', 'r2', 'r1', 's1', 's2'].forEach(id => document.getElementById(id).value = "");
+       function pivotResetForm() {
+        // Hanya mengosongkan kolom Harga Bergerak (HB)
+        const inputHB = document.getElementById('hb');
+        if (inputHB) {
+            inputHB.value = "";
+            inputHB.focus();
+        }
+
+        // Mengembalikan tampilan jarak & persentase ke strip (-), sementara R1/R2/S1/S2 tetap utuh
         ['dist-r2', 'pct-r2', 'dist-r1', 'pct-r1', 'dist-s1', 'pct-s1', 'dist-s2', 'pct-s2', 'beli-1', 'beli-2', 'beli-3', 'jual-1', 'jual-2', 'jual-3'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.innerText = "-";
         });
+
         ['r2', 'r1', 's1', 's2'].forEach(id => {
             const bar = document.getElementById('bar-' + id);
             if (bar) bar.style.width = "0%";
         });
-        simpanOtomatisSR();
-        document.getElementById('summary').innerText = "Masukkan Harga Bergerak (HB) untuk memulai.";
-    }
 
-    document.addEventListener("DOMContentLoaded", function() {
-        const inputHB = document.getElementById('hb');
-        if (inputHB) {
-            inputHB.style.background = "#0d1117";
-            inputHB.style.color = "#e0e6ed";
-            inputHB.style.fontWeight = "bold";
-        }
-        try {
-            const dataAktif = localStorage.getItem('koin_terakhir_aktif');
-            if (dataAktif) {
-                const posisi = JSON.parse(dataAktif);
-                if (posisi.bursa) document.getElementById('pilih-bursa').value = posisi.bursa;
-                document.getElementById('pilih-koin').value = posisi.koin;
-                document.getElementById('pilih-mata-uang').value = posisi.pasar;
-            }
-            const bursa = document.getElementById('pilih-bursa').value;
-            const koin = document.getElementById('pilih-koin').value;
-            const pasar = document.getElementById('pilih-mata-uang').value;
-            const savedData = localStorage.getItem("pref_" + bursa + "_" + koin + "_" + pasar);
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                document.getElementById('r2').value = data.r2;
-                document.getElementById('r1').value = data.r1;
-                document.getElementById('s1').value = data.s1;
-                document.getElementById('s2').value = data.s2;
-            }
+        document.getElementById('main-bar-profit').style.width = "50%";
+        document.getElementById('main-bar-profit').innerText = "Buy (50%)";
+        document.getElementById('main-bar-loss').style.width = "50%";
+        document.getElementById('main-bar-loss').innerText = "Sell (50%)";
+
+        document.getElementById('summary').innerText = "HB di-reset. Level S/R tetap terkunci, ketik HB baru.";
+    }
         } catch (e) {}
         hitungData();
     });
