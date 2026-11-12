@@ -398,13 +398,11 @@
         ];
         listJarak.sort((a, b) => a.nilai - b.nilai);
 
-        let dataTerdekat = listJarak;
+        let dataTerdekat = listJarak[0];
         let realPct = dataTerdekat.tipe === 'S' ? -Math.abs(dataTerdekat.pct) : Math.abs(dataTerdekat.pct);
         let signTerdekat = realPct > 0 ? "+" : "";
         document.getElementById('summary').innerHTML = "<strong>Tren:</strong> " + prediksi + " | Terdekat ke <strong>" + dataTerdekat.nama + " (" + signTerdekat + realPct.toFixed(2) + "%)</strong>.";
     }
-
-
 
    function gantiKoinAtauMataUang() {
         const bursa = document.getElementById('pilih-bursa').value;
