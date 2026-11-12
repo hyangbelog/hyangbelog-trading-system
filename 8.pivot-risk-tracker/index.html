@@ -31,18 +31,17 @@
             direction: ltr;
         }
         .container {
-    width: 100%;
-    max-width: 400px;
-    min-height: calc(100vh - 105px);
-    display: flex;
-    flex-direction: column;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 8px;
-    overflow: hidden;
-}
-
+            width: 100%;
+            max-width: 400px;
+            min-height: calc(100vh - 95px);
+            display: flex;
+            flex-direction: column;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 5px;
+            overflow: hidden;
+        }
         h3 {
             margin: 0 0 3px 0;
             text-align: center;
@@ -54,6 +53,13 @@
         .grid-inputs {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 3px;
+            margin-bottom: 3px;
+            width: 100%;
+        }
+        .grid-inputs-3 {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 3px;
             margin-bottom: 3px;
             width: 100%;
@@ -107,14 +113,7 @@
             margin: 3px 0; font-size: 0.62rem; background: var(--bg-color); padding: 3px 5px;
             border-radius: 3px; border-left: 3px solid var(--accent-blue); line-height: 1.2; word-wrap: break-word;
         }
-        .btn-group {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 4px;
-    margin-top: auto;
-    padding-top: 8px;
-}
-
+        .btn-group { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin-top: auto; padding-top: 6px; }
         button {
             width: 100%; padding: 4px 2px; border: none; border-radius: 3px; font-size: 0.64rem;
             font-weight: bold; cursor: pointer; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -128,26 +127,33 @@
     </style>
 </head>
 
-
 <body>
 <div class="container">
     <h3>Crypto Pivot & Risk Tracker</h3>
 
-    <div class="grid-inputs">
+    <div class="grid-inputs-3">
         <div class="input-group">
-            <label for="pilih-koin">PILIH KOIN</label>
-            <select id="pilih-koin" onchange="gantiKoinAtauMataUang()">
-                <option value="BTC">BTC (Bitcoin)</option>
-                <option value="ETH">ETH (Ethereum)</option>
-                <option value="SOL">SOL (Solana)</option>
-                <option value="BNB">BNB (Binance Coin)</option>
+            <label for="pilih-bursa">BURSA</label>
+            <select id="pilih-bursa" onchange="gantiKoinAtauMataUang()">
+                <option value="Indodax">Indodax</option>
+                <option value="Tokocrypto">Tokocrypto</option>
+                <option value="Reku">Reku</option>
             </select>
         </div>
         <div class="input-group">
-            <label for="pilih-mata-uang">MATA UANG (PASAR)</label>
+            <label for="pilih-koin">KOIN</label>
+            <select id="pilih-koin" onchange="gantiKoinAtauMataUang()">
+                <option value="BTC">BTC</option>
+                <option value="ETH">ETH</option>
+                <option value="SOL">SOL</option>
+                <option value="BNB">BNB</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="pilih-mata-uang">PASAR</label>
             <select id="pilih-mata-uang" onchange="gantiKoinAtauMataUang()">
-                <option value="IDR">IDR (Rupiah - Tokocrypto)</option>
-                <option value="USDT">USDT (Dollar - Binance)</option>
+                <option value="IDR">IDR (Rp)</option>
+                <option value="USDT">USDT ($)</option>
             </select>
         </div>
     </div>
@@ -159,19 +165,19 @@
         </div>
         <div class="input-group">
             <label for="r2">Resisten 2 (R2)</label>
-            <input type="text" id="r2" value="1.554.200.000" oninput="formatInputRupiah(this)">
+            <input type="text" id="r2" value="1.520.000.000" oninput="formatInputRupiah(this)">
         </div>
         <div class="input-group">
             <label for="r1">Resisten 1 (R1)</label>
-            <input type="text" id="r1" value="1.355.000.000" oninput="formatInputRupiah(this)">
+            <input type="text" id="r1" value="1.461.709.950" oninput="formatInputRupiah(this)">
         </div>
         <div class="input-group">
             <label for="s2">Support 2 (S2)</label>
-            <input type="text" id="s2" value="1.323.358.000" oninput="formatInputRupiah(this)">
+            <input type="text" id="s2" value="1.440.999.940" oninput="formatInputRupiah(this)">
         </div>
         <div class="input-group">
             <label for="s1">Support 1 (S1)</label>
-            <input type="text" id="s1" value="1.330.000.000" oninput="formatInputRupiah(this)">
+            <input type="text" id="s1" value="1.441.762.050" oninput="formatInputRupiah(this)">
         </div>
     </div>
 
@@ -284,24 +290,26 @@
 
     function simpanOtomatisSR() {
         try {
+            const bursa = document.getElementById('pilih-bursa').value;
             const koin = document.getElementById('pilih-koin').value;
             const pasar = document.getElementById('pilih-mata-uang').value;
-            localStorage.setItem("pref_" + koin + "_" + pasar, JSON.stringify({
+            localStorage.setItem("pref_" + bursa + "_" + koin + "_" + pasar, JSON.stringify({
                 r2: document.getElementById('r2').value,
                 r1: document.getElementById('r1').value,
                 s1: document.getElementById('s1').value,
                 s2: document.getElementById('s2').value
             }));
-            localStorage.setItem('koin_terakhir_aktif', JSON.stringify({ koin: koin, pasar: pasar }));
+            localStorage.setItem('koin_terakhir_aktif', JSON.stringify({ bursa: bursa, koin: koin, pasar: pasar }));
         } catch (e) {}
     }
 
     function simpanKunciManual() {
         simpanOtomatisSR();
         hitungData();
+        const bursa = document.getElementById('pilih-bursa').value;
         const koin = document.getElementById('pilih-koin').value;
         const pasar = document.getElementById('pilih-mata-uang').value;
-        document.getElementById('summary').innerHTML = "✅ <strong>Tersimpan!</strong> Level S/R " + koin + "/" + pasar + " sudah dikunci.";
+        document.getElementById('summary').innerHTML = "✅ <strong>Tersimpan!</strong> S/R <strong>" + bursa + "</strong> (" + koin + "/" + pasar + ") dikunci.";
     }
 
     function hitungData() {
@@ -311,58 +319,46 @@
         const s1 = dapatkanAngkaMurni('s1');
         const s2 = dapatkanAngkaMurni('s2');
         const pasar = document.getElementById('pilih-mata-uang').value;
-        const koin = document.getElementById('pilih-koin').value;
 
         if (!hb || !r1 || !s1) return;
 
         const targets = [
-            { id: 'r2', val: r2, tipe: 'R' }, { id: 'r1', val: r1, tipe: 'R' },
-            { id: 's1', val: s1, tipe: 'S' }, { id: 's2', val: s2, tipe: 'S' }
+            { id: 'r2', val: r2, tipe: 'R' },
+            { id: 'r1', val: r1, tipe: 'R' },
+            { id: 's1', val: s1, tipe: 'S' },
+            { id: 's2', val: s2, tipe: 'S' }
         ];
 
-        let pctAbsolutR1 = 0; let pctAbsolutS1 = 0;
+        let pctAbsolutR1 = 0, pctAbsolutS1 = 0;
 
         targets.forEach(t => {
             const distAbsolut = Math.abs(t.val - hb);
             let pct = ((t.val - hb) / hb) * 100;
-            if (t.tipe === 'R' && pct < 0) pct = pct; 
-            if (t.tipe === 'S' && pct > 0) pct = -pct; 
+            if (t.tipe === 'S' && pct > 0) pct = -pct;
 
             const sign = pct >= 0 ? "+" : "";
             const pctAbsolut = Math.abs(pct);
-            
             if (t.id === 'r1') pctAbsolutR1 = pctAbsolut;
             if (t.id === 's1') pctAbsolutS1 = pctAbsolut;
 
-            const cellPct = document.getElementById(`pct-${t.id}`);
-            const barFill = document.getElementById(`bar-${t.id}`);
-            
-            document.getElementById(`dist-${t.id}`).innerText = formatKustomMataUang(distAbsolut, pasar);
-            
-            let colorHex = ""; let emojiStatus = "";
-            let batasFee = pasar === "IDR" ? 0.30 : 0.25;
-            
-            if (pctAbsolut <= batasFee) {
-                colorHex = "#da3633"; emojiStatus = "🔴";
-            } else if (pctAbsolut > batasFee && pctAbsolut <= 0.60) {
-                colorHex = "#ff9800"; emojiStatus = "🟡";
-            } else {
-                colorHex = "#238636"; emojiStatus = "🟢";
-            }
-            
-            cellPct.innerText = `${emojiStatus} ${sign}${pct.toFixed(2)}%`;
+            document.getElementById('dist-' + t.id).innerText = formatKustomMataUang(distAbsolut, pasar);
+            const cellPct = document.getElementById('pct-' + t.id);
+            const barFill = document.getElementById('bar-' + t.id);
+
+            let colorHex = pct === 0 ? "#ff9800" : pct < 0 ? "#da3633" : "#238636";
+            let emojiStatus = pct === 0 ? "🟡" : pct < 0 ? "🔴" : "🟢";
+
+            cellPct.innerText = emojiStatus + " " + sign + pct.toFixed(2) + "%";
             cellPct.style.color = colorHex;
 
-            let lebarBar = (pctAbsolut / 5) * 100;
-            if (lebarBar > 100) lebarBar = 100;
-            barFill.style.width = `${lebarBar}%`;
+            let lebarBar = Math.min((pctAbsolut / 5) * 100, 100);
+            barFill.style.width = lebarBar + "%";
             barFill.style.backgroundColor = colorHex;
         });
 
         let totalJarakS1R1 = pctAbsolutR1 + pctAbsolutS1;
         let mainPctProfit = totalJarakS1R1 > 0 ? (pctAbsolutR1 / totalJarakS1R1) * 100 : 50;
         let mainPctRisk = 100 - mainPctProfit;
-
 
         document.getElementById('main-bar-profit').style.width = mainPctProfit.toFixed(0) + "%";
         document.getElementById('main-bar-profit').innerText = "Buy (" + mainPctProfit.toFixed(0) + "%)";
@@ -392,11 +388,13 @@
     }
 
 
+
    function gantiKoinAtauMataUang() {
+        const bursa = document.getElementById('pilih-bursa').value;
         const koin = document.getElementById('pilih-koin').value;
         const pasar = document.getElementById('pilih-mata-uang').value;
         let dataTersimpan = null;
-        try { dataTersimpan = localStorage.getItem("pref_" + koin + "_" + pasar); } catch (e) {}
+        try { dataTersimpan = localStorage.getItem("pref_" + bursa + "_" + koin + "_" + pasar); } catch (e) {}
 
         if (dataTersimpan) {
             const data = JSON.parse(dataTersimpan);
@@ -411,11 +409,12 @@
         }
 
         document.getElementById('hb').value = "";
-        document.getElementById('summary').innerText = "Koin diganti ke " + koin + "/" + pasar + ". Masukkan HB baru.";
+        document.getElementById('summary').innerText = "[" + bursa + "] " + koin + "/" + pasar + " siap. Masukkan HB baru.";
         simpanOtomatisSR();
     }
 
     function kirimWA() {
+        const bursa = document.getElementById('pilih-bursa').value;
         const hb = document.getElementById('hb').value || "-";
         const koin = document.getElementById('pilih-koin').value;
         const pasar = document.getElementById('pilih-mata-uang').value;
@@ -426,7 +425,7 @@
         const pctR1 = document.getElementById('pct-r1').innerText;
         const pctS1 = document.getElementById('pct-s1').innerText;
 
-        const text = "*Crypto Update (" + koin + "/" + pasar + ")*\n" +
+        const text = "*Crypto Update - " + bursa + " (" + koin + "/" + pasar + ")*\n" +
                      "HB: " + hb + "\n\n" +
                      "*Level S/R:*\n" +
                      "R2: " + r2 + "\n" +
@@ -467,12 +466,14 @@
             const dataAktif = localStorage.getItem('koin_terakhir_aktif');
             if (dataAktif) {
                 const posisi = JSON.parse(dataAktif);
+                if (posisi.bursa) document.getElementById('pilih-bursa').value = posisi.bursa;
                 document.getElementById('pilih-koin').value = posisi.koin;
                 document.getElementById('pilih-mata-uang').value = posisi.pasar;
             }
+            const bursa = document.getElementById('pilih-bursa').value;
             const koin = document.getElementById('pilih-koin').value;
             const pasar = document.getElementById('pilih-mata-uang').value;
-            const savedData = localStorage.getItem("pref_" + koin + "_" + pasar);
+            const savedData = localStorage.getItem("pref_" + bursa + "_" + koin + "_" + pasar);
             if (savedData) {
                 const data = JSON.parse(savedData);
                 document.getElementById('r2').value = data.r2;
@@ -486,5 +487,4 @@
 </script>
 </body>
 </html>
-
 
