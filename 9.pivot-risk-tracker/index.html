@@ -1,98 +1,270 @@
+<!DOCTYPE html>
+<html lang="id" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PPA Calc (Pro) - Pure Price Action & Risk Tracker</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --card-bg: #11161d;
+            --border-color: #232a31;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent-green: #238636;
+            --accent-red: #da3633;
+            --accent-blue: #1f6feb;
+            --table-header-bg: #161b22;
+            --text-soft-white: #e0e6ed;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #000000;
+            color: var(--text-main);
+            margin: 0;
+            padding: 4px 4px 80px 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            direction: ltr;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px;
+            overflow: hidden;
+        }
+        .header-box {
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 3px;
+            margin-bottom: 4px;
+        }
 
+
+       .header-box h3 { margin: 0; font-size: 0.82rem; color: #ffffff; letter-spacing: 0.3px; }
+        .header-box .sub-title { font-size: 0.55rem; color: #58a6ff; font-weight: 600; }
+        .grid-inputs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; margin-bottom: 4px; width: 100%; }
+        .grid-inputs-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin-bottom: 4px; width: 100%; }
+        .input-group { display: flex; flex-direction: column; min-width: 0; }
+        .input-group.full-width { grid-column: span 2; }
+        .row-layout { flex-direction: row !important; align-items: center; justify-content: space-between; gap: 5px; margin-bottom: 2px; }
+        .row-layout label { margin-bottom: 0; white-space: nowrap; flex-shrink: 0; }
+        .row-layout input { flex: 1; min-width: 0; text-align: left; }
+        label { font-size: 0.55rem; color: var(--text-muted); margin-bottom: 1px; font-weight: 600; }
+        input, select {
+            width: 100%; max-width: 100%; min-width: 0; background: #0d1117; border: 1px solid var(--border-color);
+            color: #ffffff; padding: 2px 5px; border-radius: 4px; font-size: 0.68rem; height: 22px; outline: none; direction: ltr;
+        }
+        select { cursor: pointer; text-overflow: ellipsis; padding: 1px 3px; }
+        .shift-bar { display: flex; justify-content: space-between; align-items: center; gap: 4px; margin: 2px 0 4px 0; }
+        .shift-btn {
+            flex: 1; background: #161b22; border: 1px solid #30363d; color: #58a6ff;
+            font-size: 0.56rem; font-weight: 600; padding: 3px 4px; border-radius: 4px; cursor: pointer;
+        }
+        .shift-btn:active { background: #1f6feb; color: #fff; }
+        .error-guard-box {
+            display: none; background: rgba(218, 54, 51, 0.15); border: 1px solid #da3633;
+            color: #ff7b72; font-size: 0.58rem; padding: 4px 6px; border-radius: 4px; margin-bottom: 4px; font-weight: 600;
+        }
+        .futures-panel { background: #0d1117; border: 1px solid #21262d; border-radius: 4px; padding: 4px; margin-bottom: 4px; display: none; }
+        .futures-row { display: grid; grid-template-columns: 1.2fr 0.7fr 1.3fr 0.35fr; gap: 3px; align-items: end; }
+        .side-toggle { display: flex; background: #161b22; border: 1px solid var(--border-color); border-radius: 3px; height: 22px; overflow: hidden; }
+        .side-btn { flex: 1; border: none; background: transparent; color: var(--text-muted); font-size: 0.58rem; font-weight: bold; cursor: pointer; padding: 0; }
+        .side-btn.active-long { background: var(--accent-green); color: #ffffff; }
+        .side-btn.active-short { background: var(--accent-red); color: #ffffff; }
+        .gear-btn { height: 22px; background: #21262d; border: 1px solid var(--border-color); color: #c9d1d9; border-radius: 3px; font-size: 0.68rem; cursor: pointer; padding: 0; }
+        .settings-drawer { display: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; margin-top: 4px; padding-top: 4px; border-top: 1px dashed var(--border-color); }
+        .accordion-item { border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 3px; overflow: hidden; }
+        .accordion-header {
+            background: #161b22; color: #ffffff; padding: 3px 6px; font-size: 0.62rem;
+            font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;
+        }
+        .panah-icon { color: #2196f3; font-size: 8px; transition: transform 0.2s ease; transform: rotate(0deg); }
+        .accordion-content { display: none; background: #000000; padding: 2px; width: 100%; border-top: 1px solid var(--border-color); }
+
+
+       .table-res { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 0.6rem; margin: 0; }
+        .table-res thead th { background-color: var(--table-header-bg); color: var(--text-soft-white); font-weight: bold; }
+        .table-res th, .table-res td {
+            padding: 2px 3px; text-align: left; border-bottom: 1px solid var(--border-color);
+            vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.2;
+        }
+        .wrap-cell { white-space: normal !important; word-break: break-word; font-size: 0.56rem !important; line-height: 1.25 !important; }
+        .pos-r { color: var(--accent-red); font-weight: 600; }
+        .pos-s { color: var(--accent-green); font-weight: 600; }
+        .info-text { color: var(--text-muted); font-size: 0.54rem; }
+        .sub-bar-container { width: 100%; background-color: #222; border-radius: 2px; height: 2px; margin-top: 1px; overflow: hidden; }
+        .sub-bar-fill { width: 0%; height: 100%; border-radius: 2px; transition: width 0.2s ease; }
+        .bar-flex-container-main {
+            display: flex; width: 100%; height: 13px; border-radius: 3px; overflow: hidden;
+            margin: 3px 0; font-size: 0.56rem; font-weight: bold; text-align: center; line-height: 13px; color: #ffffff;
+        }
+        .bar-main-fill { transition: width 0.2s ease; white-space: nowrap; overflow: hidden; }
+        .profit-color { background-color: var(--accent-green); }
+        .loss-color { background-color: var(--accent-red); }
+        .summary-text {
+            margin: 3px 0; font-size: 0.6rem; background: #0d1117; padding: 4px 6px;
+            border-radius: 4px; border-left: 3px solid var(--accent-blue); line-height: 1.25; word-wrap: break-word;
+        }
+        .btn-group-5 { display: grid; grid-template-columns: 1.1fr 0.38fr 0.85fr 0.95fr 0.9fr; gap: 3px; margin-top: 4px; }
+        button {
+            width: 100%; padding: 5px 2px; border: none; border-radius: 4px; font-size: 0.59rem;
+            font-weight: bold; cursor: pointer; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-calc-pivot { background-color: #d97706 !important; color: #ffffff !important; }
+        .btn-del-preset { background-color: #30363d !important; color: #ff7b72 !important; font-size: 0.65rem !important; }
+        .btn-copy-plan { background-color: #1f6feb !important; color: #ffffff !important; }
+        .btn-wa { background-color: var(--accent-green) !important; }
+        .btn-reset-pivot { background-color: var(--accent-red) !important; color: #ffffff !important; }
+        .log-list { max-height: 180px; overflow-y: auto; padding: 3px; }
+        .log-card { background: #0d1117; border: 1px solid #21262d; border-radius: 4px; padding: 4px 6px; margin-bottom: 4px; font-size: 0.56rem; line-height: 1.3; }
+        .log-top { display: flex; justify-content: space-between; color: #58a6ff; font-weight: bold; margin-bottom: 2px; }
+        .log-actions { display: flex; gap: 4px; padding: 3px; border-top: 1px solid #21262d; }
+        .log-actions button { padding: 3px 4px; font-size: 0.56rem; }
+        .ref-text { text-align: center; font-size: 8.5px; color: #8b949e; margin: 5px auto 2px auto; line-height: 1.1; }
+        .ref-buttons { display: flex; justify-content: space-between; gap: 4px; width: 100%; margin: 0 auto 2px auto; }
+        .ref-buttons button { flex: 1; padding: 4px 2px; font-size: 9.5px; border-radius: 4px; }
+    </style>
+</head>
+
+
+<body>
 <div class="container">
-    <h3>Crypto Pivot & Risk Tracker</h3>
-    
-    <!-- FITUR BARU: Dropdown Pilihan Koin dan Mata Uang -->
-    <div class="grid-inputs" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 4px;">
+    <div class="header-box">
+        <h3>PPA Calc (Pro)</h3>
+        <div class="sub-title">Pure Price Action & Risk Tracker</div>
+    </div>
+
+    <div class="grid-inputs-3">
         <div class="input-group">
-            <label for="pilih-koin">PILIH KOIN</label>
-            <select id="pilih-koin" onchange="gantiKoinAtauMataUang()">
-                <option value="BTC" />BTC (Bitcoin)
-                <option value="ETH" />ETH (Ethereum)
-                <option value="SOL" />SOL (Solana)
-                <option value="BNB" />BNB (Binance Coin)
+            <label for="pilih-bursa">BURSA</label>
+            <select id="pilih-bursa" onchange="gantiKonteksPasar()">
+                <option value="INDODAX">Indodax</option>
+                <option value="TOKOCRYPTO">Tokocrypto</option>
+                <option value="REKU">Reku</option>
             </select>
         </div>
         <div class="input-group">
-            <label for="pilih-mata-uang">MATA UANG (PASAR)</label>
-            <select id="pilih-mata-uang" onchange="gantiKoinAtauMataUang()">
-                <option value="IDR" />IDR (Rupiah - Tokocrypto)
-                <option value="USDT" />USDT (Dollar - Binance)
+            <label for="pilih-koin">KOIN</label>
+            <select id="pilih-koin" onchange="gantiKonteksPasar()">
+                <option value="BTC">BTC</option>
+                <option value="ETH">ETH</option>
+                <option value="SOL">SOL</option>
+                <option value="BNB">BNB</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="pilih-mode-pasar">MODE / PASAR</label>
+            <select id="pilih-mode-pasar" onchange="gantiKonteksPasar()">
+                <option value="SPOT_IDR">Spot (IDR)</option>
+                <option value="SPOT_USDT">Spot (USDT)</option>
+                <option value="FUTURES_IDR">Futures (IDR)</option>
+                <option value="FUTURES_USDT">Futures (USDT)</option>
             </select>
         </div>
     </div>
-    
-    <div class="grid-inputs">
-        <!-- Kolom HB dikunci (readonly) karena sudah otomatis terisi live -->
-        <div class="input-group full-width row-layout">
-            <label for="hb">Harga Bergerak (HB) <span id="status-live" style="color:#2196f3; font-size:9px;">● LIVE</span></label>
-            <input type="text" id="hb" value="-" readonly style="background:#090d13; color:#2196f3; font-weight:bold;" />
+
+    <div id="panel-futures" class="futures-panel">
+        <div class="futures-row">
+            <div class="input-group">
+                <label>ARAH POSISI</label>
+                <div class="side-toggle">
+                    <button type="button" id="btn-long" class="side-btn active-long" onclick="setArahFutures('LONG')">LONG</button>
+                    <button type="button" id="btn-short" class="side-btn" onclick="setArahFutures('SHORT')">SHORT</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="fut-lev">LEV (x)</label>
+                <input type="number" id="fut-lev" value="10" min="1" max="125" oninput="hitungData()">
+            </div>
+
+
+           <div class="input-group">
+                <label for="fut-saldo">SALDO / MODAL</label>
+                <input type="text" id="fut-saldo" value="10.000.000" oninput="formatInputAngka(this)">
+            </div>
+            <button type="button" class="gear-btn" onclick="toggleSettingsFutures()" title="Pengaturan Risk & Buffer">⚙️</button>
         </div>
+        <div id="futures-settings" class="settings-drawer">
+            <div class="input-group">
+                <label for="fut-risk">RISK PER TRADE (%)</label>
+                <input type="number" id="fut-risk" value="2" step="0.1" min="0.1" oninput="hitungData()">
+            </div>
+            <div class="input-group">
+                <label for="fut-buffer">BUFFER SL (%)</label>
+                <input type="number" id="fut-buffer" value="0.5" step="0.1" min="0" oninput="hitungData()">
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-inputs">
+        <div class="input-group full-width row-layout">
+            <label for="hb">Harga Bergerak (HB) <span style="color:#2196f3; font-size:8px;">● MANUAL</span></label>
+            <input type="text" id="hb" value="" placeholder="Ketik harga..." oninput="formatInputAngka(this)">
+        </div>
+    </div>
+
+    <div class="shift-bar">
+        <button type="button" class="shift-btn" onclick="geserStruktur('TURUN')">⬇️ Geser Turun (Breakdown)</button>
+        <button type="button" class="shift-btn" onclick="geserStruktur('NAIK')">⬆️ Geser Naik (Breakout)</button>
+    </div>
+
+    <div id="error-guard-msg" class="error-guard-box"></div>
+
+    <div class="grid-inputs">
         <div class="input-group">
             <label for="r2">Resisten 2 (R2)</label>
-            <input type="text" id="r2" value="1.520.000.000" oninput="formatInputRupiah(this)" />
+            <input type="text" id="r2" value="1.358.000.000" oninput="formatInputAngka(this)">
         </div>
         <div class="input-group">
             <label for="r1">Resisten 1 (R1)</label>
-            <input type="text" id="r1" value="1.461.709.950" oninput="formatInputRupiah(this)" />
+            <input type="text" id="r1" value="1.345.000.000" oninput="formatInputAngka(this)">
         </div>
         <div class="input-group">
             <label for="s2">Support 2 (S2)</label>
-            <input type="text" id="s2" value="1.440.999.940"
-        oninput="formatInputRupiah(this)" />
+            <input type="text" id="s2" value="1.280.000.000" oninput="formatInputAngka(this)">
         </div>
         <div class="input-group">
             <label for="s1">Support 1 (S1)</label>
-            <input type="text" id="s1" value="1.441.762.050" oninput="formatInputRupiah(this)" />
+            <input type="text" id="s1" value="1.300.000.000" oninput="formatInputAngka(this)">
         </div>
     </div>
 
-    <!-- ACCORDION 1: ANALISIS JARAK -->
-    <div class="accordion-item">
+
+   <div class="accordion-item">
         <div class="accordion-header" onclick="toggleAccordion('acc-jarak', 'panah-jarak')">
-            <span>📊 Analisis Jarak & Persentase</span>
+            <span>📊 Analisis Jarak & Kelayakan Range</span>
             <span id="panah-jarak" class="panah-icon">▼</span>
         </div>
         <div id="acc-jarak" class="accordion-content">
             <table class="table-res">
                 <thead>
-                    <tr><th>Target</th><th>Jarak</th><th>Visual % & Bar</th></tr>
+                    <tr><th style="width:18%;">Target</th><th style="width:38%;">Jarak</th><th style="width:44%;">Visual % & Bar</th></tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="pos-r">R2</td><td id="dist-r2">-</td>
-                        <td>
-                            <div id="pct-r2">-</div>
-                            <div class="sub-bar-container"><div id="bar-r2" class="sub-bar-fill"></div></div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="pos-r">R1</td><td id="dist-r1">-</td>
-                        <td>
-                            <div id="pct-r1">-</div>
-                            <div class="sub-bar-container"><div id="bar-r1" class="sub-bar-fill"></div></div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="pos-s">S1</td><td id="dist-s1">-</td>
-                        <td>
-                            <div id="pct-s1">-</div>
-                            <div class="sub-bar-container"><div id="bar-s1" class="sub-bar-fill"></div></div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="pos-s">S2</td><td id="dist-s2">-</td>
-                        <td>
-                            <div id="pct-s2">-</div>
-                            <div class="sub-bar-container"><div id="bar-s2" class="sub-bar-fill"></div></div>
-                        </td>
+                    <tr><td class="pos-r">R2</td><td id="dist-r2">-</td><td><div id="pct-r2">-</div><div class="sub-bar-container"><div id="bar-r2" class="sub-bar-fill"></div></div></td></tr>
+                    <tr><td class="pos-r">R1</td><td id="dist-r1">-</td><td><div id="pct-r1">-</div><div class="sub-bar-container"><div id="bar-r1" class="sub-bar-fill"></div></div></td></tr>
+                    <tr><td class="pos-s">S1</td><td id="dist-s1">-</td><td><div id="pct-s1">-</div><div class="sub-bar-container"><div id="bar-s1" class="sub-bar-fill"></div></div></td></tr>
+                    <tr><td class="pos-s">S2</td><td id="dist-s2">-</td><td><div id="pct-s2">-</div><div class="sub-bar-container"><div id="bar-s2" class="sub-bar-fill"></div></div></td></tr>
+                    <tr style="border-top: 1px dashed var(--border-color); background: #11161d;">
+                        <td style="color: #58a6ff; font-weight: bold;">Range</td>
+                        <td id="range-s1r1" style="font-weight: bold;">-</td>
+                        <td id="status-layak" style="font-weight: bold;">-</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- ACCORDION 2: RENCANA POSISI -->
     <div class="accordion-item">
         <div class="accordion-header" onclick="toggleAccordion('acc-posisi', 'panah-posisi')">
             <span>🎯 Rencana Posisi Bertingkat</span>
@@ -101,349 +273,145 @@
         <div id="acc-posisi" class="accordion-content">
             <table class="table-res">
                 <thead>
-                    <tr><th>Aksi</th><th>Target Harga</th><th>Ket.</th></tr>
+                    <tr><th style="width:28%;">Aksi / Posisi</th><th style="width:46%;">Target Harga</th><th style="width:26%;">Ket.</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td class="pos-r">Jual 3</td><td id="jual-3">-</td><td class="info-text">R3 Max</td></tr>
-                    <tr><td class="pos-r">Jual 2</td><td id="jual-2">-</td><td class="info-text">R2 Mid</td></tr>
-                    <tr><td class="pos-r">Jual 1</td><td id="jual-1">-</td><td class="info-text">R1 Low</td></tr>
-                    <tr style="border-top: 1px dashed var(--border-color);">
-                        <td class="pos-s">Beli 1</td><td id="beli-1">-</td><td class="info-text">S1 Low</td></tr>
-                    <tr><td class="pos-s">Beli 2</td><td id="beli-2">-</td><td class="info-text">S2 Mid</td></tr>
-                    <tr><td class="pos-s">Beli 3</td><td id="beli-3">-</td><td class="info-text">S3 Max</td></tr>
+                    <tr><td id="lbl-r3" class="pos-r">Jual 3</td><td id="jual-3">-</td><td class="info-text">R3 Max</td></tr>
+                    <tr><td id="lbl-r2" class="pos-r">Jual 2</td><td id="jual-2">-</td><td class="info-text">R2 Mid</td></tr>
+                    <tr><td id="lbl-r1" class="pos-r">Jual 1</td><td id="jual-1">-</td><td class="info-text">R1 Low</td></tr>
+                    <tr style="border-top: 1px dashed var(--border-color);"><td id="lbl-s1" class="pos-s">Beli 1</td><td id="beli-1">-</td><td class="info-text">S1 Low</td></tr>
+                    <tr><td id="lbl-s2" class="pos-s">Beli 2</td><td id="beli-2">-</td><td class="info-text">S2 Mid</td></tr>
+                    <tr><td id="lbl-s3" class="pos-s">Beli 3</td><td id="beli-3">-</td><td class="info-text">S3 Max</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div class="summary-text" id="summary">
-        Menghubungkan ke bursa, memuat harga live...
+
+   <div id="acc-item-futures" class="accordion-item" style="display: none;">
+        <div class="accordion-header" onclick="toggleAccordion('acc-risiko-fut', 'panah-risiko-fut')">
+            <span>⚡ Manajemen Risiko & Position Sizing (Futures)</span>
+            <span id="panah-risiko-fut" class="panah-icon">▼</span>
+        </div>
+        <div id="acc-risiko-fut" class="accordion-content">
+            <table class="table-res">
+                <tbody>
+                    <tr><td style="width:32%; color:#8b949e;">Entry Utama</td><td id="fut-out-entry" style="width:68%; font-weight:bold; color:#ffffff;">-</td></tr>
+                    <tr><td style="color:#da3633;">Stop Loss (SL)</td><td id="fut-out-sl" style="font-weight:bold;">-</td></tr>
+                    <tr><td style="color:#238636;">Target TP 1</td><td id="fut-out-tp1" style="font-weight:bold;">-</td></tr>
+                    <tr><td style="color:#ff9800;">Est. Likuidasi</td><td id="fut-out-liq" style="font-weight:bold;">-</td></tr>
+                    <tr><td style="color:#58a6ff;">Rasio R:R</td><td id="fut-out-rr" style="font-weight:bold;">-</td></tr>
+                    <tr style="border-top: 1px dashed var(--border-color); background:#11161d;">
+                        <td style="color:#e0e6ed; font-weight:bold;">Position Size</td>
+                        <td id="fut-out-size" class="wrap-cell" style="color:#58a6ff; font-weight:bold;">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
+
+    <div class="summary-text" id="summary">Masukkan Harga Bergerak (HB) untuk memulai.</div>
 
     <div class="bar-flex-container-main">
-        <div id="main-bar-profit" class="bar-main-fill profit-color">(50%) Buy</div>
-        <div id="main-bar-loss" class="bar-main-fill loss-color">(50%) Sell</div>
+        <div id="main-bar-profit" class="bar-main-fill profit-color" style="width: 50%;">Buy (50%)</div>
+        <div id="main-bar-loss" class="bar-main-fill loss-color" style="width: 50%;">Sell (50%)</div>
     </div>
 
-            <div class="btn-group">
-        <button type="button" class="btn-calc-pivot" onclick="hitungData()">Simpan/Kunci S/R</button>
-       <button class="btn-wa" onclick="kirimWA()">Kirim WA</button>
-        <button type="button" class="btn-reset-pivot" onclick="pivotResetForm()">Reset</button>
+    <div class="btn-group-5">
+        <button type="button" id="btn-simpan-sr" class="btn-calc-pivot" onclick="simpanKunciManual()">Simpan S/R</button>
+        <button type="button" class="btn-del-preset" onclick="hapusPresetProfil()" title="Hapus Preset Profil Ini">🗑️</button>
+        <button type="button" class="btn-copy-plan" onclick="salinRencana()">Salin</button>
+        <button type="button" class="btn-wa" onclick="kirimWA()">Kirim WA</button>
+        <button type="button" class="btn-reset-pivot" onclick="pivotResetForm()">Reset HB</button>
     </div>
 
+    <div class="accordion-item" style="margin-top: 5px;">
+        <div class="accordion-header" onclick="toggleAccordion('acc-riwayat', 'panah-riwayat')">
+            <span>📜 Riwayat Perubahan S/R (Auto-Log)</span>
+            <span id="panah-riwayat" class="panah-icon">▼</span>
+        </div>
+        <div id="acc-riwayat" class="accordion-content">
+            <div id="log-container" class="log-list">
+                <div style="text-align:center; color:#8b949e; font-size:0.56rem; padding:6px;">Belum ada riwayat tersimpan.</div>
+            </div>
+            <div class="log-actions">
+                <button type="button" style="background:#238636;" onclick="eksporCSV()">📥 Ekspor CSV</button>
+                <button type="button" style="background:#da3633;" onclick="hapusSemuaRiwayat()">🧹 Hapus Riwayat</button>
+            </div>
+        </div>
+    </div>
 
-<style>
-:root {
-        --bg-color: #0d1117;
-        --card-bg: #161b22;
-        --border-color: #30363d;
-        --text-main: #c9d1d9;
-        --text-muted: #8b949e;
-        --accent-green: #238636;
-        --accent-red: #da3633;
-        --accent-blue: #1f6feb;
-        --table-header-bg: #21262d; 
-        --text-soft-white: #e0e6ed; 
-    }
-
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        background-color: var(--bg-color);
-        color: var(--text-main);
-        margin: 0;
-        padding: 0px; 
-        display: flex;
-        justify-content: center;
-    }
-
-    .container {
-        width: 100%;
-        max-width: 400px;
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 6px; 
-        box-sizing: border-box;
-    }
-
-    h3 {
-        margin: 0 0 5px 0; 
-        text-align: center;
-        font-size: 0.85rem;
-        color: #ffffff;
-        border-bottom: 1px solid var(--border-color);
-        padding-bottom: 2px;
-    }
-
-    .grid-inputs {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 3px; 
-        margin-bottom: 4px;
-    }
-
-    .input-group { display: flex; flex-direction: column; }
-    .input-group.full-width { grid-column: span 2; }
-    
-    .row-layout {
-        flex-direction: row !important;
-        align-items: center;
-        justify-content: space-between;
-        gap: 6px;
-        margin-bottom: 1px;
-    }
-    .row-layout label { margin-bottom: 0; white-space: nowrap; }
-    .row-layout input { flex-grow: 1; text-align: right; }
-
-    label {
-        font-size: 0.62rem;
-        color: var(--text-muted);
-        margin-bottom: 0px;
-        font-weight: 600;
-    }
-
-    input, select {
-        background: var(--bg-color);
-        border: 1px solid var(--border-color);
-        color: #ffffff;
-        padding: 3px 5px; 
-        border-radius: 4px;
-        font-size: 0.72rem;
-        outline: none;
-    }
-
-    select {
-        cursor: pointer;
-        padding: 2px 4px;
-    }
-
-    .accordion-item {
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
-        margin-bottom: 3px; 
-        overflow: hidden;
-    }
-
-    .accordion-header {
-        background: #21262d;
-        color: #ffffff;
-        padding: 4px 6px; 
-        font-size: 0.68rem;
-        font-weight: bold;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        cursor: pointer;
-        user-select: none;
-    }
-
-    .panah-icon {
-        color: #2196f3;
-        font-size: 8px;
-        transition: transform 0.3s ease;
-        transform: rotate(0deg);
-    }
-
-    .accordion-content {
-        display: none;
-        background: #000000; 
-        padding: 1px 2px;
-        width: 100%;
-        box-sizing: border-box;
-        border-top: 1px solid var(--border-color);
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .table-res {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.68rem;
-        margin: 0;
-    }
-
-    .table-res thead th {
-        background-color: var(--table-header-bg);
-        color: var(--text-soft-white);
-        font-weight: bold;
-    }
-
-    .table-res th, .table-res td {
-        padding: 2px 4px; 
-        text-align: left;
-        border-bottom: 1px solid var(--border-color);
-        vertical-align: middle;
-    }
-
-    .pos-r { color: var(--accent-red); font-weight: 600; }
-    .pos-s { color: var(--accent-green); font-weight: 600; }
-    .info-text { color: var(--text-muted); font-size: 0.62rem; }
-
-    .sub-bar-container {
-        width: 100%;
-        background-color: #222;
-        border-radius: 3px;
-        height: 3px; 
-        margin-top: 1px;
-        overflow: hidden;
-    }
-
-    .sub-bar-fill {
-        width: 0%;
-        height: 100%;
-        border-radius: 3px;
-        transition: width 0.3s ease, background-color 0.3s ease;
-    }
-
-    .bar-flex-container-main {
-        display: flex;
-        width: 100%;
-        height: 14px; 
-        border-radius: 4px;
-        overflow: hidden;
-        margin: 4px 0;
-        font-size: 0.6rem;
-        font-weight: bold;
-        text-align: center;
-        line-height: 14px;
-        color: #ffffff;
-    }
-
-    .bar-main-fill { transition: width 0.3s ease; }
-    .profit-color { background-color: var(--accent-green); }
-    .loss-color { background-color: var(--accent-red); }
-
-    .summary-text {
-        margin: 3px 0;
-        font-size: 0.68rem;
-        background: var(--bg-color);
-        padding: 3px 5px;
-        border-radius: 4px;
-        border-left: 3px solid var(--accent-blue);
-        line-height: 1.2;
-    }
-
-    .btn-group {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 4px;
-        margin-top: 4px;
-    }
-
-    button {
-        padding: 4px; 
-        border: none;
-        border-radius: 4px;
-        font-size: 0.68rem;
-        font-weight: bold;
-        cursor: pointer;
-        color: #ffffff;
-    }
-
-    .btn-calc-pivot {
-  background-color: #ff9f00 !important; /* Latar belakang kuning */
-  border: 1px solid #ff9f00 !important;
-  color: #ffffff !important;            /* Warna teks diubah menjadi putih bersih */
-}
-
-
-.btn-wa { background-color: var(--accent-green); }
-.btn-reset-pivot {
-  background-color: var(--accent-red) !important;
-  border: 1px solid var(--accent-red) !important;
-  color: var(--text-soft-white) !important;
-}
-
-</style>
+    <p class="ref-text">💡 <span style="color: #58a6ff; font-weight: bold;">Dukung Aplikasi Ini:</span> Daftar bursa melalui link resmi/referral kami di bawah:</p>
+    <div class="ref-buttons">
+        <button type="button" onclick="window.open('https://indodax.com', '_blank')" style="background-color: #00B4D8;">Indodax</button>
+        <button type="button" onclick="window.open('https://tokocrypto.com', '_blank')" style="background-color: #00C853;">Tokocrypto</button>
+        <button type="button" onclick="window.open('https://reku.id', '_blank')" style="background-color: #2979FF;">Reku</button>
+    </div>
+</div>
 
 
 <script>
-
-function bukaIndodax() {
-    // 1. Mengambil nama koin otomatis dari pilihan di layar
-    let elemenKoin = document.getElementById('pilihKoin');
-    let namaKoin = elemenKoin ? elemenKoin.value.toLowerCase() : "btc";
-    let pasanganPasar = namaKoin + "_idr";
-
-    // 2. Angka harga target beli
-    let targetHarga = "1460118020";
-
-    // 3. Jumlah minimal pembelian
-    let targetJumlah = "10000";
-
-    // 4. URL Jembatan Vercel yang sudah diperbaiki (Ditambahkan pencegah cache)
-    const URL_JEMBATAN = 'https://vercel.app' + Date.now();
-
-    console.log("Mencoba menghubungkan ke URL:", URL_JEMBATAN);
-
-    // 5. Mengirimkan sinyal tes koneksi ke Vercel
-    fetch(URL_JEMBATAN, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-            pair: pasanganPasar,
-            action: 'buy',
-            price: targetHarga,
-            amount: targetJumlah
-        })
-    })
-    .then(response => {
-        console.log("Status Respon HTTP Backend:", response.status);
-        if (!response.ok) {
-            throw new Error("Server Vercel merespon dengan kode error HTTP: " + response.status);
-        }
-        return response.json();
-    })
-    .then(hasil => {
-        console.log("Respon Asli Indodax/Vercel:", hasil);
-        
-        // Memeriksa hasil sukses dari backend Express Anda
-        if (hasil.success === 1 || hasil.success === true || hasil.return) {
-            alert("Koneksi Sukses! Jembatan berhasil terhubung ke akun Indodax Anda.");
-        } else {
-            alert("Jembatan Terhubung, tapi Indodax Menolak.\nAlasan: " + (hasil.error || hasil.message || JSON.stringify(hasil)));
-        }
-    })
-    .catch(error => {
-        console.error("Detail Error Pelacakan:", error);
-        alert("Gagal Terhubung ke Jembatan Vercel.\n\nDetail Error: " + error.message + "\n\nSolusi: Pastikan Anda sudah Clear Cache browser HP Anda.");
-    });
-}
-
-
+    let arahFutures = "LONG";
+    const LOG_STORAGE_KEY = "ppa_calc_history_log";
 
     function toggleAccordion(contentId, panahId) {
         const content = document.getElementById(contentId);
         const panah = document.getElementById(panahId);
-        if (content.style.display === "table" || content.style.display === "block") {
+        if (content.style.display === "block") {
             content.style.display = "none";
             panah.style.transform = "rotate(0deg)";
         } else {
-            content.style.display = "table"; 
+            content.style.display = "block";
             panah.style.transform = "rotate(-180deg)";
         }
     }
 
-    function formatInputRupiah(input) {
-    let nilaiBersih = input.value.replace(/[^0-9]/g, ""); 
-    
-    if (nilaiBersih === "") {
-        input.value = "";
-        return;
+    function toggleSettingsFutures() {
+        const drawer = document.getElementById('futures-settings');
+        drawer.style.display = (drawer.style.display === "grid") ? "none" : "grid";
     }
-    
-    let nilaiFormat = new Intl.NumberFormat('id-ID').format(parseFloat(nilaiBersih));
-    input.value = nilaiFormat;
-    
-    hargaMentahLiveGlobal = parseFloat(nilaiBersih);
-    hitungData(); 
-}
+
+    function setArahFutures(arah) {
+        arahFutures = arah;
+        document.getElementById('btn-long').className = arah === "LONG" ? "side-btn active-long" : "side-btn";
+        document.getElementById('btn-short').className = arah === "SHORT" ? "side-btn active-short" : "side-btn";
+        perbaruiLabelPosisi();
+        hitungData();
+    }
+
+    function getInfoModePasar() {
+        const val = document.getElementById('pilih-mode-pasar').value;
+        const pos = val.indexOf("_");
+        const modeStr = pos > -1 ? val.substring(0, pos) : "SPOT";
+        const uangStr = pos > -1 ? val.substring(pos + 1) : "IDR";
+        return { mode: modeStr, mataUang: uangStr };
+    }
+
+    function formatInputAngka(input) {
+        const info = getInfoModePasar();
+        if (info.mataUang === "IDR") {
+            let nilaiBersih = input.value.replace(/[^0-9]/g, "");
+            if (nilaiBersih === "") { input.value = ""; validasiUrutanSR(); hitungData(); return; }
+            input.value = new Intl.NumberFormat('id-ID').format(parseFloat(nilaiBersih));
+        } else {
+            let nilaiBersih = input.value.replace(/[^0-9.]/g, "");
+            const titikPos = nilaiBersih.indexOf(".");
+            if (titikPos > -1) {
+                const depan = nilaiBersih.substring(0, titikPos + 1);
+                const belakang = nilaiBersih.substring(titikPos + 1).replace(/\./g, "");
+                nilaiBersih = depan + belakang;
+            }
+            input.value = nilaiBersih;
+        }
+        if (validasiUrutanSR()) {
+            simpanOtomatisSR();
+        }
+        hitungData();
+    }
 
 
-    function formatKustomMataUang(angka, pasar) {
-        if (pasar === "IDR") {
+   function formatKustomMataUang(angka, mataUang) {
+        if (mataUang === "IDR") {
             return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(angka);
         } else {
             return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(angka);
@@ -451,69 +419,353 @@ function bukaIndodax() {
     }
 
     function dapatkanAngkaMurni(id) {
-        const textVal = document.getElementById(id).value;
-        if (!textVal) return 0;
-        return parseFloat(textVal.replace(/\./g, "").replace(/,/g, "")) || 0;
+        const el = document.getElementById(id);
+        if (!el || !el.value) return 0;
+        const info = getInfoModePasar();
+        return info.mataUang === "IDR"
+            ? (parseFloat(el.value.replace(/\./g, "").replace(/,/g, "")) || 0)
+            : (parseFloat(el.value.replace(/,/g, "")) || 0);
+    }
+
+    function validasiUrutanSR() {
+        const r2 = dapatkanAngkaMurni('r2');
+        const r1 = dapatkanAngkaMurni('r1');
+        const s1 = dapatkanAngkaMurni('s1');
+        const s2 = dapatkanAngkaMurni('s2');
+        const boxError = document.getElementById('error-guard-msg');
+        const btnSimpan = document.getElementById('btn-simpan-sr');
+
+        if ((r2 > 0 && r1 > 0 && r2 <= r1) || (s1 > 0 && s2 > 0 && s1 <= s2) || (r1 > 0 && s1 > 0 && r1 <= s1)) {
+            boxError.style.display = "block";
+            boxError.innerText = "⚠️ Cek Input: Urutan wajib R2 > R1 > S1 > S2!";
+            if (btnSimpan) btnSimpan.disabled = true;
+            return false;
+        } else {
+            boxError.style.display = "none";
+            if (btnSimpan) btnSimpan.disabled = false;
+            return true;
+        }
+    }
+
+    function geserStruktur(arah) {
+        const r2Val = document.getElementById('r2').value;
+        const r1Val = document.getElementById('r1').value;
+        const s1Val = document.getElementById('s1').value;
+        const s2Val = document.getElementById('s2').value;
+
+        if (arah === 'TURUN') {
+            document.getElementById('r2').value = r1Val;
+            document.getElementById('r1').value = s1Val;
+            document.getElementById('s1').value = s2Val;
+            document.getElementById('s2').value = "";
+            document.getElementById('s2').focus();
+            document.getElementById('summary').innerHTML = "⬇️ <strong>Geser Turun (Breakdown):</strong> S1 lama jadi R1. Silakan isi S2 baru.";
+        } else {
+            document.getElementById('s2').value = s1Val;
+            document.getElementById('s1').value = r1Val;
+            document.getElementById('r1').value = r2Val;
+            document.getElementById('r2').value = "";
+            document.getElementById('r2').focus();
+            document.getElementById('summary').innerHTML = "⬆️ <strong>Geser Naik (Breakout):</strong> R1 lama jadi S1. Silakan isi R2 baru.";
+        }
+        validasiUrutanSR();
+        hitungData();
     }
 
 
-      function hitungData() {
+   function getStorageKey() {
+        const bursa = document.getElementById('pilih-bursa').value;
+        const koin = document.getElementById('pilih-koin').value;
+        const info = getInfoModePasar();
+        return info.mode + "_" + bursa + "_" + koin + "_" + info.mataUang;
+    }
+
+    function simpanOtomatisSR() {
+        try {
+            const key = getStorageKey();
+            localStorage.setItem(key, JSON.stringify({
+                r2: document.getElementById('r2').value,
+                r1: document.getElementById('r1').value,
+                s1: document.getElementById('s1').value,
+                s2: document.getElementById('s2').value,
+                saldo: document.getElementById('fut-saldo').value,
+                lev: document.getElementById('fut-lev').value
+            }));
+            localStorage.setItem('ppa_last_context', JSON.stringify({
+                bursa: document.getElementById('pilih-bursa').value,
+                koin: document.getElementById('pilih-koin').value,
+                modePasar: document.getElementById('pilih-mode-pasar').value
+            }));
+        } catch (e) {}
+    }
+
+    function hapusPresetProfil() {
+        const key = getStorageKey();
+        if (confirm("Hapus preset tersimpan untuk profil " + key + "?")) {
+            try { localStorage.removeItem(key); } catch (e) {}
+            ['r2', 'r1', 's1', 's2'].forEach(id => document.getElementById(id).value = "");
+            validasiUrutanSR();
+            hitungData();
+            document.getElementById('summary').innerHTML = "🗑️ <strong>Preset dihapus:</strong> " + key;
+        }
+    }
+
+    function dapatkanWaktuSekarang() {
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, '0');
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const yyyy = now.getFullYear();
+        const hh = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        return dd + "/" + mm + "/" + yyyy + " " + hh + ":" + min;
+    }
+
+
+
+   function simpanKunciManual() {
+        if (!validasiUrutanSR()) return;
+        simpanOtomatisSR();
+        hitungData();
+
+        const bursa = document.getElementById('pilih-bursa').value;
+        const koin = document.getElementById('pilih-koin').value;
+        const info = getInfoModePasar();
+        const waktu = dapatkanWaktuSekarang();
+        const profil = info.mode + " | " + bursa + " | " + koin + "/" + info.mataUang;
+        const hbVal = document.getElementById('hb').value || "-";
+        const r2Val = document.getElementById('r2').value || "-";
+        const r1Val = document.getElementById('r1').value || "-";
+        const s1Val = document.getElementById('s1').value || "-";
+        const s2Val = document.getElementById('s2').value || "-";
+        const r1Num = dapatkanAngkaMurni('r1');
+        const s1Num = dapatkanAngkaMurni('s1');
+        const hbNum = dapatkanAngkaMurni('hb');
+        const rangePct = (s1Num > 0 && r1Num > s1Num) ? (((r1Num - s1Num) / s1Num) * 100).toFixed(2) + "%" : "0%";
+        const tren = hbNum > 0 ? ((hbNum > r1Num) ? "Bullish Kuat" : (hbNum < s1Num) ? "Breakdown Bearish" : "Sideways (S1-R1)") : "Menunggu HB";
+
+        try {
+            let logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]");
+            logs.unshift({
+                waktu: waktu, profil: profil, hb: hbVal,
+                r2: r2Val, r1: r1Val, s1: s1Val, s2: s2Val,
+                status: tren + " | Range " + rangePct
+            });
+            if (logs.length > 50) logs = logs.slice(0, 50);
+            localStorage.setItem(LOG_STORAGE_KEY, JSON.stringify(logs));
+            renderRiwayatLog();
+        } catch (e) {}
+
+        document.getElementById('summary').innerHTML = "✅ <strong>Tersimpan & Tercatat!</strong> " + profil + " masuk ke Riwayat.";
+    }
+
+    function renderRiwayatLog() {
+        const container = document.getElementById('log-container');
+        if (!container) return;
+        let logs = [];
+        try { logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]"); } catch (e) {}
+        if (logs.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:#8b949e; font-size:0.56rem; padding:6px;">Belum ada riwayat tersimpan.</div>';
+            return;
+        }
+        container.innerHTML = logs.slice(0, 10).map(item => `
+            <div class="log-card">
+                <div class="log-top"><span>${item.profil}</span><span>${item.waktu}</span></div>
+                <div style="color:#e0e6ed;">HB: <b>${item.hb}</b> | ${item.status}</div>
+                <div style="color:#8b949e;">R2: ${item.r2} | R1: ${item.r1} | S1: ${item.s1} | S2: ${item.s2}</div>
+            </div>
+        `).join('');
+    }
+
+
+   function eksporCSV() {
+        let logs = [];
+        try { logs = JSON.parse(localStorage.getItem(LOG_STORAGE_KEY) || "[]"); } catch (e) {}
+        if (logs.length === 0) { alert("Belum ada riwayat S/R untuk diekspor."); return; }
+
+        let csvContent = "Waktu,Profil,Harga_HB,R2,R1,S1,S2,Status_Tren_Range\n";
+        logs.forEach(row => {
+            csvContent += `"${row.waktu}","${row.profil}","${row.hb}","${row.r2}","${row.r1}","${row.s1}","${row.s2}","${row.status}"\n`;
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Jurnal_PPA_Calc_" + new Date().toISOString().slice(0, 10) + ".csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function hapusSemuaRiwayat() {
+        if (confirm("Hapus seluruh riwayat perubahan S/R?")) {
+            try { localStorage.removeItem(LOG_STORAGE_KEY); } catch (e) {}
+            renderRiwayatLog();
+        }
+    }
+
+    function perbaruiLabelPosisi() {
+        const info = getInfoModePasar();
+        if (info.mode === "SPOT") {
+            document.getElementById('lbl-r3').innerText = "Jual 3";
+            document.getElementById('lbl-r2').innerText = "Jual 2";
+            document.getElementById('lbl-r1').innerText = "Jual 1";
+            document.getElementById('lbl-s1').innerText = "Beli 1";
+            document.getElementById('lbl-s2').innerText = "Beli 2";
+            document.getElementById('lbl-s3').innerText = "Beli 3";
+        } else if (arahFutures === "LONG") {
+            document.getElementById('lbl-r3').innerText = "TP 3 (Max)";
+            document.getElementById('lbl-r2').innerText = "TP 2 (Mid)";
+            document.getElementById('lbl-r1').innerText = "TP 1 (Min)";
+            document.getElementById('lbl-s1').innerText = "Entry Long 1";
+            document.getElementById('lbl-s2').innerText = "Entry Long 2";
+            document.getElementById('lbl-s3').innerText = "Entry Long 3";
+        } else {
+            document.getElementById('lbl-r3').innerText = "Entry Short 3";
+            document.getElementById('lbl-r2').innerText = "Entry Short 2";
+            document.getElementById('lbl-r1').innerText = "Entry Short 1";
+            document.getElementById('lbl-s1').innerText = "TP 1 (Min)";
+            document.getElementById('lbl-s2').innerText = "TP 2 (Mid)";
+            document.getElementById('lbl-s3').innerText = "TP 3 (Max)";
+        }
+    }
+
+
+   function hitungData() {
         const hb = dapatkanAngkaMurni('hb');
         const r2 = dapatkanAngkaMurni('r2');
         const r1 = dapatkanAngkaMurni('r1');
         const s1 = dapatkanAngkaMurni('s1');
         const s2 = dapatkanAngkaMurni('s2');
-        const pasar = document.getElementById('pilih-mata-uang').value;
+        const info = getInfoModePasar();
+        const pasar = info.mataUang;
         const koin = document.getElementById('pilih-koin').value;
+        const isFutures = info.mode === "FUTURES";
 
-        if (!hb || !r1 || !s1) return;
+        document.getElementById('panel-futures').style.display = isFutures ? "block" : "none";
+        document.getElementById('acc-item-futures').style.display = isFutures ? "block" : "none";
+        perbaruiLabelPosisi();
+
+        let teksKelayakanRingkas = "";
+        if (r1 > 0 && s1 > 0 && r1 > s1) {
+            const selisihRange = r1 - s1;
+            const pctRange = (selisihRange / s1) * 100;
+            const elRange = document.getElementById('range-s1r1');
+            const elLayak = document.getElementById('status-layak');
+
+            let statusWarna = pctRange < 0.60 ? "#da3633" : pctRange <= 1.20 ? "#ff9800" : "#238636";
+            let labelLayak = pctRange < 0.60 ? "🔴 " + pctRange.toFixed(2) + "% (Sempit)" : pctRange <= 1.20 ? "🟡 " + pctRange.toFixed(2) + "% (Ketat)" : "🟢 " + pctRange.toFixed(2) + "% (Layak)";
+            teksKelayakanRingkas = pctRange < 0.60 ? "🔴 Sempit (" + pctRange.toFixed(2) + "%)" : pctRange <= 1.20 ? "🟡 Ketat (" + pctRange.toFixed(2) + "%)" : "🟢 Layak (" + pctRange.toFixed(2) + "%)";
+
+            if (elRange) elRange.innerText = formatKustomMataUang(selisihRange, pasar);
+            if (elLayak) { elLayak.innerText = labelLayak; elLayak.style.color = statusWarna; }
+        }
+
+        if (r1 > 0 && r2 > 0 && s1 > 0 && s2 > 0) {
+            document.getElementById('beli-1').innerText = formatKustomMataUang(s1 * 1.002, pasar);
+            document.getElementById('beli-2').innerText = formatKustomMataUang(s1, pasar);
+            document.getElementById('beli-3').innerText = formatKustomMataUang(s2, pasar);
+            document.getElementById('jual-1').innerText = formatKustomMataUang(r1, pasar);
+            document.getElementById('jual-2').innerText = formatKustomMataUang(r1 + ((r2 - r1) / 2), pasar);
+            document.getElementById('jual-3').innerText = formatKustomMataUang(r2, pasar);
+        }
+
+
+       if (isFutures && r1 > 0 && r2 > 0 && s1 > 0 && s2 > 0) {
+            const lev = parseFloat(document.getElementById('fut-lev').value) || 10;
+            const saldo = dapatkanAngkaMurni('fut-saldo');
+            const riskPct = parseFloat(document.getElementById('fut-risk').value) || 2;
+            const bufferPct = parseFloat(document.getElementById('fut-buffer').value) || 0.5;
+
+            let entry = (arahFutures === "LONG") ? s1 : r1;
+            let tp1 = (arahFutures === "LONG") ? r1 : s1;
+            let sl = (arahFutures === "LONG") ? s2 * (1 - bufferPct / 100) : r2 * (1 + bufferPct / 100);
+            let liq = (arahFutures === "LONG") ? entry * (1 - (1 / lev) + 0.005) : entry * (1 + (1 / lev) - 0.005);
+
+            let jarakSlPct = ((sl - entry) / entry) * 100;
+            let roeSl = -Math.abs(jarakSlPct) * lev;
+            let jarakTpPct = ((tp1 - entry) / entry) * 100;
+            let roeTp = Math.abs(jarakTpPct) * lev;
+
+            let rr = Math.abs(tp1 - entry) / Math.abs(entry - sl);
+            let bahayaLiq = (arahFutures === "LONG") ? (sl <= liq) : (sl >= liq);
+
+            let maxRugi = saldo * (riskPct / 100);
+            let rasioSl = Math.abs(entry - sl) / entry;
+            let nilaiKontrak = rasioSl > 0 ? (maxRugi / rasioSl) : 0;
+            let qtyKoin = entry > 0 ? (nilaiKontrak / entry) : 0;
+            let marginDipakai = lev > 0 ? (nilaiKontrak / lev) : 0;
+
+            document.getElementById('fut-out-entry').innerText = formatKustomMataUang(entry, pasar) + " (" + arahFutures + " " + lev + "x)";
+
+            const signSl = jarakSlPct >= 0 ? "+" : "";
+            document.getElementById('fut-out-sl').innerText = formatKustomMataUang(sl, pasar) + " (" + signSl + jarakSlPct.toFixed(2) + "% | ROE " + roeSl.toFixed(1) + "%)";
+            document.getElementById('fut-out-sl').style.color = "#da3633";
+
+            const signTp = jarakTpPct >= 0 ? "+" : "";
+            document.getElementById('fut-out-tp1').innerText = formatKustomMataUang(tp1, pasar) + " (" + signTp + jarakTpPct.toFixed(2) + "% | ROE +" + roeTp.toFixed(1) + "%)";
+            document.getElementById('fut-out-tp1').style.color = "#238636";
+
+            const elLiq = document.getElementById('fut-out-liq');
+            elLiq.innerText = formatKustomMataUang(liq, pasar) + (bahayaLiq ? " 🔴 BAHAYA (Kena Liq!)" : " (🟢 Aman)");
+            elLiq.style.color = bahayaLiq ? "#da3633" : "#238636";
+
+            const elRr = document.getElementById('fut-out-rr');
+            elRr.innerText = "1 : " + rr.toFixed(2) + (rr >= 1.5 ? " (🟢 Layak)" : rr < 1.0 ? " (🔴 Buruk)" : " (🟡 Cukup)");
+            elRr.style.color = rr >= 1.5 ? "#238636" : rr < 1.0 ? "#da3633" : "#ff9800";
+
+            const prefixMataUang = pasar === "IDR" ? "Rp " : "$";
+            document.getElementById('fut-out-size').innerHTML = "Risk " + prefixMataUang + formatKustomMataUang(maxRugi, pasar) + " | Margin " + prefixMataUang + formatKustomMataUang(marginDipakai, pasar) + "<br><span style='color:#e0e6ed;'>Max Size: " + qtyKoin.toFixed(5) + " " + koin + "</span>";
+        }
+
+       if (!hb) {
+            if (teksKelayakanRingkas) {
+                document.getElementById('summary').innerHTML = "<strong>Range S1-R1:</strong> " + teksKelayakanRingkas + " | Ketik HB untuk analisis arah.";
+            }
+            return;
+        }
+
+        if (!r1 || !s1) return;
 
         const targets = [
-            { id: 'r2', val: r2, tipe: 'R' }, { id: 'r1', val: r1, tipe: 'R' },
-            { id: 's1', val: s1, tipe: 'S' }, { id: 's2', val: s2, tipe: 'S' }
+            { id: 'r2', val: r2 },
+            { id: 'r1', val: r1 },
+            { id: 's1', val: s1 },
+            { id: 's2', val: s2 }
         ];
 
-        let pctAbsolutR1 = 0; let pctAbsolutS1 = 0;
+        let pctAbsolutR1 = 0, pctAbsolutS1 = 0;
+        let terdekatNama = "R1", terdekatNilai = Math.abs(r1 - hb), terdekatPct = ((r1 - hb) / hb) * 100;
 
         targets.forEach(t => {
             const distAbsolut = Math.abs(t.val - hb);
             let pct = ((t.val - hb) / hb) * 100;
-            if (t.tipe === 'R' && pct < 0) pct = pct; 
-            if (t.tipe === 'S' && pct > 0) pct = -pct; 
-
-            const sign = pct >= 0 ? "+" : "";
+            const sign = pct > 0 ? "+" : "";
             const pctAbsolut = Math.abs(pct);
-            
+
+            if (distAbsolut < terdekatNilai) {
+                terdekatNilai = distAbsolut;
+                terdekatNama = t.id.toUpperCase();
+                terdekatPct = pct;
+            }
+
             if (t.id === 'r1') pctAbsolutR1 = pctAbsolut;
             if (t.id === 's1') pctAbsolutS1 = pctAbsolut;
 
-            const cellPct = document.getElementById(`pct-${t.id}`);
-            const barFill = document.getElementById(`bar-${t.id}`);
-            
-            document.getElementById(`dist-${t.id}`).innerText = formatKustomMataUang(distAbsolut, pasar);
-            
-            let colorHex = ""; let emojiStatus = "";
-            let batasFee = pasar === "IDR" ? 0.30 : 0.25;
-            
-            // GANTI BLOK IF-ELSE YANG LAMA DENGAN KODE DI BAWAH INI:
-if (pct === 0) {
-    colorHex = "#ff9800"; // Kuning / Jingga
-    emojiStatus = "🟡";
-} else if (pct < 0) {
-colorHex = "#da3633"; // Merah (Plus)
-    emojiStatus = "🔴";
-} else {
-    colorHex = "#238636"; // Hijau (Minus)
-    emojiStatus = "🟢";
-    }
+            document.getElementById('dist-' + t.id).innerText = formatKustomMataUang(distAbsolut, pasar);
+            const cellPct = document.getElementById('pct-' + t.id);
+            const barFill = document.getElementById('bar-' + t.id);
 
-            
-            cellPct.innerText = `${emojiStatus} ${sign}${pct.toFixed(2)}%`;
+            let batasFee = pasar === "IDR" ? 0.30 : 0.25;
+            let colorHex = pctAbsolut <= batasFee ? "#da3633" : pctAbsolut <= 0.60 ? "#ff9800" : "#238636";
+            let emojiStatus = pctAbsolut <= batasFee ? "🔴" : pctAbsolut <= 0.60 ? "🟡" : "🟢";
+
+            cellPct.innerText = emojiStatus + " " + sign + pct.toFixed(2) + "%";
             cellPct.style.color = colorHex;
 
-            let lebarBar = (pctAbsolut / 5) * 100;
-            if (lebarBar > 100) lebarBar = 100;
-            barFill.style.width = `${lebarBar}%`;
+            let lebarBar = Math.min((pctAbsolut / 5) * 100, 100);
+            barFill.style.width = lebarBar + "%";
             barFill.style.backgroundColor = colorHex;
         });
 
@@ -521,203 +773,166 @@ colorHex = "#da3633"; // Merah (Plus)
         let mainPctProfit = totalJarakS1R1 > 0 ? (pctAbsolutR1 / totalJarakS1R1) * 100 : 50;
         let mainPctRisk = 100 - mainPctProfit;
 
-        document.getElementById('main-bar-profit').style.width = `${mainPctProfit.toFixed(0)}%`;
-        document.getElementById('main-bar-profit').innerText = `Buy (${mainPctProfit.toFixed(0)}%)`;
-        document.getElementById('main-bar-loss').style.width = `${mainPctRisk.toFixed(0)}%`;
-        document.getElementById('main-bar-loss').innerText = `Sel (${mainPctRisk.toFixed(0)}%)`;
+        document.getElementById('main-bar-profit').style.width = mainPctProfit.toFixed(0) + "%";
+        document.getElementById('main-bar-profit').innerText = mainPctProfit >= 15 ? "Buy (" + mainPctProfit.toFixed(0) + "%)" : "";
+        document.getElementById('main-bar-loss').style.width = mainPctRisk.toFixed(0) + "%";
+        document.getElementById('main-bar-loss').innerText = mainPctRisk >= 15 ? "Sell (" + mainPctRisk.toFixed(0) + "%)" : "";
 
-        document.getElementById('beli-1').innerText = formatKustomMataUang(s1 * 1.002, pasar);
-        document.getElementById('beli-2').innerText = formatKustomMataUang(s1, pasar);
-        document.getElementById('beli-3').innerText = formatKustomMataUang(s2, pasar);
-        document.getElementById('jual-1').innerText = formatKustomMataUang(r1, pasar);
-        document.getElementById('jual-2').innerText = formatKustomMataUang(r1 + ((r2 - r1) / 2), pasar);
-        document.getElementById('jual-3').innerText = formatKustomMataUang(r2, pasar);
-
-        let prediksi = (hb > r1) ? "Bullish Kuat (Kejar R2)" : (hb < s1) ? "Breakdown Bearish (Jebol S1)" : "Sideways / Konsolidasi (S1-R1)";
-        
-        let listJarak = [
-            { nama: 'R2', nilai: Math.abs(r2 - hb), pct: ((r2 - hb) / hb) * 100, tipe: 'R' },
-            { nama: 'R1', nilai: Math.abs(r1 - hb), pct: ((r1 - hb) / hb) * 100, tipe: 'R' },
-            { nama: 'S1', nilai: Math.abs(s1 - hb), pct: ((s1 - hb) / hb) * 100, tipe: 'S' },
-            { nama: 'S2', nilai: Math.abs(s2 - hb), pct: ((s2 - hb) / hb) * 100, tipe: 'S' }
-        ];
-        listJarak.sort((a, b) => a.nilai - b.nilai);
-        
-        let dataTerdekat = listJarak[0];
-        let realPct = dataTerdekat.tipe === 'S' ? -Math.abs(dataTerdekat.pct) : Math.abs(dataTerdekat.pct);
-        let signTerdekat = realPct > 0 ? "+" : "";
-        let teksTerdekat = `${dataTerdekat.nama} (${signTerdekat}${realPct.toFixed(2)}%)`;
-
-        document.getElementById('summary').innerHTML = `<strong>Tren:</strong> ${prediksi} | Terdekat ke <strong>${teksTerdekat}</strong>.`;
-        
-        // Perbaikan Utama: Menyimpan data spesifik berdasarkan nama koin unik (misal: preferensi_BTC atau preferensi_ETH)
-        localStorage.setItem(`pref_${koin}_${pasar}`, JSON.stringify({
-            r2: document.getElementById('r2').value,
-            r1: document.getElementById('r1').value,
-            s1: document.getElementById('s1').value,
-            s2: document.getElementById('s2').value
-        }));
-        // Menyimpan status koin terakhir yang sedang aktif dibuka
-        localStorage.setItem('koin_terakhir_aktif', JSON.stringify({ koin: koin, pasar: pasar }));
+        let prediksi = (hb > r1) ? "Bullish Kuat" : (hb < s1) ? "Breakdown Bearish" : "Sideways (S1-R1)";
+        let signTerdekat = terdekatPct > 0 ? "+" : "";
+        document.getElementById('summary').innerHTML = "<strong>" + prediksi + "</strong> | Dekat <strong>" + terdekatNama + " (" + signTerdekat + terdekatPct.toFixed(2) + "%)</strong> | Range: <strong>" + teksKelayakanRingkas + "</strong>";
     }
 
-    function gantiKoinAtauMataUang() {
-        const koin = document.getElementById('pilih-koin').value;
-        const pasar = document.getElementById('pilih-mata-uang').value;
-        
-        // Cek apakah ada data lama yang tersimpan khusus untuk koin ini
-        const dataTersimpan = localStorage.getItem(`pref_${koin}_${pasar}`);
-        
+
+   function gantiKonteksPasar() {
+        const info = getInfoModePasar();
+        const isFutures = info.mode === "FUTURES";
+
+        document.getElementById('panel-futures').style.display = isFutures ? "block" : "none";
+        document.getElementById('acc-item-futures').style.display = isFutures ? "block" : "none";
+
+        let dataTersimpan = null;
+        try { dataTersimpan = localStorage.getItem(getStorageKey()); } catch (e) {}
+
         if (dataTersimpan) {
             const data = JSON.parse(dataTersimpan);
-            document.getElementById('r2').value = data.r2;
-            document.getElementById('r1').value = data.r1;
-            document.getElementById('s1').value = data.s1;
-            document.getElementById('s2').value = data.s2;
+            document.getElementById('r2').value = data.r2 || "";
+            document.getElementById('r1').value = data.r1 || "";
+            document.getElementById('s1').value = data.s1 || "";
+            document.getElementById('s2').value = data.s2 || "";
+            if (data.saldo) document.getElementById('fut-saldo').value = data.saldo;
+            if (data.lev) document.getElementById('fut-lev').value = data.lev;
         } else {
-            // Jika koin baru pertama kali dibuka dan belum ada simpanan, kosongkan kolom S/R agar tidak memakai angka koin lain
             ['r2', 'r1', 's1', 's2'].forEach(id => document.getElementById(id).value = "");
-            const fields = ['dist-r2', 'pct-r2', 'dist-r1', 'pct-r1', 'dist-s1', 'pct-s1', 'dist-s2', 'pct-s2', 'beli-1', 'beli-2', 'beli-3', 'jual-1', 'jual-2', 'jual-3'];
-            fields.forEach(id => document.getElementById(id).innerText = "-");
-            ['r2', 'r1', 's1', 's2'].forEach(id => document.getElementById(`bar-${id}`).style.width = "0%");
+            ['dist-r2', 'pct-r2', 'dist-r1', 'pct-r1', 'dist-s1', 'pct-s1', 'dist-s2', 'pct-s2', 'beli-1', 'beli-2', 'beli-3', 'jual-1', 'jual-2', 'jual-3', 'range-s1r1', 'status-layak', 'fut-out-entry', 'fut-out-sl', 'fut-out-tp1', 'fut-out-liq', 'fut-out-rr', 'fut-out-size'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = "-";
+            });
+            ['r2', 'r1', 's1', 's2'].forEach(id => document.getElementById('bar-' + id).style.width = "0%");
         }
-        
+
         document.getElementById('hb').value = "";
-        document.getElementById('summary').innerText = `Koin diganti ke ${koin}/${pasar}. Masukkan HB baru.`;
+        validasiUrutanSR();
+        simpanOtomatisSR();
         hitungData();
     }
 
+    function susunTeksLaporan() {
+        const bursa = document.getElementById('pilih-bursa').value;
+        const koin = document.getElementById('pilih-koin').value;
+        const info = getInfoModePasar();
+        const waktu = dapatkanWaktuSekarang();
+        const hb = document.getElementById('hb').value || "-";
+        const r2 = document.getElementById('r2').value || "-";
+        const r1 = document.getElementById('r1').value || "-";
+        const s1 = document.getElementById('s1').value || "-";
+        const s2 = document.getElementById('s2').value || "-";
+        const hbNum = dapatkanAngkaMurni('hb');
+        const r1Num = dapatkanAngkaMurni('r1');
+        const s1Num = dapatkanAngkaMurni('s1');
 
-   function kirimWA() {
-  const hb = document.getElementById('hb').value;
-  const koin = document.getElementById('pilih-koin').value;
-  const pasar = document.getElementById('pilih-mata-uang').value;
+        const pctR2 = document.getElementById('pct-r2').innerText.replace(/[^\d.+\-%]/g, '');
+        const pctR1 = document.getElementById('pct-r1').innerText.replace(/[^\d.+\-%]/g, '');
+        const pctS1 = document.getElementById('pct-s1').innerText.replace(/[^\d.+\-%]/g, '');
+        const pctS2 = document.getElementById('pct-s2').innerText.replace(/[^\d.+\-%]/g, '');
 
-  // Mengambil data murni beserta emoji dari tabel dasbor Anda
-  const r1 = document.getElementById('pct-r1').innerText;
-  const s1 = document.getElementById('pct-s1').innerText;
+        const buyBar = document.getElementById('main-bar-profit').innerText || "Buy (50%)";
+        const sellBar = document.getElementById('main-bar-loss').innerText || "Sell (50%)";
+        const tren = hbNum > 0 ? ((hbNum > r1Num) ? "Bullish Kuat" : (hbNum < s1Num) ? "Breakdown Bearish" : "Sideways (S1-R1)") : "Menunggu HB";
 
-  // 1. MENGAMBIL LINK WEB HALAMAN AKTIF SECARA OTOMATIS
-  const linkAktifWeb = window.location.href;
+        let teks = "*JURNAL PPA CALC (PRO)*\n" +
+                   "Waktu: " + waktu + "\n" +
+                   "Profil: " + info.mode + " - " + bursa + " (" + koin + "/" + info.mataUang + ")\n" +
+                   "Harga (HB): " + hb + "\n" +
+                   "--------------------------\n" +
+                   "R2: " + r2 + (pctR2 ? " (" + pctR2 + ")" : "") + "\n" +
+                   "R1: " + r1 + (pctR1 ? " (" + pctR1 + ")" : "") + "\n" +
+                   "S1: " + s1 + (pctS1 ? " (" + pctS1 + ")" : "") + "\n" +
+                   "S2: " + s2 + (pctS2 ? " (" + pctS2 + ")" : "") + "\n" +
+                   "--------------------------\n" +
+                   "Rencana Posisi:\n";
 
-  // 2. MENYUSUN TEKS (Sudah ditambahkan link web di baris paling bawah)
-  const text = `*Crypto Update (${koin}/${pasar})*\nHB: ${hb}\n\n*Target %:*\nR1: ${r1}\nS1: ${s1}\n\n_Via Crypto Pivot & Risk Tracker_\n\nAnalisis Live Selengkapnya:\n${linkAktifWeb}`;
+       if (info.mode === "SPOT") {
+            teks += "Jual 1: " + document.getElementById('jual-1').innerText + " | Jual 2: " + document.getElementById('jual-2').innerText + " | Jual 3: " + document.getElementById('jual-3').innerText + "\n" +
+                    "Beli 1: " + document.getElementById('beli-1').innerText + " | Beli 2: " + document.getElementById('beli-2').innerText + " | Beli 3: " + document.getElementById('beli-3').innerText + "\n";
+        } else {
+            teks += "Arah: " + arahFutures + " (" + document.getElementById('fut-lev').value + "x)\n" +
+                    "Entry: " + document.getElementById('fut-out-entry').innerText + "\n" +
+                    "TP 1: " + document.getElementById('fut-out-tp1').innerText + "\n" +
+                    "TP 2: " + document.getElementById('jual-2').innerText + " | TP 3: " + document.getElementById('jual-3').innerText + "\n" +
+                    "Stop Loss: " + document.getElementById('fut-out-sl').innerText + "\n" +
+                    "Rasio R:R: " + document.getElementById('fut-out-rr').innerText + "\n";
+        }
 
-  // 3. PROSES PENGIRIMAN / BERBAGI
-  if (navigator.share) {
-    navigator.share({ 
-      title: 'Crypto Update', 
-      text: text 
-    })
-    .catch(console.error);
-  } else {
-    navigator.clipboard.writeText(text).then(function() {
-      alert('Teks + Link Web berhasil disalin ke clipboard! Silakan paste langsung di WhatsApp.');
-    });
-  }
-}
-
-
-
-
-             function pivotResetForm() {
-        // Mengosongkan paksa nilai teks di semua kolom input utama
-        document.getElementById('hb').value = "";
-        document.getElementById('r2').value = "";
-        document.getElementById('r1').value = "";
-        document.getElementById('s1').value = "";
-        document.getElementById('s2').value = "";
-        
-        // Mengembalikan tampilan teks tabel analisis jarak ke kondisi strip (-)
-        const fields = ['dist-r2', 'pct-r2', 'dist-r1', 'pct-r1', 'dist-s1', 'pct-s1', 'dist-s2', 'pct-s2', 'beli-1', 'beli-2', 'beli-3', 'jual-1', 'jual-2', 'jual-3'];
-        fields.forEach(id => {
-            const elemen = document.getElementById(id);
-            if (elemen) elemen.innerText = "-";
-        });
-        
-        // Mengosongkan lebar visual sub-bar persentase menggunakan gabungan string biasa agar aman di HP
-        ['r2', 'r1', 's1', 's2'].forEach(id => {
-            const barfill = document.getElementById('bar-' + id);
-            if (barfill) barfill.style.width = "0%";
-        });
-        
-        // Mengembalikan pesan petunjuk di bawah tabel
-        document.getElementById('summary').innerText = "Masukkan Harga Bergerak (HB) untuk memulai.";
+        teks += "Status: " + tren + " (" + buyBar + " | " + sellBar + ")";
+        return teks;
     }
 
+    function salinRencana() {
+        const teks = susunTeksLaporan();
+        navigator.clipboard.writeText(teks).then(function() {
+            document.getElementById('summary').innerHTML = "📋 <strong>Jurnal berhasil disalin</strong> ke clipboard!";
+        }).catch(function() {
+            alert("Gagal menyalin otomatis. Gunakan tombol Kirim WA.");
+        });
+    }
 
+    function kirimWA() {
+        const waUrl = "https://whatsapp.com" + encodeURIComponent(susunTeksLaporan());
+        const win = window.open(waUrl, '_blank');
+        if (!win) window.top.location.href = waUrl;
+    }
 
-    window.onload = function() {
+    function pivotResetForm() {
+        const inputHB = document.getElementById('hb');
+        if (inputHB) { inputHB.value = ""; inputHB.focus(); }
+        ['dist-r2', 'pct-r2', 'dist-r1', 'pct-r1', 'dist-s1', 'pct-s1', 'dist-s2', 'pct-s2'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = "-";
+        });
+        ['r2', 'r1', 's1', 's2'].forEach(id => {
+            const bar = document.getElementById('bar-' + id);
+            if (bar) bar.style.width = "0%";
+        });
+        document.getElementById('main-bar-profit').style.width = "50%";
+        document.getElementById('main-bar-profit').innerText = "Buy (50%)";
+        document.getElementById('main-bar-loss').style.width = "50%";
+        document.getElementById('main-bar-loss').innerText = "Sell (50%)";
+        hitungData();
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
         const inputHB = document.getElementById('hb');
         if (inputHB) {
-            inputHB.removeAttribute('readonly');
-            
-            // Perbaikan Gaya Visual HB: Mengubah warna ke putih soft dan menaikkan ukuran font sebesar 1px (dari 0.72rem ke 0.78rem)
-            inputHB.style.background = "#0d1117"; 
-            inputHB.style.color = "#e0e6ed"; 
-            inputHB.style.fontSize = "0.78rem"; 
+            inputHB.style.background = "#0d1117";
+            inputHB.style.color = "#e0e6ed";
             inputHB.style.fontWeight = "bold";
-            
-            inputHB.setAttribute('oninput', 'formatInputRupiah(this)');
-            inputHB.value = "";
         }
-
-        // Memulihkan koin terakhir yang aktif dibuka sebelum halaman di-refresh
-        const dataAktif = localStorage.getItem('koin_terakhir_aktif');
-        if (dataAktif) {
-            const posisi = JSON.parse(dataAktif);
-            document.getElementById('pilih-koin').value = posisi.koin;
-            document.getElementById('pilih-mata-uang').value = posisi.pasar;
-        }
-
-        // Memulihkan data S/R yang tersimpan khusus untuk koin aktif tersebut
-        const koin = document.getElementById('pilih-koin').value;
-        const pasar = document.getElementById('pilih-mata-uang').value;
-        const savedData = localStorage.getItem(`pref_${koin}_${pasar}`);
-        
-        if (savedData) {
-            const data = JSON.parse(savedData);
-            document.getElementById('r2').value = data.r2;
-            document.getElementById('r1').value = data.r1;
-            document.getElementById('s1').value = data.s1;
-            document.getElementById('s2').value = data.s2;
-        }
-        
-        document.getElementById('summary').innerText = "Masukkan Harga Bergerak (HB) untuk memulai.";
-        
-       hitungData();
-    }
-
-
-
-// Menjalankan pencarian harga live otomatis setiap 5 detik
-setInterval(ambilHargaLiveBursa, 5000);
-
-
+        try {
+            const lastCtx = localStorage.getItem('ppa_last_context');
+            if (lastCtx) {
+                const ctx = JSON.parse(lastCtx);
+                if (ctx.bursa) document.getElementById('pilih-bursa').value = ctx.bursa;
+                if (ctx.koin) document.getElementById('pilih-koin').value = ctx.koin;
+                if (ctx.modePasar) document.getElementById('pilih-mode-pasar').value = ctx.modePasar;
+            }
+            const savedData = localStorage.getItem(getStorageKey());
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                document.getElementById('r2').value = data.r2 || "";
+                document.getElementById('r1').value = data.r1 || "";
+                document.getElementById('s1').value = data.s1 || "";
+                document.getElementById('s2').value = data.s2 || "";
+                if (data.saldo) document.getElementById('fut-saldo').value = data.saldo;
+                if (data.lev) document.getElementById('fut-lev').value = data.lev;
+            }
+        } catch (e) {}
+        validasiUrutanSR();
+        renderRiwayatLog();
+        hitungData();
+    });
 </script>
+</body>
+</html>
 
-<!-- 3 TOMBOL BURSA DI SINI (PERSIS DI BAWAH BOX DAN DI ATAS NAVIGASI GLOBAL) →
-
-<!-- TEKS KETERANGAN REFERRAL MINIMALIS & ELEGAN -->
-<p style="text-align: center; font-size: 10px; color: #8b949e; margin: 15px auto -10px auto; font-family: -apple-system, BlinkMacSystemFont, sans-serif; tracking-wide: 0.5px;">
-    💡 <span style="color: #58a6ff; font-weight: bold;">Dukung Aplikasi Ini:</span> Daftar bursa melalui link resmi/referral kami di bawah:
-</p>
-
-<!-- 3 TOMBOL BURSA PINDAH DI BAWAH (PAS DI ATAS MENU HITAM) -->
-<div style="display: flex; justify-content: space-between; gap: 6px; width: 100%; max-width: 450px; margin: 15px auto 10px auto; padding: 0 10px; box-sizing: border-box;">
-
-
-<div style="display: flex; justify-content: space-between; gap: 6px; width: 100%; max-width: 450px; margin: 15px auto 10px auto; padding: 0 10px; box-sizing: border-box;">
-    
-<button type="button" onclick="window.open('https://indodax.com/deeplink?page=register&id=mustway', '_blank')" style="flex: 1; padding: 10px 4px; font-size: 11px; font-weight: bold; background-color: #00B4D8; color: white; border: none; border-radius: 6px; cursor: pointer; text-align: center; white-space: nowrap;">Indodax</button>
-
-    
-<button type="button" onclick="window.open('https://www.tokocrypto.com/app?scope=register&ref=A2I8164E', '_blank')" style="flex: 1; padding: 10px 4px; font-size: 11px; font-weight: bold; background-color: #85BB65; color: white; border: none; border-radius: 6px; cursor: pointer; text-align: center; white-space: nowrap;">Tokocrypto</button>
-    
-<button type="button" onclick="window.open('https://reku.id/ref/mus786', '_blank')" style="flex: 1; padding: 10px 4px; font-size: 11px; font-weight: bold; background-color: #1E3A8A; color: white; border: none; border-radius: 6px; cursor: pointer; text-align: center; white-space: nowrap;">Reku</button>
-</div>
-
-</div> <!-- Tag penutup container utama -->
-
-</div></!doctype>
 
