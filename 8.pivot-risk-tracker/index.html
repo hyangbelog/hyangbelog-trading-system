@@ -1,14 +1,14 @@
 <div class="dca-mini-box">
-  <!-- 1. TICKER BERJALAN (DARK MODE) -->
-  <div class="tv-ticker-container" style="margin-bottom: 8px;">
+  <!-- 1. TICKER BERJALAN (TANPA PEMBATAS TINGGI AGAR UKURAN NORMAL) -->
+  <div style="margin-bottom: 10px;">
     <script type="module" src="https://tradingview-widget.com"></script>
     <tv-ticker-tape symbols="BTCIDR,ETHIDR,BINANCE:BTCUSDT,BINANCE:ETHUSDT,BINANCE:BNBUSDT" theme="dark" locale="id"></tv-ticker-tape>
   </div>
 
-  <!-- 2. GRAFIK CANDLESTICK TRADINGVIEW (DARK MODE) -->
-  <div class="tv-chart-container">
+  <!-- 2. GRAFIK HARGA INTERAKTIF TRADINGVIEW (WEB COMPONENT RESMI) -->
+  <div style="margin-bottom: 10px; border-radius: 6px; overflow: hidden;">
     <script type="module" src="https://tradingview-widget.com"></script>
-    <tv-advanced-chart symbol="BINANCE:BTCUSDT" interval="240" timezone="Asia/Jakarta" theme="dark" locale="id" style="width: 100%; height: 420px; display: block;"></tv-advanced-chart>
+    <tv-symbol-overview symbols="BINANCE:BTCUSDT|1D,BINANCE:ETHUSDT|1D,BINANCE:BNBUSDT|1D" theme="dark" locale="id" style="width: 100%; height: 380px; display: block;"></tv-symbol-overview>
   </div>
 
   <!-- 3. DISCLAIMER KECIL & SOFT -->
@@ -23,25 +23,12 @@
   background: #0b0f19;
   border: 1px solid #1e293b;
   border-radius: 8px;
-  padding: 8px;
+  padding: 10px;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: #e2e8f0;
-}
-.tv-ticker-container, .tv-chart-container {
-  background: #121824;
-  border: 1px solid #1e293b;
-  border-radius: 6px;
-  overflow: hidden;
-}
-.tv-ticker-container {
-  padding: 4px 4px 0 4px;
-}
-.tv-chart-container {
-  height: 420px;
-  margin-bottom: 8px;
 }
 .tv-disclaimer {
   margin: 0;
