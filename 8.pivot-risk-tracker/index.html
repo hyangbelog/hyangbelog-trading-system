@@ -1,170 +1,70 @@
 <!doctype html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crypto Terminal</title>
-<style>
-  body {
-    background: #0b0f19;
-    color: #e2e8f0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    margin: 0;
-    padding: 8px;
-    display: flex;
-    justify-content: center;
-  }
-  .wrap {
-    width: 100%;
-    max-width: 390px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .card {
-    background: #121824;
-    border: 1px solid #1e293b;
-    border-radius: 8px;
-    padding: 8px;
-    box-sizing: border-box;
-    overflow: hidden;
-  }
-  .chart-card {
-    background: #121824;
-    border: 1px solid #1e293b;
-    border-radius: 8px;
-    height: 360px;
-    overflow: hidden;
-  }
-  .title {
-    margin: 0 0 8px 0;
-    font-size: 12px;
-    color: #3b82f6;
-    text-align: center;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    margin-bottom: 8px;
-  }
-  select, input {
-    width: 100%;
-    padding: 7px;
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 4px;
-    color: #fff;
-    font-size: 12px;
-    box-sizing: border-box;
-    height: 34px;
-  }
-  .btn {
-    background: #22c55e;
-    color: #000;
-    border: none;
-    width: 100%;
-    padding: 8px;
-    font-size: 12px;
-    font-weight: bold;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  .status {
-    margin-top: 6px;
-    font-size: 11px;
-    text-align: center;
-    color: #94a3b8;
-  }
-  .disclaimer {
-    font-size: 10px;
-    color: #64748b;
-    text-align: center;
-    line-height: 1.4;
-    margin: 0;
-    padding: 2px 6px;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticker & Grafik TradingView</title>
+    <style>
+        body {
+            background-color: #0b0f19;
+            margin: 0;
+            padding: 8px;
+            display: flex;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        .dashboard {
+            width: 100%;
+            max-width: 390px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .ticker-box {
+            background-color: #121824;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 6px 6px 2px 6px;
+            overflow: hidden;
+        }
+        .chart-box {
+            background-color: #121824;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            height: 450px;
+            overflow: hidden;
+        }
+    </style>
 </head>
 <body>
 
-<div class="wrap">
-  <div class="card" style="padding-bottom:2px;">
-    <script type="module" src="https://tradingview-widget.com"></script>
-    <tv-ticker-tape symbols="BTCIDR,ETHIDR,BINANCE:BTCUSDT,BINANCE:ETHUSDT,BINANCE:BNBUSDT" theme="dark" locale="id"></tv-ticker-tape>
-  </div>
+    <div class="dashboard">
+        <div class="ticker-box">
+            <script type="module" src="https://tradingview-widget.com"></script>
+            <tv-ticker-tape symbols="BTCIDR,ETHIDR,BINANCE:BTCUSDT,BINANCE:ETHUSDT,BINANCE:BNBUSDT" theme="dark" locale="id"></tv-ticker-tape>
+        </div>
 
-  <div class="chart-card">
-    <div id="tv_chart_terminal" style="width:100%; height:100%;"></div>
-  </div>
-
-  <div class="card">
-    <div class="title">Uji Penarikan Harga Live</div>
-    <div class="grid">
-      <select id="pilihPair" onchange="tarikHargaLive()">
-        <option value="BTC-USD">BTC / USD</option>
-        <option value="BTC-IDR">BTC / IDR</option>
-        <option value="ETH-USD">ETH / USD</option>
-        <option value="ETH-IDR">ETH / IDR</option>
-        <option value="SOL-USD">SOL / USD</option>
-      </select>
-      <input type="number" id="kolomHarga" placeholder="Harga Live..." step="any" />
+        <div class="chart-box">
+            <div id="tv_chart_terminal" style="width: 100%; height: 100%;"></div>
+        </div>
     </div>
-    <button type="button" class="btn" onclick="tarikHargaLive()">Perbarui Harga Sekarang</button>
-    <div id="statusPesan" class="status">Memuat harga...</div>
-  </div>
 
-  <p class="disclaimer">
-    <strong>Disclaimer:</strong> Data harga dan grafik disediakan oleh TradingView &amp; Coinbase hanya untuk tujuan informasi dan edukasi, bukan merupakan saran investasi atau ajakan jual beli. Selalu lakukan riset mandiri (DYOR) sebelum mengambil keputusan finansial.
-  </p>
-</div>
+    <script type="text/javascript" src="https://tradingview.com"></script>
+    <script type="text/javascript">
+        new TradingView.widget({
+            "autosize": true,
+            "symbol": "BINANCE:BTCUSDT",
+            "interval": "240",
+            "timezone": "Asia/Jakarta",
+            "theme": "dark",
+            "style": "1",
+            "locale": "id",
+            "enable_publishing": false,
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "container_id": "tv_chart_terminal"
+        });
+    </script>
 
-<script type="text/javascript" src="https://tradingview.com"></script>
-<script>
-new TradingView.widget({
-  "autosize": true,
-  "symbol": "BINANCE:BTCUSDT",
-  "interval": "240",
-  "timezone": "Asia/Jakarta",
-  "theme": "dark",
-  "style": "1",
-  "locale": "id",
-  "enable_publishing": false,
-  "hide_side_toolbar": false,
-  "allow_symbol_change": true,
-  "container_id": "tv_chart_terminal"
-});
-
-async function tarikHargaLive() {
-  var pair = document.getElementById('pilihPair').value;
-  var inputHarga = document.getElementById('kolomHarga');
-  var statusText = document.getElementById('statusPesan');
-
-  statusText.innerText = "Mengambil data...";
-  statusText.style.color = "#f59e0b";
-
-  try {
-    var res = await fetch("https://coinbase.com" + pair + "/spot");
-    var json = await res.json();
-    var angka = parseFloat(json.data.amount);
-    var isIDR = pair.indexOf("IDR") !== -1;
-    var hargaBersih = isIDR ? Math.round(angka) : angka.toFixed(2);
-
-    inputHarga.value = hargaBersih;
-
-    var simbol = isIDR ? "Rp " : "$";
-    var waktu = new Date().toLocaleTimeString("id-ID");
-    statusText.innerText = "Berhasil! " + pair + ": " + simbol + Number(hargaBersih).toLocaleString("id-ID") + " (" + waktu + ")";
-    statusText.style.color = "#22c55e";
-  } catch (e) {
-    statusText.innerText = "Gagal memuat data.";
-    statusText.style.color = "#ef4444";
-  }
-}
-
-tarikHargaLive();
-</script>
 </body>
 </html>
