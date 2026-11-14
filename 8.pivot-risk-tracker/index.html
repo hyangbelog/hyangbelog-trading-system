@@ -2,50 +2,195 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Trading Pro Terminal</title>
-    <style>
 
+<!-- KODE GABUNGAN TICKER LIVE TRADINGVIEW + KALKULATOR DCA MANDIRI (ANTI-GAGAL) -->
 <div class="dca-mini-box">
-  <!-- 1. TICKER BERJALAN (TANPA PEMBATAS TINGGI AGAR UKURAN NORMAL) -->
-  <div style="margin-bottom: 10px;">
-    <script type="module" src="https://tradingview-widget.com"></script>
-    <tv-ticker-tape symbols="BTCIDR,ETHIDR,BINANCE:BTCUSDT,BINANCE:ETHUSDT,BINANCE:BNBUSDT" theme="dark" locale="id"></tv-ticker-tape>
+  <h3>Simulasi & Harga Live Spot</h3>
+  
+  <!-- WIDGET TICKER RESMI TRADINGVIEW (Aman, Legal, Akurat & Pasti Muncul di HP) -->
+  <div class="tv-ticker-container" style="margin-bottom: 12px;">
+    <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-ticker-tape.js"></script>
+    <tv-ticker-tape symbols="BINANCE:BTCUSDT,BINANCE:ETHUSDT,BINANCE:BNBUSDT" theme="light" locale="id"></tv-ticker-tape>
   </div>
 
-  <!-- 2. GRAFIK HARGA INTERAKTIF TRADINGVIEW (WEB COMPONENT RESMI) -->
-  <div style="margin-bottom: 10px; border-radius: 6px; overflow: hidden;">
-    <script type="module" src="https://tradingview-widget.com"></script>
-    <tv-symbol-overview symbols="BINANCE:BTCUSDT|1D,BINANCE:ETHUSDT|1D,BINANCE:BNBUSDT|1D" theme="dark" locale="id" style="width: 100%; height: 380px; display: block;"></tv-symbol-overview>
+  <!-- Grid Form 2 Kolom untuk Menghemat Ruang Vertikal HP -->
+  <div class="dca-mini-grid">
+    <div class="dca-mini-field">
+      <label>Nama Aset Kripto:</label>
+      <input type="text" id="coinName" value="Bitcoin (BTC)" />
+    </div>
+
+    <div class="dca-mini-field">
+      <label>Harga Input (Lihat Ticker di Atas):</label>
+      <input type="number" id="manualPrice" value="65000" min="1" />
+    </div>
+
+    <div class="dca-mini-field">
+      <label>Dana Per Interval (USD):</label>
+      <input type="number" id="investmentAmount" value="50" min="1" />
+    </div>
+
+    <div class="dca-mini-field">
+      <label>Durasi (Bulan):</label>
+      <input type="number" id="duration" value="12" min="1" />
+    </div>
+    
+    <div class="dca-mini-field">
+      <label>Frekuensi:</label>
+      <select id="frequency">
+        <option value="7" />Mingguan
+        <option value="30" selected />Bulanan
+      </select>
+    </div>
+
+    <div class="dca-mini-field">
+      <label>Tren Pasar Pasca-DCA:</label>
+      <select id="marketTrend">
+        <option value="0.2" />Bullish (+20%)
+        <option value="0" selected />Sideways (Flat)
+        <option value="-0.2" />Bearish (-20%)
+      </select>
+    </div>
   </div>
 
-  <!-- 3. DISCLAIMER KECIL & SOFT -->
-  <p class="tv-disclaimer">
-    <strong>Disclaimer:</strong> Data harga dan grafik disediakan oleh TradingView hanya untuk tujuan informasi dan edukasi, bukan merupakan saran investasi atau ajakan jual beli. Selalu lakukan riset mandiri (DYOR) sebelum mengambil keputusan finansial.
-  </p>
+  <button type="button" class="dca-mini-btn" onclick="hitungDCA()">Hitung Sekarang</button>
+
+  <!-- Hasil Box Kompak Rapat -->
+  <div id="dcaResult" class="dca-mini-result" style="display: none;">
+    <div class="dca-res-row"><span>Total Investasi:</span> <strong id="resTotalInvested"></strong></div>
+    <div class="dca-res-row"><span>Koin Didapat:</span> <strong id="resTotalCoins"></strong></div>
+    <div class="dca-res-row"><span>Harga Rata2 Beli:</span> <strong id="resAvgPrice"></strong></div>
+    <div class="dca-res-row"><span>Nilai Akhir Portofolio:</span> <strong id="resFinalValue"></strong></div>
+    <div class="dca-res-row" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+      <span>Persentase ROI:</span> <strong id="resReturnPct"></strong>
+    </div>
+  </div>
 </div>
 
-<!-- Desain CSS Gelap Rapat Full Layar HP -->
+<!-- Desain CSS Padat Rapat Full Layar HP -->
 <style>
 .dca-mini-box {
-  background: #0b0f19;
-  border: 1px solid #1e293b;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 10px;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  color: #e2e8f0;
+  color: #2d3748;
 }
-.tv-disclaimer {
-  margin: 0;
-  padding: 2px 4px;
-  font-size: 10px;
-  color: #64748b;
+.dca-mini-box h3 {
+  margin: 0 0 8px 0;
+  font-size: 15px;
   text-align: center;
-  line-height: 1.4;
+  color: #1a202c;
+  font-weight: 700;
+}
+.dca-mini-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.dca-mini-field {
+  display: flex;
+  flex-direction: column;
+}
+.dca-mini-field label {
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  color: #4a5568;
+}
+.dca-mini-field input, .dca-mini-field select {
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  font-size: 12px;
+  box-sizing: border-box;
+  background-color: #fff;
+  height: 32px;
+}
+.dca-mini-btn {
+  background: #0084ff;
+  color: white;
+  border: none;
+  width: 100%;
+  padding: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  border-radius: 4px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+.dca-mini-btn:hover {
+  background: #0066cc;
+}
+.dca-mini-result {
+  background: #f0fff4;
+  border: 1px solid #c6f6d5;
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 10px;
+}
+.dca-res-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px dashed #cbd5e0;
+  padding-bottom: 4px;
 }
 </style>
+
+<!-- Logika Matematika Kalkulator -->
+<script>
+function hitungDCA() {
+  const currentPrice = parseFloat(document.getElementById('manualPrice').value);
+  const amount = parseFloat(document.getElementById('investmentAmount').value);
+  const freq = parseInt(document.getElementById('frequency').value);
+  const durationMonths = parseInt(document.getElementById('duration').value);
+  const trend = parseFloat(document.getElementById('marketTrend').value);
+
+  if (isNaN(currentPrice) || currentPrice <= 0 || isNaN(amount) || amount <= 0 || isNaN(durationMonths) || durationMonths <= 0) {
+    alert("Mohon isi semua data angka dengan benar.");
+    return;
+  }
+
+  let totalPurchases = durationMonths;
+  if (freq === 7) {
+    totalPurchases = Math.floor((durationMonths * 30) / 7);
+  }
+
+  const totalInvested = amount * totalPurchases;
+  let totalCoinsAccumulated = 0;
+
+  const targetPrice = currentPrice * (1 + trend);
+  const priceStep = (targetPrice - currentPrice) / (totalPurchases || 1);
+
+  for (let i = 0; i < totalPurchases; i++) {
+    let simulatedPriceAtStep = currentPrice + (priceStep * i);
+    if (simulatedPriceAtStep <= 0) simulatedPriceAtStep = currentPrice * 0.1;
+    totalCoinsAccumulated += (amount / simulatedPriceAtStep);
+  }
+
+  const averageBuyingPrice = totalInvested / totalCoinsAccumulated;
+  const finalPortfolioValue = totalCoinsAccumulated * currentPrice;
+  const returnPercentage = ((finalPortfolioValue - totalInvested) / totalInvested) * 100;
+
+  document.getElementById('resTotalInvested').innerText = `$${totalInvested.toLocaleString('en-US', {maximumFractionDigits: 2})}`;
+  document.getElementById('resTotalCoins').innerText = totalCoinsAccumulated.toFixed(5);
+  document.getElementById('resAvgPrice').innerText = `$${averageBuyingPrice.toLocaleString('en-US', {maximumFractionDigits: 2})}`;
+  document.getElementById('resFinalValue').innerText = `$${finalPortfolioValue.toLocaleString('en-US', {maximumFractionDigits: 2})}`;
+
+  const returnEl = document.getElementById('resReturnPct');
+  returnEl.innerText = `${returnPercentage >= 0 ? '+' : ''}${returnPercentage.toFixed(2)}%`;
+  returnEl.style.color = returnPercentage >= 0 ? '#22543d' : '#9b2c2c';
+
+  document.getElementById('dcaResult').style.display = 'block';
+}
+</script>
 
 </!doctype>
 
