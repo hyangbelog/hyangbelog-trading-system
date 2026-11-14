@@ -1,122 +1,19 @@
 <!doctype html>
-<html lang="id">
+<html>
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulasi & Harga Live Spot</title>
-    <style>
-        body {
-            background-color: #0b0f19;
-            margin: 0;
-            padding: 8px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            color: #e2e8f0;
-        }
-        .dca-mini-box {
-            background: #121824;
-            border: 1px solid #1e293b;
-            border-radius: 8px;
-            padding: 12px;
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            box-sizing: border-box;
-            color: #e2e8f0;
-        }
-        .dca-mini-box h3 {
-            margin: 0 0 10px 0;
-            font-size: 15px;
-            text-align: center;
-            color: #f8fafc;
-            font-weight: 700;
-        }
-        .tv-ticker-container {
-            margin-bottom: 12px;
-            min-height: 46px;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-        .dca-mini-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-        .dca-mini-field {
-            display: flex;
-            flex-direction: column;
-        }
-        .dca-mini-field label {
-            font-size: 11px;
-            font-weight: 600;
-            margin-bottom: 3px;
-            color: #94a3b8;
-        }
-        .dca-mini-field input, .dca-mini-field select {
-            width: 100%;
-            padding: 5px 8px;
-            border: 1px solid #334155;
-            border-radius: 4px;
-            font-size: 12px;
-            box-sizing: border-box;
-            background-color: #1e293b;
-            color: #ffffff;
-            height: 34px;
-            outline: none;
-        }
-        .dca-mini-btn {
-            background: #3b82f6;
-            color: #ffffff;
-            border: none;
-            width: 100%;
-            padding: 9px;
-            font-size: 13px;
-            font-weight: bold;
-            border-radius: 4px;
-            margin-top: 12px;
-            cursor: pointer;
-        }
-        .dca-mini-result {
-            background: rgba(34, 197, 94, 0.08);
-            border: 1px dashed #22c55e;
-            border-radius: 6px;
-            padding: 10px;
-            margin-top: 12px;
-        }
-        .dca-res-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            margin-bottom: 4px;
-            border-bottom: 1px dashed #334155;
-            padding-bottom: 4px;
-        }
-        .dca-res-row span {
-            color: #94a3b8;
-        }
-        .dca-disclaimer {
-            background-color: #0b0f19;
-            border: 1px solid #1e293b;
-            border-radius: 4px;
-            padding: 6px 8px;
-            margin-top: 12px;
-            text-align: center;
-            font-size: 8px;
-            line-height: 1.3;
-            color: #94a3b8;
-        }
-    </style>
-</head>
-<body>
 
+<!-- KODE GABUNGAN TICKER LIVE TRADINGVIEW + KALKULATOR DCA MANDIRI (ANTI-GAGAL) -->
 <div class="dca-mini-box">
-  <h3>Simulasi &amp; Harga Live Spot</h3>
+  <h3>Simulasi & Harga Live Spot</h3>
   
-  <!-- WEB COMPONENT TICKER ASLI ANDA (DIUBAH KE DARK MODE) -->
-  <div class="tv-ticker-container">
-    <script type="module" src="https://tradingview-widget.com"></script>
-    <tv-ticker-tape symbols="BINANCE:BTCUSDT,BINANCE:ETHUSDT,BINANCE:BNBUSDT" theme="dark" locale="id"></tv-ticker-tape>
+  <!-- WIDGET TICKER RESMI TRADINGVIEW (Aman, Legal, Akurat & Pasti Muncul di HP) -->
+  <div class="tv-ticker-container" style="margin-bottom: 12px;">
+    <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-ticker-tape.js"></script>
+    <tv-ticker-tape symbols="BINANCE:BTCUSDT,BINANCE:ETHUSDT,BINANCE:BNBUSDT" theme="light" locale="id"></tv-ticker-tape>
   </div>
 
+  <!-- Grid Form 2 Kolom untuk Menghemat Ruang Vertikal HP -->
   <div class="dca-mini-grid">
     <div class="dca-mini-field">
       <label>Nama Aset Kripto:</label>
@@ -141,23 +38,24 @@
     <div class="dca-mini-field">
       <label>Frekuensi:</label>
       <select id="frequency">
-        <option value="7">Mingguan</option>
-        <option value="30" selected>Bulanan</option>
+        <option value="7" />Mingguan
+        <option value="30" selected />Bulanan
       </select>
     </div>
 
     <div class="dca-mini-field">
       <label>Tren Pasar Pasca-DCA:</label>
       <select id="marketTrend">
-        <option value="0.2">Bullish (+20%)</option>
-        <option value="0" selected>Sideways (Flat)</option>
-        <option value="-0.2">Bearish (-20%)</option>
+        <option value="0.2" />Bullish (+20%)
+        <option value="0" selected />Sideways (Flat)
+        <option value="-0.2" />Bearish (-20%)
       </select>
     </div>
   </div>
 
   <button type="button" class="dca-mini-btn" onclick="hitungDCA()">Hitung Sekarang</button>
 
+  <!-- Hasil Box Kompak Rapat -->
   <div id="dcaResult" class="dca-mini-result" style="display: none;">
     <div class="dca-res-row"><span>Total Investasi:</span> <strong id="resTotalInvested"></strong></div>
     <div class="dca-res-row"><span>Koin Didapat:</span> <strong id="resTotalCoins"></strong></div>
@@ -167,12 +65,86 @@
       <span>Persentase ROI:</span> <strong id="resReturnPct"></strong>
     </div>
   </div>
-
-  <div class="dca-disclaimer">
-    <strong>Disclaimer:</strong> Hasil simulasi DCA dan data harga disediakan hanya untuk tujuan edukasi dan informasi, bukan merupakan saran investasi atau ajakan jual beli. Selalu lakukan riset mandiri (DYOR) sebelum mengambil keputusan finansial.
-  </div>
 </div>
 
+<!-- Desain CSS Padat Rapat Full Layar HP -->
+<style>
+.dca-mini-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #2d3748;
+}
+.dca-mini-box h3 {
+  margin: 0 0 8px 0;
+  font-size: 15px;
+  text-align: center;
+  color: #1a202c;
+  font-weight: 700;
+}
+.dca-mini-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.dca-mini-field {
+  display: flex;
+  flex-direction: column;
+}
+.dca-mini-field label {
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  color: #4a5568;
+}
+.dca-mini-field input, .dca-mini-field select {
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  font-size: 12px;
+  box-sizing: border-box;
+  background-color: #fff;
+  height: 32px;
+}
+.dca-mini-btn {
+  background: #0084ff;
+  color: white;
+  border: none;
+  width: 100%;
+  padding: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  border-radius: 4px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+.dca-mini-btn:hover {
+  background: #0066cc;
+}
+.dca-mini-result {
+  background: #f0fff4;
+  border: 1px solid #c6f6d5;
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 10px;
+}
+.dca-res-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px dashed #cbd5e0;
+  padding-bottom: 4px;
+}
+</style>
+
+<!-- Logika Matematika Kalkulator -->
 <script>
 function hitungDCA() {
   const currentPrice = parseFloat(document.getElementById('manualPrice').value);
@@ -214,11 +186,12 @@ function hitungDCA() {
 
   const returnEl = document.getElementById('resReturnPct');
   returnEl.innerText = `${returnPercentage >= 0 ? '+' : ''}${returnPercentage.toFixed(2)}%`;
-  returnEl.style.color = returnPercentage >= 0 ? '#22c55e' : '#ef4444';
+  returnEl.style.color = returnPercentage >= 0 ? '#22543d' : '#9b2c2c';
 
   document.getElementById('dcaResult').style.display = 'block';
 }
 </script>
 
-</body>
-</html>
+</!doctype>
+
+
