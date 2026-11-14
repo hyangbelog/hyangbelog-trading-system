@@ -3,35 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terminal Harga Live & Grafik Kripto</title>
+    <title>Terminal Harga & Grafik Kripto - Dark Mode</title>
     <style>
         :root {
             --bg-main: #0b0f19;
             --bg-card: #121824;
-            --bg-input: #1e293b;
-            --text-primary: #e2e8f0;
-            --text-secondary: #94a3b8;
-            --text-soft: #64748b;
-            --bullish: #22c55e;
-            --brand: #3b82f6;
             --border: #1e293b;
+            --text-soft: #64748b;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-primary);
             margin: 0;
             padding: 12px;
+            background-color: var(--bg-main);
             display: flex;
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
             box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         /* Wadah utama ukuran minimalis HP */
-        .app-container {
+        .blog-crypto-widget {
             width: 100%;
             max-width: 390px;
             display: flex;
@@ -39,22 +33,24 @@
             gap: 8px;
         }
 
-        /* 1. Kotak Ticker Berjalan */
+        /* 1. Kotak Ticker Berjalan Paling Atas */
         .ticker-card {
             background-color: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 10px;
             padding: 8px 8px 4px 8px;
+            box-sizing: border-box;
             overflow: hidden;
         }
 
-        /* 2. Kotak Grafik TradingView */
+        /* 2. Kotak Grafik Utama di Tengah */
         .chart-card {
             background-color: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 10px;
-            height: 380px;
+            height: 420px;
             overflow: hidden;
+            box-sizing: border-box;
         }
 
         #tv_chart_terminal {
@@ -62,63 +58,7 @@
             height: 100%;
         }
 
-        /* 3. Kotak Uji Coba Harga Live */
-        .live-test-card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px;
-        }
-
-        .live-test-card h4 {
-            margin: 0 0 8px 0;
-            font-size: 12px;
-            color: var(--brand);
-            text-transform: uppercase;
-            text-align: center;
-        }
-
-        .live-row {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 8px;
-        }
-
-        .live-row select, .live-row input {
-            flex: 1;
-            background: var(--bg-input);
-            border: 1px solid #334155;
-            border-radius: 6px;
-            color: #fff;
-            padding: 8px;
-            font-size: 12px;
-            outline: none;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .btn-live {
-            width: 100%;
-            background: var(--bullish);
-            color: #000;
-            font-weight: bold;
-            border: none;
-            padding: 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .btn-live:active { opacity: 0.85; }
-
-        .status-text {
-            margin-top: 8px;
-            font-size: 11px;
-            text-align: center;
-            color: var(--text-secondary);
-        }
-
-        /* 4. Teks Disclaimer Soft */
+        /* 3. Teks Disclaimer Kecil & Soft di Bawah */
         .disclaimer-text {
             font-size: 10px;
             color: var(--text-soft);
@@ -132,9 +72,9 @@
 </head>
 <body>
 
-    <div class="app-container">
+    <div class="blog-crypto-widget">
         
-        <!-- 1. TICKER BERJALAN -->
+        <!-- BAGIAN 1: TICKER BERJALAN PALING ATAS -->
         <div class="ticker-card">
             <script type="module" src="https://tradingview-widget.com"></script>
             <tv-ticker-tape 
@@ -144,36 +84,19 @@
             </tv-ticker-tape>
         </div>
 
-        <!-- 2. GRAFIK TRADINGVIEW -->
+        <!-- BAGIAN 2: GRAFIK TRADINGVIEW DI BAWAHNYA -->
         <div class="chart-card">
             <div id="tv_chart_terminal"></div>
         </div>
 
-        <!-- 3. UJI COBA PENARIKAN HARGA LIVE -->
-        <div class="live-test-card">
-            <h4>Uji Penarikan Harga Live</h4>
-            <div class="live-row">
-                <select id="pilihPair" onchange="tarikHargaLive()">
-                    <option value="BTC-USD">BTC / USD</option>
-                    <option value="BTC-IDR">BTC / IDR</option>
-                    <option value="ETH-USD">ETH / USD</option>
-                    <option value="ETH-IDR">ETH / IDR</option>
-                    <option value="SOL-USD">SOL / USD</option>
-                </select>
-                <input type="number" id="kolomHarga" placeholder="Harga Live..." step="any" />
-            </div>
-            <button type="button" class="btn-live" onclick="tarikHargaLive()">Perbarui Harga Sekarang</button>
-            <div id="statusPesan" class="status-text">Menghubungkan ke server...</div>
-        </div>
-
-        <!-- 4. DISCLAIMER SOFT -->
+        <!-- BAGIAN 3: DISCLAIMER KECIL & SOFT -->
         <p class="disclaimer-text">
-            <strong>Disclaimer:</strong> Data harga dan grafik disediakan oleh TradingView &amp; Coinbase hanya untuk tujuan informasi dan edukasi, bukan merupakan saran investasi atau ajakan jual beli. Selalu lakukan riset mandiri (DYOR) sebelum mengambil keputusan finansial.
+            <strong>Disclaimer:</strong> Data harga dan grafik disediakan oleh TradingView hanya untuk tujuan informasi dan edukasi, bukan merupakan saran investasi atau ajakan jual beli. Selalu lakukan riset mandiri (DYOR) sebelum mengambil keputusan finansial.
         </p>
 
     </div>
 
-    <!-- Script Grafik TradingView -->
+    <!-- Script Inisialisasi Grafik TradingView -->
     <script type="text/javascript" src="https://tradingview.com"></script>
     <script type="text/javascript">
         new TradingView.widget({
@@ -193,42 +116,8 @@
             "save_image": false,
             "container_id": "tv_chart_terminal"
         });
-
-        // Script Uji Penarikan Harga Live (Coinbase API)
-        async function tarikHargaLive() {
-            const pair = document.getElementById('pilihPair').value;
-            const inputHarga = document.getElementById('kolomHarga');
-            const statusText = document.getElementById('statusPesan');
-
-            statusText.innerText = "Mengambil data terbaru...";
-            statusText.style.color = "#f59e0b";
-
-            try {
-                const response = await fetch(`https://coinbase.com{pair}/spot`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-                const hasil = await response.json();
-                if (hasil && hasil.data && hasil.data.amount) {
-                    const angka = parseFloat(hasil.data.amount);
-                    const isIDR = pair.endsWith('IDR');
-                    const hargaBersih = isIDR ? Math.round(angka) : angka.toFixed(2);
-                    
-                    inputHarga.value = hargaBersih;
-                    
-                    const simbol = isIDR ? 'Rp ' : '$';
-                    const waktu = new Date().toLocaleTimeString('id-ID');
-                    statusText.innerText = `Berhasil! ${pair}: ${simbol}${Number(hargaBersih).toLocaleString('id-ID')} (${waktu})`;
-                    statusText.style.color = "#22c55e";
-                }
-            } catch (err) {
-                statusText.innerText = `Gagal: ${err.message}`;
-                statusText.style.color = "#ef4444";
-            }
-        }
-
-        // Jalankan otomatis saat halaman terbuka
-        tarikHargaLive();
     </script>
 
 </body>
 </html>
+
