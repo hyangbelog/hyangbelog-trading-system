@@ -1,550 +1,234 @@
 <!DOCTYPE html>
-<html lang="id" dir="ltr">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Crypto Pivot & Risk Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal Harga Live & Grafik Kripto</title>
     <style>
         :root {
-            --bg-color: #0d1117;
-            --card-bg: #161b22;
-            --border-color: #30363d;
-            --text-main: #c9d1d9;
-            --text-muted: #8b949e;
-            --accent-green: #238636;
-            --accent-red: #da3633;
-            --accent-blue: #1f6feb;
-            --table-header-bg: #21262d;
-            --text-soft-white: #e0e6ed;
+            --bg-main: #0b0f19;
+            --bg-card: #121824;
+            --bg-input: #1e293b;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-soft: #64748b;
+            --bullish: #22c55e;
+            --brand: #3b82f6;
+            --border: #1e293b;
         }
-        * { box-sizing: border-box; }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            background-color: var(--bg-main);
+            color: var(--text-primary);
             margin: 0;
-            padding: 2px;
+            padding: 12px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
-            direction: ltr;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
-        .container {
+
+        /* Wadah utama ukuran minimalis HP */
+        .app-container {
             width: 100%;
-            max-width: 400px;
-            min-height: calc(100vh - 95px);
+            max-width: 390px;
             display: flex;
             flex-direction: column;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 5px;
+            gap: 8px;
+        }
+
+        /* 1. Kotak Ticker Berjalan */
+        .ticker-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 8px 4px 8px;
             overflow: hidden;
         }
-        h3 {
-            margin: 0 0 3px 0;
+
+        /* 2. Kotak Grafik TradingView */
+        .chart-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            height: 380px;
+            overflow: hidden;
+        }
+
+        #tv_chart_terminal {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 3. Kotak Uji Coba Harga Live */
+        .live-test-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .live-test-card h4 {
+            margin: 0 0 8px 0;
+            font-size: 12px;
+            color: var(--brand);
+            text-transform: uppercase;
             text-align: center;
-            font-size: 0.78rem;
-            color: #ffffff;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 2px;
         }
-        .grid-inputs {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 3px;
-            margin-bottom: 3px;
+
+        .live-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .live-row select, .live-row input {
+            flex: 1;
+            background: var(--bg-input);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #fff;
+            padding: 8px;
+            font-size: 12px;
+            outline: none;
             width: 100%;
+            box-sizing: border-box;
         }
-        .grid-inputs-3 {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 3px;
-            margin-bottom: 3px;
+
+        .btn-live {
             width: 100%;
+            background: var(--bullish);
+            color: #000;
+            font-weight: bold;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
         }
-        .input-group { display: flex; flex-direction: column; min-width: 0; }
-        .input-group.full-width { grid-column: span 2; }
-        .row-layout {
-            flex-direction: row !important;
-            align-items: center;
-            justify-content: space-between;
-            gap: 5px;
-            margin-bottom: 1px;
+
+        .btn-live:active { opacity: 0.85; }
+
+        .status-text {
+            margin-top: 8px;
+            font-size: 11px;
+            text-align: center;
+            color: var(--text-secondary);
         }
-        .row-layout label { margin-bottom: 0; white-space: nowrap; flex-shrink: 0; }
-        .row-layout input { flex: 1; min-width: 0; text-align: left; }
-        label { font-size: 0.56rem; color: var(--text-muted); margin-bottom: 1px; font-weight: 600; }
-        input, select {
-            width: 100%; max-width: 100%; min-width: 0;
-            background: var(--bg-color); border: 1px solid var(--border-color);
-            color: #ffffff; padding: 2px 4px; border-radius: 3px;
-            font-size: 0.68rem; height: 22px; outline: none; direction: ltr;
+
+        /* 4. Teks Disclaimer Soft */
+        .disclaimer-text {
+            font-size: 10px;
+            color: var(--text-soft);
+            text-align: center;
+            line-height: 1.45;
+            padding: 4px 8px;
+            margin: 0;
+            opacity: 0.85;
         }
-        select { cursor: pointer; text-overflow: ellipsis; padding: 1px 3px; }
-        .accordion-item { border: 1px solid var(--border-color); border-radius: 3px; margin-bottom: 3px; overflow: hidden; }
-        .accordion-header {
-            background: #21262d; color: #ffffff; padding: 3px 6px; font-size: 0.64rem;
-            font-weight: bold; display: flex; justify-content: space-between;
-            align-items: center; cursor: pointer; user-select: none;
-        }
-        .panah-icon { color: #2196f3; font-size: 8px; transition: transform 0.2s ease; transform: rotate(0deg); }
-        .accordion-content { display: none; background: #000000; padding: 1px; width: 100%; border-top: 1px solid var(--border-color); }
-        .table-res { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 0.62rem; margin: 0; }
-        .table-res thead th { background-color: var(--table-header-bg); color: var(--text-soft-white); font-weight: bold; }
-        .table-res th, .table-res td {
-            padding: 1.5px 4px; text-align: left; border-bottom: 1px solid var(--border-color);
-            vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.15;
-        }
-        .pos-r { color: var(--accent-red); font-weight: 600; }
-        .pos-s { color: var(--accent-green); font-weight: 600; }
-        .info-text { color: var(--text-muted); font-size: 0.56rem; }
-        .sub-bar-container { width: 100%; background-color: #222; border-radius: 2px; height: 2.5px; margin-top: 1px; overflow: hidden; }
-        .sub-bar-fill { width: 0%; height: 100%; border-radius: 2px; transition: width 0.2s ease; }
-        .bar-flex-container-main {
-            display: flex; width: 100%; height: 13px; border-radius: 3px; overflow: hidden;
-            margin: 3px 0; font-size: 0.58rem; font-weight: bold; text-align: center; line-height: 13px; color: #ffffff;
-        }
-        .bar-main-fill { transition: width 0.2s ease; white-space: nowrap; overflow: hidden; }
-        .profit-color { background-color: var(--accent-green); }
-        .loss-color { background-color: var(--accent-red); }
-        .summary-text {
-            margin: 3px 0; font-size: 0.62rem; background: var(--bg-color); padding: 3px 5px;
-            border-radius: 3px; border-left: 3px solid var(--accent-blue); line-height: 1.2; word-wrap: break-word;
-        }
-        .btn-group { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin-top: auto; padding-top: 6px; }
-        button {
-            width: 100%; padding: 4px 2px; border: none; border-radius: 3px; font-size: 0.64rem;
-            font-weight: bold; cursor: pointer; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .btn-calc-pivot { background-color: #ff9f00 !important; color: #ffffff !important; }
-        .btn-wa { background-color: var(--accent-green); }
-        .btn-reset-pivot { background-color: var(--accent-red) !important; color: var(--text-soft-white) !important; }
-        .ref-text { text-align: center; font-size: 9px; color: #8b949e; margin: 5px auto 3px auto; line-height: 1.1; }
-        .ref-buttons { display: flex; justify-content: space-between; gap: 4px; width: 100%; margin: 0 auto 2px auto; }
-        .ref-buttons button { flex: 1; padding: 4px 2px; font-size: 10px; border-radius: 4px; }
     </style>
 </head>
-
 <body>
-<div class="container">
-    <h3>Crypto Pivot & Risk Tracker</h3>
 
-    <div class="grid-inputs-3">
-        <div class="input-group">
-            <label for="pilih-bursa">BURSA</label>
-            <select id="pilih-bursa" onchange="gantiKoinAtauMataUang()">
-                <option value="Indodax">Indodax</option>
-                <option value="Tokocrypto">Tokocrypto</option>
-                <option value="Reku">Reku</option>
-            </select>
+    <div class="app-container">
+        
+        <!-- 1. TICKER BERJALAN -->
+        <div class="ticker-card">
+            <script type="module" src="https://tradingview-widget.com"></script>
+            <tv-ticker-tape 
+                symbols="BTCIDR,ETHIDR,BINANCE:BTCUSDT,BINANCE:ETHUSDT,BINANCE:BNBUSDT" 
+                theme="dark" 
+                locale="id">
+            </tv-ticker-tape>
         </div>
-        <div class="input-group">
-            <label for="pilih-koin">KOIN</label>
-            <select id="pilih-koin" onchange="gantiKoinAtauMataUang()">
-                <option value="BTC">BTC</option>
-                <option value="ETH">ETH</option>
-                <option value="SOL">SOL</option>
-                <option value="BNB">BNB</option>
-            </select>
+
+        <!-- 2. GRAFIK TRADINGVIEW -->
+        <div class="chart-card">
+            <div id="tv_chart_terminal"></div>
         </div>
-        <div class="input-group">
-            <label for="pilih-mata-uang">PASAR</label>
-            <select id="pilih-mata-uang" onchange="gantiKoinAtauMataUang()">
-                <option value="IDR">IDR (Rp)</option>
-                <option value="USDT">USDT ($)</option>
-            </select>
+
+        <!-- 3. UJI COBA PENARIKAN HARGA LIVE -->
+        <div class="live-test-card">
+            <h4>Uji Penarikan Harga Live</h4>
+            <div class="live-row">
+                <select id="pilihPair" onchange="tarikHargaLive()">
+                    <option value="BTC-USD">BTC / USD</option>
+                    <option value="BTC-IDR">BTC / IDR</option>
+                    <option value="ETH-USD">ETH / USD</option>
+                    <option value="ETH-IDR">ETH / IDR</option>
+                    <option value="SOL-USD">SOL / USD</option>
+                </select>
+                <input type="number" id="kolomHarga" placeholder="Harga Live..." step="any" />
+            </div>
+            <button type="button" class="btn-live" onclick="tarikHargaLive()">Perbarui Harga Sekarang</button>
+            <div id="statusPesan" class="status-text">Menghubungkan ke server...</div>
         </div>
+
+        <!-- 4. DISCLAIMER SOFT -->
+        <p class="disclaimer-text">
+            <strong>Disclaimer:</strong> Data harga dan grafik disediakan oleh TradingView &amp; Coinbase hanya untuk tujuan informasi dan edukasi, bukan merupakan saran investasi atau ajakan jual beli. Selalu lakukan riset mandiri (DYOR) sebelum mengambil keputusan finansial.
+        </p>
+
     </div>
 
-    <div class="grid-inputs">
-        <div class="input-group full-width row-layout">
-            <label for="hb">Harga Bergerak (HB) <span id="status-live" style="color:#2196f3; font-size:8px;">● MANUAL</span></label>
-            <input type="text" id="hb" value="" placeholder="Ketik harga..." oninput="formatInputRupiah(this)">
-        </div>
-        <div class="input-group">
-            <label for="r2">Resisten 2 (R2)</label>
-            <input type="text" id="r2" value="1.554.200.000" oninput="formatInputRupiah(this)">
-        </div>
-        <div class="input-group">
-            <label for="r1">Resisten 1 (R1)</label>
-            <input type="text" id="r1" value="1.355.000.000" oninput="formatInputRupiah(this)">
-        </div>
-        <div class="input-group">
-            <label for="s2">Support 2 (S2)</label>
-            <input type="text" id="s2" value="1.323.358.000" oninput="formatInputRupiah(this)">
-        </div>
-        <div class="input-group">
-            <label for="s1">Support 1 (S1)</label>
-            <input type="text" id="s1" value="1.330.000.000" oninput="formatInputRupiah(this)">
-        </div>
-    </div>
-
-    <div class="accordion-item">
-        <div class="accordion-header" onclick="toggleAccordion('acc-jarak', 'panah-jarak')">
-            <span>📊 Analisis Jarak & Persentase</span>
-            <span id="panah-jarak" class="panah-icon">▼</span>
-        </div>
-        <div id="acc-jarak" class="accordion-content">
-            <table class="table-res">
-                <thead>
-                    <tr><th style="width:18%;">Target</th><th style="width:38%;">Jarak</th><th style="width:44%;">Visual % & Bar</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td class="pos-r">R2</td><td id="dist-r2">-</td><td><div id="pct-r2">-</div><div class="sub-bar-container"><div id="bar-r2" class="sub-bar-fill"></div></div></td></tr>
-                    <tr><td class="pos-r">R1</td><td id="dist-r1">-</td><td><div id="pct-r1">-</div><div class="sub-bar-container"><div id="bar-r1" class="sub-bar-fill"></div></div></td></tr>
-                    <tr><td class="pos-s">S1</td><td id="dist-s1">-</td><td><div id="pct-s1">-</div><div class="sub-bar-container"><div id="bar-s1" class="sub-bar-fill"></div></div></td></tr>
-                    <tr><td class="pos-s">S2</td><td id="dist-s2">-</td><td><div id="pct-s2">-</div><div class="sub-bar-container"><div id="bar-s2" class="sub-bar-fill"></div></div></td></tr>
-
-                   <tr style="border-top: 1px dashed var(--border-color); background: #11161d;">
-                        <td style="color: #58a6ff; font-weight: bold;">Range</td>
-                        <td id="range-s1r1" style="font-weight: bold;">-</td>
-                        <td id="status-layak" style="font-weight: bold;">-</td>
-                    </tr>
-
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="accordion-item">
-        <div class="accordion-header" onclick="toggleAccordion('acc-posisi', 'panah-posisi')">
-            <span>🎯 Rencana Posisi Bertingkat</span>
-            <span id="panah-posisi" class="panah-icon">▼</span>
-        </div>
-        <div id="acc-posisi" class="accordion-content">
-            <table class="table-res">
-                <thead>
-                    <tr><th style="width:24%;">Aksi</th><th style="width:48%;">Target Harga</th><th style="width:28%;">Ket.</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td class="pos-r">Jual 3</td><td id="jual-3">-</td><td class="info-text">R3 Max</td></tr>
-                    <tr><td class="pos-r">Jual 2</td><td id="jual-2">-</td><td class="info-text">R2 Mid</td></tr>
-                    <tr><td class="pos-r">Jual 1</td><td id="jual-1">-</td><td class="info-text">R1 Low</td></tr>
-                    <tr style="border-top: 1px dashed var(--border-color);"><td class="pos-s">Beli 1</td><td id="beli-1">-</td><td class="info-text">S1 Low</td></tr>
-                    <tr><td class="pos-s">Beli 2</td><td id="beli-2">-</td><td class="info-text">S2 Mid</td></tr>
-                    <tr><td class="pos-s">Beli 3</td><td id="beli-3">-</td><td class="info-text">S3 Max</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="summary-text" id="summary">Masukkan Harga Bergerak (HB) untuk memulai.</div>
-
-    <div class="bar-flex-container-main">
-        <div id="main-bar-profit" class="bar-main-fill profit-color" style="width: 50%;">Buy (50%)</div>
-        <div id="main-bar-loss" class="bar-main-fill loss-color" style="width: 50%;">Sell (50%)</div>
-    </div>
-
-    <div class="btn-group">
-        <button type="button" class="btn-calc-pivot" onclick="simpanKunciManual()">Simpan/Kunci S/R</button>
-        <button type="button" class="btn-wa" onclick="kirimWA()">Kirim WA</button>
-        <button type="button" class="btn-reset-pivot" onclick="pivotResetForm()">Reset</button>
-    </div>
-
-    <p class="ref-text">💡 <span style="color: #58a6ff; font-weight: bold;">Dukung Aplikasi Ini:</span> Daftar bursa melalui link resmi/referral kami di bawah:</p>
-    <div class="ref-buttons">
-        <button type="button" onclick="window.open('https://indodax.com', '_blank')" style="background-color: #00B4D8;">Indodax</button>
-        <button type="button" onclick="window.open('https://tokocrypto.com', '_blank')" style="background-color: #85BB65;">Tokocrypto</button>
-        <button type="button" onclick="window.open('https://reku.id', '_blank')" style="background-color: #1E3A8A;">Reku</button>
-    </div>
-</div>
-
-
-<script>
-    function toggleAccordion(contentId, panahId) {
-        const content = document.getElementById(contentId);
-        const panah = document.getElementById(panahId);
-        if (content.style.display === "block") {
-            content.style.display = "none";
-            panah.style.transform = "rotate(0deg)";
-        } else {
-            content.style.display = "block";
-            panah.style.transform = "rotate(-180deg)";
-        }
-    }
-
-    function formatInputRupiah(input) {
-        const pasar = document.getElementById('pilih-mata-uang').value;
-        if (pasar === "IDR") {
-            let nilaiBersih = input.value.replace(/[^0-9]/g, "");
-            if (nilaiBersih === "") { input.value = ""; return; }
-            input.value = new Intl.NumberFormat('id-ID').format(parseFloat(nilaiBersih));
-        } else {
-            input.value = input.value.replace(/[^0-9.]/g, "");
-        }
-        simpanOtomatisSR();
-        hitungData();
-    }
-
-    function formatKustomMataUang(angka, pasar) {
-        if (pasar === "IDR") {
-            return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(angka);
-        } else {
-            return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(angka);
-        }
-    }
-
-    function dapatkanAngkaMurni(id) {
-        const el = document.getElementById(id);
-        if (!el || !el.value) return 0;
-        const pasar = document.getElementById('pilih-mata-uang').value;
-        return pasar === "IDR"
-            ? (parseFloat(el.value.replace(/\./g, "").replace(/,/g, "")) || 0)
-            : (parseFloat(el.value.replace(/,/g, "")) || 0);
-    }
-
-    function simpanOtomatisSR() {
-        try {
-            const bursa = document.getElementById('pilih-bursa').value;
-            const koin = document.getElementById('pilih-koin').value;
-            const pasar = document.getElementById('pilih-mata-uang').value;
-            localStorage.setItem("pref_" + bursa + "_" + koin + "_" + pasar, JSON.stringify({
-                r2: document.getElementById('r2').value,
-                r1: document.getElementById('r1').value,
-                s1: document.getElementById('s1').value,
-                s2: document.getElementById('s2').value
-            }));
-            localStorage.setItem('koin_terakhir_aktif', JSON.stringify({ bursa: bursa, koin: koin, pasar: pasar }));
-        } catch (e) {}
-    }
-
-    function simpanKunciManual() {
-        simpanOtomatisSR();
-        hitungData();
-        const bursa = document.getElementById('pilih-bursa').value;
-        const koin = document.getElementById('pilih-koin').value;
-        const pasar = document.getElementById('pilih-mata-uang').value;
-        document.getElementById('summary').innerHTML = "✅ <strong>Tersimpan!</strong> S/R <strong>" + bursa + "</strong> (" + koin + "/" + pasar + ") dikunci.";
-    }
-
-    function hitungData() {
-        const hb = dapatkanAngkaMurni('hb');
-        const r2 = dapatkanAngkaMurni('r2');
-        const r1 = dapatkanAngkaMurni('r1');
-        const s1 = dapatkanAngkaMurni('s1');
-        const s2 = dapatkanAngkaMurni('s2');
-        const pasar = document.getElementById('pilih-mata-uang').value;
-
-        let teksKelayakanRingkas = "";
-        if (r1 > 0 && s1 > 0 && r1 > s1) {
-            const selisihRange = r1 - s1;
-            const pctRange = (selisihRange / s1) * 100;
-            const elRange = document.getElementById('range-s1r1');
-            const elLayak = document.getElementById('status-layak');
-
-            let statusWarna = "";
-            let labelLayak = "";
-
-            if (pctRange < 0.60) {
-                statusWarna = "#da3633";
-                labelLayak = "🔴 " + pctRange.toFixed(2) + "% (Sempit)";
-                teksKelayakanRingkas = "🔴 Sempit (" + pctRange.toFixed(2) + "%)";
-            } else if (pctRange <= 1.20) {
-                statusWarna = "#ff9800";
-                labelLayak = "🟡 " + pctRange.toFixed(2) + "% (Ketat)";
-                teksKelayakanRingkas = "🟡 Ketat (" + pctRange.toFixed(2) + "%)";
-            } else {
-                statusWarna = "#238636";
-                labelLayak = "🟢 " + pctRange.toFixed(2) + "% (Layak)";
-                teksKelayakanRingkas = "🟢 Layak (" + pctRange.toFixed(2) + "%)";
-            }
-
-            if (elRange) elRange.innerText = formatKustomMataUang(selisihRange, pasar);
-            if (elLayak) {
-                elLayak.innerText = labelLayak;
-                elLayak.style.color = statusWarna;
-            }
-
-            if (!hb) {
-                document.getElementById('summary').innerHTML = "<strong>Range S1-R1:</strong> " + teksKelayakanRingkas + " | Ketik HB untuk analisis arah.";
-                return;
-            }
-        }
-
-        if (!hb || !r1 || !s1) return;
-
-        const targets = [
-            { id: 'r2', val: r2, tipe: 'R' },
-            { id: 'r1', val: r1, tipe: 'R' },
-            { id: 's1', val: s1, tipe: 'S' },
-            { id: 's2', val: s2, tipe: 'S' }
-        ];
-
-        let pctAbsolutR1 = 0, pctAbsolutS1 = 0;
-
-        targets.forEach(t => {
-            const distAbsolut = Math.abs(t.val - hb);
-            let pct = ((t.val - hb) / hb) * 100;
-            if (t.tipe === 'S' && pct > 0) pct = -pct;
-
-            const sign = pct >= 0 ? "+" : "";
-            const pctAbsolut = Math.abs(pct);
-            if (t.id === 'r1') pctAbsolutR1 = pctAbsolut;
-            if (t.id === 's1') pctAbsolutS1 = pctAbsolut;
-
-            document.getElementById('dist-' + t.id).innerText = formatKustomMataUang(distAbsolut, pasar);
-            const cellPct = document.getElementById('pct-' + t.id);
-            const barFill = document.getElementById('bar-' + t.id);
-
-            let batasFee = pasar === "IDR" ? 0.30 : 0.25;
-            let colorHex = pctAbsolut <= batasFee ? "#da3633" : pctAbsolut <= 0.60 ? "#ff9800" : "#238636";
-            let emojiStatus = pctAbsolut <= batasFee ? "🔴" : pctAbsolut <= 0.60 ? "🟡" : "🟢";
-
-            cellPct.innerText = emojiStatus + " " + sign + pct.toFixed(2) + "%";
-            cellPct.style.color = colorHex;
-
-            let lebarBar = Math.min((pctAbsolut / 5) * 100, 100);
-            barFill.style.width = lebarBar + "%";
-            barFill.style.backgroundColor = colorHex;
+    <!-- Script Grafik TradingView -->
+    <script type="text/javascript" src="https://tradingview.com"></script>
+    <script type="text/javascript">
+        new TradingView.widget({
+            "autosize": true,
+            "symbol": "BINANCE:BTCUSDT",
+            "interval": "240",
+            "timezone": "Asia/Jakarta",
+            "theme": "dark",
+            "style": "1",
+            "locale": "id",
+            "toolbar_bg": "#121824",
+            "backgroundColor": "#121824",
+            "gridColor": "rgba(30, 41, 59, 0.4)",
+            "enable_publishing": false,
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "save_image": false,
+            "container_id": "tv_chart_terminal"
         });
 
-        let totalJarakS1R1 = pctAbsolutR1 + pctAbsolutS1;
-        let mainPctProfit = totalJarakS1R1 > 0 ? (pctAbsolutR1 / totalJarakS1R1) * 100 : 50;
-        let mainPctRisk = 100 - mainPctProfit;
+        // Script Uji Penarikan Harga Live (Coinbase API)
+        async function tarikHargaLive() {
+            const pair = document.getElementById('pilihPair').value;
+            const inputHarga = document.getElementById('kolomHarga');
+            const statusText = document.getElementById('statusPesan');
 
-               document.getElementById('main-bar-profit').style.width = mainPctProfit.toFixed(0) + "%";
-        document.getElementById('main-bar-profit').innerText = mainPctProfit >= 15 ? "Buy (" + mainPctProfit.toFixed(0) + "%)" : "";
-        document.getElementById('main-bar-loss').style.width = mainPctRisk.toFixed(0) + "%";
-        document.getElementById('main-bar-loss').innerText = mainPctRisk >= 15 ? "Sell (" + mainPctRisk.toFixed(0) + "%)" : "";
+            statusText.innerText = "Mengambil data terbaru...";
+            statusText.style.color = "#f59e0b";
 
+            try {
+                const response = await fetch(`https://coinbase.com{pair}/spot`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-        document.getElementById('beli-1').innerText = formatKustomMataUang(s1 * 1.002, pasar);
-        document.getElementById('beli-2').innerText = formatKustomMataUang(s1, pasar);
-        document.getElementById('beli-3').innerText = formatKustomMataUang(s2, pasar);
-        document.getElementById('jual-1').innerText = formatKustomMataUang(r1, pasar);
-        document.getElementById('jual-2').innerText = formatKustomMataUang(r1 + ((r2 - r1) / 2), pasar);
-        document.getElementById('jual-3').innerText = formatKustomMataUang(r2, pasar);
-
-        let prediksi = (hb > r1) ? "Bullish Kuat" : (hb < s1) ? "Breakdown Bearish" : "Sideways (S1-R1)";
-        let listJarak = [
-            { nama: 'R2', nilai: Math.abs(r2 - hb), pct: ((r2 - hb) / hb) * 100, tipe: 'R' },
-            { nama: 'R1', nilai: Math.abs(r1 - hb), pct: ((r1 - hb) / hb) * 100, tipe: 'R' },
-            { nama: 'S1', nilai: Math.abs(s1 - hb), pct: ((s1 - hb) / hb) * 100, tipe: 'S' },
-            { nama: 'S2', nilai: Math.abs(s2 - hb), pct: ((s2 - hb) / hb) * 100, tipe: 'S' }
-        ];
-        listJarak.sort((a, b) => a.nilai - b.nilai);
-
-        let dataTerdekat = listJarak[0];
-        let realPct = dataTerdekat.tipe === 'S' ? -Math.abs(dataTerdekat.pct) : Math.abs(dataTerdekat.pct);
-        let signTerdekat = realPct > 0 ? "+" : "";
-
-        document.getElementById('summary').innerHTML = "<strong>" + prediksi + "</strong> | Dekat <strong>" + dataTerdekat.nama + " (" + signTerdekat + realPct.toFixed(2) + "%)</strong> | Range: <strong>" + teksKelayakanRingkas + "</strong>";
-    }
-
-
-   function gantiKoinAtauMataUang() {
-        const bursa = document.getElementById('pilih-bursa').value;
-        const koin = document.getElementById('pilih-koin').value;
-        const pasar = document.getElementById('pilih-mata-uang').value;
-        let dataTersimpan = null;
-        try { dataTersimpan = localStorage.getItem("pref_" + bursa + "_" + koin + "_" + pasar); } catch (e) {}
-
-        if (dataTersimpan) {
-            const data = JSON.parse(dataTersimpan);
-            document.getElementById('r2').value = data.r2;
-            document.getElementById('r1').value = data.r1;
-            document.getElementById('s1').value = data.s1;
-            document.getElementById('s2').value = data.s2;
-        } else {
-            ['r2', 'r1', 's1', 's2'].forEach(id => document.getElementById(id).value = "");
-            ['dist-r2', 'pct-r2', 'dist-r1', 'pct-r1', 'dist-s1', 'pct-s1', 'dist-s2', 'pct-s2', 'beli-1', 'beli-2', 'beli-3', 'jual-1', 'jual-2', 'jual-3', 'range-s1r1', 'status-layak'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.innerText = "-";
-            });
-            ['r2', 'r1', 's1', 's2'].forEach(id => document.getElementById('bar-' + id).style.width = "0%");
-        }
-
-        document.getElementById('hb').value = "";
-        simpanOtomatisSR();
-        hitungData();
-    }
-
-    function kirimWA() {
-        const bursa = document.getElementById('pilih-bursa').value;
-        const hb = document.getElementById('hb').value || "-";
-        const koin = document.getElementById('pilih-koin').value;
-        const pasar = document.getElementById('pilih-mata-uang').value;
-        const r2 = document.getElementById('r2').value || "-";
-        const r1 = document.getElementById('r1').value || "-";
-        const s1 = document.getElementById('s1').value || "-";
-        const s2 = document.getElementById('s2').value || "-";
-        const pctR1 = document.getElementById('pct-r1').innerText;
-        const pctS1 = document.getElementById('pct-s1').innerText;
-        const statusLayak = document.getElementById('status-layak') ? document.getElementById('status-layak').innerText : "-";
-
-        const text = "*Crypto Update - " + bursa + " (" + koin + "/" + pasar + ")*\n" +
-                     "HB: " + hb + "\n" +
-                     "Range S1-R1: " + statusLayak + "\n\n" +
-                     "*Level S/R:*\n" +
-                     "R2: " + r2 + "\n" +
-                     "R1: " + r1 + " (" + pctR1 + ")\n" +
-                     "S1: " + s1 + " (" + pctS1 + ")\n" +
-                     "S2: " + s2 + "\n\n" +
-                     "_Via Crypto Pivot & Risk Tracker_";
-
-        const waUrl = "https://whatsapp.com" + encodeURIComponent(text);
-        const win = window.open(waUrl, '_blank');
-        if (!win) {
-            window.top.location.href = waUrl;
-        }
-    }
-
-    function pivotResetForm() {
-        const inputHB = document.getElementById('hb');
-        if (inputHB) {
-            inputHB.value = "";
-            inputHB.focus();
-        }
-        ['dist-r2', 'pct-r2', 'dist-r1', 'pct-r1', 'dist-s1', 'pct-s1', 'dist-s2', 'pct-s2', 'beli-1', 'beli-2', 'beli-3', 'jual-1', 'jual-2', 'jual-3'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.innerText = "-";
-        });
-        ['r2', 'r1', 's1', 's2'].forEach(id => {
-            const bar = document.getElementById('bar-' + id);
-            if (bar) bar.style.width = "0%";
-        });
-        document.getElementById('main-bar-profit').style.width = "50%";
-        document.getElementById('main-bar-profit').innerText = "Buy (50%)";
-        document.getElementById('main-bar-loss').style.width = "50%";
-        document.getElementById('main-bar-loss').innerText = "Sell (50%)";
-        hitungData();
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const inputHB = document.getElementById('hb');
-        if (inputHB) {
-            inputHB.style.background = "#0d1117";
-            inputHB.style.color = "#e0e6ed";
-            inputHB.style.fontWeight = "bold";
-        }
-        try {
-            const dataAktif = localStorage.getItem('koin_terakhir_aktif');
-            if (dataAktif) {
-                const posisi = JSON.parse(dataAktif);
-                if (posisi.bursa) document.getElementById('pilih-bursa').value = posisi.bursa;
-                document.getElementById('pilih-koin').value = posisi.koin;
-                document.getElementById('pilih-mata-uang').value = posisi.pasar;
+                const hasil = await response.json();
+                if (hasil && hasil.data && hasil.data.amount) {
+                    const angka = parseFloat(hasil.data.amount);
+                    const isIDR = pair.endsWith('IDR');
+                    const hargaBersih = isIDR ? Math.round(angka) : angka.toFixed(2);
+                    
+                    inputHarga.value = hargaBersih;
+                    
+                    const simbol = isIDR ? 'Rp ' : '$';
+                    const waktu = new Date().toLocaleTimeString('id-ID');
+                    statusText.innerText = `Berhasil! ${pair}: ${simbol}${Number(hargaBersih).toLocaleString('id-ID')} (${waktu})`;
+                    statusText.style.color = "#22c55e";
+                }
+            } catch (err) {
+                statusText.innerText = `Gagal: ${err.message}`;
+                statusText.style.color = "#ef4444";
             }
-            const bursa = document.getElementById('pilih-bursa').value;
-            const koin = document.getElementById('pilih-koin').value;
-            const pasar = document.getElementById('pilih-mata-uang').value;
-            const savedData = localStorage.getItem("pref_" + bursa + "_" + koin + "_" + pasar);
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                document.getElementById('r2').value = data.r2;
-                document.getElementById('r1').value = data.r1;
-                document.getElementById('s1').value = data.s1;
-                document.getElementById('s2').value = data.s2;
-            }
-        } catch (e) {}
-        hitungData();
-    });
-</script>
+        }
+
+        // Jalankan otomatis saat halaman terbuka
+        tarikHargaLive();
+    </script>
+
 </body>
 </html>
-
-
-
-
