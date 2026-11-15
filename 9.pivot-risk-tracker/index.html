@@ -11,9 +11,8 @@
             --input-bg: #1f2937;
             --text: #f3f4f6;
             --muted: #9ca3af;
-            --accent: #0084ff;
-            --accent-light: #38bdf8;
-            --accent-hover: #0066cc;
+            --accent: #f59e0b;
+            --accent-hover: #d97706;
             --border: #374151;
             --success: #10b981;
             --danger: #ef4444;
@@ -30,6 +29,10 @@
             background-color: var(--bg);
             color: var(--text);
             padding: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
         }
 
         .dca-mini-box {
@@ -39,7 +42,6 @@
             padding: 10px;
             width: 100%;
             max-width: 420px;
-            margin: 0 auto;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
         }
 
@@ -47,19 +49,15 @@
             margin: 0 0 8px 0;
             font-size: 0.9rem;
             text-align: center;
-            color: var(--accent-light);
+            color: var(--accent);
             font-weight: 700;
         }
 
         .tv-ticker-container {
-            display: block;
-            width: 100%;
             margin-bottom: 10px;
-        }
-
-        tv-ticker-tape {
-            display: block;
-            width: 100%;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border);
         }
 
         .dca-mini-grid {
@@ -99,7 +97,7 @@
 
         .dca-mini-btn {
             background: var(--accent);
-            color: #ffffff;
+            color: #000;
             border: none;
             width: 100%;
             padding: 8px;
@@ -137,20 +135,6 @@
             color: var(--text);
             font-size: 0.8rem;
         }
-
-        .dca-disclaimer {
-            margin-top: 10px;
-            padding-top: 7px;
-            border-top: 1px dashed var(--border);
-            font-size: 0.62rem;
-            line-height: 1.35;
-            color: #6b7280;
-            text-align: justify;
-        }
-
-        .dca-disclaimer strong {
-            color: var(--muted);
-        }
     </style>
 </head>
 <body>
@@ -160,7 +144,7 @@
     
     <!-- WIDGET TICKER RESMI TRADINGVIEW (DARK MODE) -->
     <div class="tv-ticker-container">
-        <script type="module" src="https://tradingview-widget.com"></script>
+        <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-ticker-tape.js"></script>
         <tv-ticker-tape symbols="BINANCE:BTCUSDT,BINANCE:ETHUSDT,BINANCE:BNBUSDT" theme="dark" locale="id"></tv-ticker-tape>
     </div>
 
@@ -215,11 +199,6 @@
         <div class="dca-res-row" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
             <span>Persentase ROI:</span> <strong id="resReturnPct"></strong>
         </div>
-    </div>
-
-    <!-- KOTAK DISCLAIMER KECIL DI BAWAH -->
-    <div class="dca-disclaimer">
-        <strong>Disclaimer:</strong> Hasil simulasi DCA dan data harga disediakan hanya untuk tujuan edukasi dan informasi, bukan merupakan saran investasi atau ajakan jual beli. Selalu lakukan riset mandiri (DYOR) sebelum mengambil keputusan finansial.
     </div>
 </div>
 
