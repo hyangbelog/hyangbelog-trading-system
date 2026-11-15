@@ -1,57 +1,253 @@
 <!doctype html>
-<html>
+<html lang="id">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-  
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Simulasi & Harga Live Spot</title>
     <style>
+        :root {
+            --bg: #090d16;
+            --card: #111827;
+            --input-bg: #1f2937;
+            --text: #f3f4f6;
+            --muted: #9ca3af;
+            --accent: #f59e0b;
+            --accent-hover: #d97706;
+            --border: #374151;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
 
-<!-- Logika Matematika Kalkulator -->
-<script type="text/javascript">
-//<![CDATA[
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .dca-mini-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .dca-mini-box h3 {
+            margin: 0 0 8px 0;
+            font-size: 0.9rem;
+            text-align: center;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .tv-ticker-container {
+            margin-bottom: 10px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .dca-mini-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 7px;
+        }
+
+        .dca-mini-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dca-mini-field label {
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-bottom: 2px;
+            color: var(--muted);
+        }
+
+        .dca-mini-field input, .dca-mini-field select {
+            width: 100%;
+            padding: 5px 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background-color: var(--input-bg);
+            color: var(--text);
+            height: 30px;
+        }
+
+        .dca-mini-field input:focus, .dca-mini-field select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .dca-mini-btn {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            width: 100%;
+            padding: 8px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            border-radius: 6px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .dca-mini-btn:active {
+            background: var(--accent-hover);
+        }
+
+        .dca-mini-result {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-top: 10px;
+        }
+
+        .dca-res-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            margin-bottom: 4px;
+            border-bottom: 1px dashed #1f2937;
+            padding-bottom: 4px;
+            color: var(--muted);
+        }
+
+        .dca-res-row strong {
+            color: var(--text);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dca-mini-box">
+    <h3>Simulasi & Harga Live Spot</h3>
+    
+    <!-- WIDGET TICKER RESMI TRADINGVIEW (DARK MODE) -->
+    <div class="tv-ticker-container">
+        <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-ticker-tape.js"></script>
+        <tv-ticker-tape symbols="BINANCE:BTCUSDT,BINANCE:ETHUSDT,BINANCE:BNBUSDT" theme="dark" locale="id"></tv-ticker-tape>
+    </div>
+
+    <!-- Grid Form 2 Kolom -->
+    <div class="dca-mini-grid">
+        <div class="dca-mini-field">
+            <label>Nama Aset Kripto:</label>
+            <input type="text" id="coinName" value="Bitcoin (BTC)">
+        </div>
+
+        <div class="dca-mini-field">
+            <label>Harga Input (Lihat Ticker):</label>
+            <input type="number" id="manualPrice" value="65000" min="1">
+        </div>
+
+        <div class="dca-mini-field">
+            <label>Dana Per Interval (USD):</label>
+            <input type="number" id="investmentAmount" value="50" min="1">
+        </div>
+
+        <div class="dca-mini-field">
+            <label>Durasi (Bulan):</label>
+            <input type="number" id="duration" value="12" min="1">
+        </div>
+        
+        <div class="dca-mini-field">
+            <label>Frekuensi:</label>
+            <select id="frequency">
+                <option value="7">Mingguan</option>
+                <option value="30" selected>Bulanan</option>
+            </select>
+        </div>
+
+        <div class="dca-mini-field">
+            <label>Tren Pasar Pasca-DCA:</label>
+            <select id="marketTrend">
+                <option value="0.2">Bullish (+20%)</option>
+                <option value="0" selected>Sideways (Flat)</option>
+                <option value="-0.2">Bearish (-20%)</option>
+            </select>
+        </div>
+    </div>
+
+    <button type="button" class="dca-mini-btn" onclick="hitungDCA()">Hitung Sekarang</button>
+
+    <!-- Hasil Box Kompak -->
+    <div id="dcaResult" class="dca-mini-result" style="display: none;">
+        <div class="dca-res-row"><span>Total Investasi:</span> <strong id="resTotalInvested"></strong></div>
+        <div class="dca-res-row"><span>Koin Didapat:</span> <strong id="resTotalCoins"></strong></div>
+        <div class="dca-res-row"><span>Harga Rata2 Beli:</span> <strong id="resAvgPrice"></strong></div>
+        <div class="dca-res-row"><span>Nilai Akhir Portofolio:</span> <strong id="resFinalValue"></strong></div>
+        <div class="dca-res-row" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+            <span>Persentase ROI:</span> <strong id="resReturnPct"></strong>
+        </div>
+    </div>
+</div>
+
+<script>
 function hitungDCA() {
-  const currentPrice = parseFloat(document.getElementById('manualPrice').value);
-  const amount = parseFloat(document.getElementById('investmentAmount').value);
-  const freq = parseInt(document.getElementById('frequency').value);
-  const durationMonths = parseInt(document.getElementById('duration').value);
-  const trend = parseFloat(document.getElementById('marketTrend').value);
+    const currentPrice = parseFloat(document.getElementById('manualPrice').value);
+    const amount = parseFloat(document.getElementById('investmentAmount').value);
+    const freq = parseInt(document.getElementById('frequency').value);
+    const durationMonths = parseInt(document.getElementById('duration').value);
+    const trend = parseFloat(document.getElementById('marketTrend').value);
 
-  if (isNaN(currentPrice) || currentPrice <= 0 || isNaN(amount) || amount <= 0 || isNaN(durationMonths) || durationMonths <= 0) {
-    alert("Mohon isi semua data angka dengan benar.");
-    return;
-  }
+    if (isNaN(currentPrice) || currentPrice <= 0 || isNaN(amount) || amount <= 0 || isNaN(durationMonths) || durationMonths <= 0) {
+        alert("Mohon isi semua data angka dengan benar.");
+        return;
+    }
 
-  let totalPurchases = durationMonths;
-  if (freq === 7) {
-    totalPurchases = Math.floor((durationMonths * 30) / 7);
-  }
+    let totalPurchases = durationMonths;
+    if (freq === 7) {
+        totalPurchases = Math.floor((durationMonths * 30) / 7);
+    }
 
-  const totalInvested = amount * totalPurchases;
-  let totalCoinsAccumulated = 0;
+    const totalInvested = amount * totalPurchases;
+    let totalCoinsAccumulated = 0;
 
-  const targetPrice = currentPrice * (1 + trend);
-  const priceStep = (targetPrice - currentPrice) / (totalPurchases || 1);
+    const targetPrice = currentPrice * (1 + trend);
+    const priceStep = (targetPrice - currentPrice) / (totalPurchases || 1);
 
-  for (let i = 0; i < totalPurchases; i++) {
-    let simulatedPriceAtStep = currentPrice + (priceStep * i);
-    if (simulatedPriceAtStep <= 0) simulatedPriceAtStep = currentPrice * 0.1;
-    totalCoinsAccumulated += (amount / simulatedPriceAtStep);
-  }
+    for (let i = 0; i < totalPurchases; i++) {
+        let simulatedPriceAtStep = currentPrice + (priceStep * i);
+        if (simulatedPriceAtStep <= 0) simulatedPriceAtStep = currentPrice * 0.1;
+        totalCoinsAccumulated += (amount / simulatedPriceAtStep);
+    }
 
-  const averageBuyingPrice = totalInvested / totalCoinsAccumulated;
-  const finalPortfolioValue = totalCoinsAccumulated * currentPrice;
-  const returnPercentage = ((finalPortfolioValue - totalInvested) / totalInvested) * 100;
+    const averageBuyingPrice = totalInvested / totalCoinsAccumulated;
+    const finalPortfolioValue = totalCoinsAccumulated * targetPrice;
+    const returnPercentage = ((finalPortfolioValue - totalInvested) / totalInvested) * 100;
 
-  document.getElementById('resTotalInvested').innerText = `$${totalInvested.toLocaleString('en-US', {maximumFractionDigits: 2})}`;
-  document.getElementById('resTotalCoins').innerText = totalCoinsAccumulated.toFixed(5);
-  document.getElementById('resAvgPrice').innerText = `$${averageBuyingPrice.toLocaleString('en-US', {maximumFractionDigits: 2})}`;
-  document.getElementById('resFinalValue').innerText = `$${finalPortfolioValue.toLocaleString('en-US', {maximumFractionDigits: 2})}`;
+    document.getElementById('resTotalInvested').innerText = `$${totalInvested.toLocaleString('en-US', {maximumFractionDigits: 2})}`;
+    document.getElementById('resTotalCoins').innerText = totalCoinsAccumulated.toFixed(5);
+    document.getElementById('resAvgPrice').innerText = `$${averageBuyingPrice.toLocaleString('en-US', {maximumFractionDigits: 2})}`;
+    document.getElementById('resFinalValue').innerText = `$${finalPortfolioValue.toLocaleString('en-US', {maximumFractionDigits: 2})}`;
 
-  const returnEl = document.getElementById('resReturnPct');
-  returnEl.innerText = `${returnPercentage >= 0 ? '+' : ''}${returnPercentage.toFixed(2)}%`;
-  returnEl.style.color = returnPercentage >= 0 ? '#22c55e' : '#ef4444';
+    const returnEl = document.getElementById('resReturnPct');
+    returnEl.innerText = `${returnPercentage >= 0 ? '+' : ''}${returnPercentage.toFixed(2)}%`;
+    returnEl.style.color = returnPercentage >= 0 ? '#10b981' : '#ef4444';
 
-  document.getElementById('dcaResult').style.display = 'block';
+    document.getElementById('dcaResult').style.display = 'block';
 }
-//]]>
 </script>
-</!doctype>
+
+</body>
+</html>
