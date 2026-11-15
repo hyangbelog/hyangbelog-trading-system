@@ -30,10 +30,6 @@
             background-color: var(--bg);
             color: var(--text);
             padding: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
         }
 
         .dca-mini-box {
@@ -43,6 +39,7 @@
             padding: 10px;
             width: 100%;
             max-width: 420px;
+            margin: 0 auto;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
         }
 
@@ -52,6 +49,17 @@
             text-align: center;
             color: var(--accent-light);
             font-weight: 700;
+        }
+
+        .tv-ticker-container {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        tv-ticker-tape {
+            display: block;
+            width: 100%;
         }
 
         .dca-mini-grid {
@@ -151,7 +159,7 @@
     <h3>Simulasi & Harga Live Spot</h3>
     
     <!-- WIDGET TICKER RESMI TRADINGVIEW (DARK MODE) -->
-    <div class="tv-ticker-container" style="margin-bottom: 10px;">
+    <div class="tv-ticker-container">
         <script type="module" src="https://tradingview-widget.com"></script>
         <tv-ticker-tape symbols="BINANCE:BTCUSDT,BINANCE:ETHUSDT,BINANCE:BNBUSDT" theme="dark" locale="id"></tv-ticker-tape>
     </div>
